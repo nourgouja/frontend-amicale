@@ -1,0 +1,203 @@
+$primary: #00756e;
+$primary-dark: #005a54;
+
+.login-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ── Left Panel ── */
+.left-panel {
+  width: 45%;
+  background: linear-gradient(160deg, #00897b 0%, #004d45 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 48px 40px;
+  width: 70%;
+  max-width: 360px;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.logo-img {
+  width: 100%;
+  max-width: 220px;
+  object-fit: contain;
+}
+
+/* ── Right Panel ── */
+.right-panel {
+  width: 55%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 460px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0d1b2a;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0 0 32px;
+}
+
+/* ── Form Elements ── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #0d1b2a;
+  }
+
+  input[type='email'],
+  input[type='password'] {
+    padding: 14px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #f3f4f6;
+    font-size: 0.9rem;
+    color: #374151;
+    outline: none;
+    transition: box-shadow 0.2s;
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba($primary, 0.35);
+    }
+  }
+}
+
+/* ── Remember me + Forgot password ── */
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #374151;
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    accent-color: $primary;
+    cursor: pointer;
+  }
+}
+
+.forgot-link {
+  font-size: 0.875rem;
+  color: $primary;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* ── Error message ── */
+.error-msg {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+/* ── Sign In Button ── */
+.sign-in-btn {
+  width: 100%;
+  padding: 15px;
+  background: $primary;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 28px;
+
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+/* ── Contact text ── */
+.contact-text {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.contact-link {
+  color: $primary;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* ── Help Button ── */
+.help-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  border: none;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: background 0.2s;
+
+  &:hover {
+    background: #d1d5db;
+  }
+}
