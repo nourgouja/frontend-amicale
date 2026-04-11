@@ -1,0 +1,168 @@
+<!-- ═══════════════════════ HEADER ═══════════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <img src="logo.png" alt="STAR Assurances" />
+    </div>
+    <nav class="nav">
+      @for (link of navLinks; track link) {
+        <a href="#" class="nav-link" [class.active]="link === 'Home'">{{ link }}</a>
+      }
+    </nav>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Favourites">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </button>
+      <button class="icon-btn" aria-label="Account">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="hero-title">Travel | Stay | Leisure</h1>
+    <p class="hero-subtitle">Discover unforgettable experiences</p>
+    <button class="explore-btn">Explore Now</button>
+  </div>
+  <div class="hero-images">
+    <div class="img-card img-card--left"></div>
+    <div class="img-card img-card--center"></div>
+    <div class="img-card img-card--right"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ LOGOS ═══════════════════════ -->
+<section class="logos">
+  <div class="logos-inner">
+    @for (i of [1,2,3,4,5,6,7,8]; track i) {
+      <div class="logo-placeholder"></div>
+    }
+  </div>
+  <div class="logos-divider"></div>
+</section>
+
+<!-- ═══════════════════════ SERVICES ═══════════════════════ -->
+<section class="services">
+  <div class="service-card">
+    <div class="service-icon service-icon--travel">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0a8e98" stroke-width="1.5">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <div class="service-text">
+      <h3>Travels &amp; Tours</h3>
+      <p>Discover the world's wonders with our personalized travel experiences.</p>
+    </div>
+  </div>
+  <div class="service-card">
+    <div class="service-icon service-icon--stays">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0a8e98" stroke-width="1.5">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    </div>
+    <div class="service-text">
+      <h3>Stays</h3>
+      <p>Discover the world's wonders with our personalized travel experiences.</p>
+    </div>
+  </div>
+  <div class="service-card">
+    <div class="service-icon service-icon--leisure">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0a8e98" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+      </svg>
+    </div>
+    <div class="service-text">
+      <h3>Leisure</h3>
+      <p>Discover the world's wonders with our personalized travel experiences.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ DESTINATIONS ═══════════════════════ -->
+<section class="destinations">
+  <h2 class="section-title">Our Destinations</h2>
+  <div class="destinations-grid">
+    <div class="dest-card dest-card--rome">
+      <div class="dest-info">
+        <h3>Rome</h3>
+        <p>6 Activities</p>
+        <p>3 Tours</p>
+      </div>
+    </div>
+    <div class="dest-card dest-card--greece">
+      <div class="dest-info">
+        <h3>Greece</h3>
+        <p>1 Activity</p>
+      </div>
+    </div>
+    <div class="dest-card dest-card--italy">
+      <div class="dest-info">
+        <h3>Italy</h3>
+        <p>63 Activities</p>
+        <p>9 Tours</p>
+      </div>
+      <div class="dest-nav">
+        <button class="dest-btn dest-btn--outline" aria-label="Previous">&#8592;</button>
+        <button class="dest-btn dest-btn--filled" aria-label="Next">&#8594;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PROCESS ═══════════════════════ -->
+<section class="process">
+  <div class="process-header">
+    <h2 class="section-title dark">Our Process</h2>
+    <p class="process-subtitle">Fast And easy way to complete the processes.</p>
+  </div>
+  <div class="steps">
+    @for (step of steps; track step.number; let last = $last) {
+      <div class="step">
+        <div class="step-number" [style.background]="step.color">{{ step.number }}</div>
+        <h4 class="step-title">{{ step.title }}</h4>
+        <p class="step-desc">{{ step.description }}</p>
+      </div>
+      @if (!last) {
+        <div class="step-divider"></div>
+      }
+    }
+  </div>
+</section>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer class="footer">
+  <div class="footer-topbar">
+    <div class="footer-contact">
+      <span class="contact-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d3e55" stroke-width="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.1a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.34h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        Call on +9573993000484030
+      </span>
+      <span class="contact-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d3e55" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+        </svg>
+        info@tourism.com
+      </span>
+    </div>
+  </div>
+  <div class="footer-main">
+    <div class="footer-logo">
+      <img src="logo.png" alt="STAR Assurances" />
+    </div>
+    <nav class="footer-nav">
+      @for (link of navLinks; track link) {
+        <a href="#" class="footer-link">{{ link }}</a>
+      }
+    </nav>
+  </div>
+</footer>

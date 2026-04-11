@@ -1,16 +1,9 @@
 <div class="login-wrapper">
-  <!-- Left Panel -->
+  <!-- Left Panel: Form -->
   <div class="left-panel">
-    <div class="logo-card">
-      <img src="logo.png" alt="STAR Assurances" class="logo-img" />
-    </div>
-  </div>
-
-  <!-- Right Panel -->
-  <div class="right-panel">
     <div class="form-container">
-      <h1 class="title">Login</h1>
-      <p class="subtitle">Welcome back! Please enter your credentials.</p>
+      <h1 class="title">LOGIN</h1>
+      <p class="subtitle">Please enter your details.</p>
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
@@ -30,7 +23,7 @@
             id="password"
             type="password"
             formControlName="password"
-            placeholder="Enter your password"
+            placeholder="••••••••••"
             autocomplete="current-password"
           />
         </div>
@@ -40,7 +33,7 @@
             <input type="checkbox" formControlName="rememberMe" />
             <span>Remember me</span>
           </label>
-          <a href="#" class="forgot-link">Forgot password?</a>
+          <a href="#" class="forgot-link">Forgot password</a>
         </div>
 
         @if (errorMessage()) {
@@ -48,15 +41,16 @@
         }
 
         <button type="submit" class="sign-in-btn" [disabled]="loading()">
-          {{ loading() ? 'Signing in…' : 'Sign In' }}
+          {{ loading() ? 'Signing in…' : 'Sign in' }}
         </button>
       </form>
+    </div>
+  </div>
 
-      <p class="contact-text">
-        Don't have an account? <a href="#" class="contact-link">Contact us</a>
-      </p>
+  <!-- Right Panel: Logo -->
+  <div class="right-panel">
+    <div class="logo-card">
+      <img src="logo.png" alt="STAR Assurances" class="logo-img" />
     </div>
   </div>
 </div>
-
-<button class="help-btn" type="button" aria-label="Help">?</button>

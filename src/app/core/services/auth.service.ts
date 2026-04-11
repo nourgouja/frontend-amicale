@@ -5,8 +5,8 @@ import { tap } from 'rxjs/operators';
 
 export interface AuthResponse {
   accessToken: string;
-  email: string;
   role: string;
+  firstLogin: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,7 +26,8 @@ export class AuthService {
       .pipe(
         tap((res) => {
           localStorage.setItem(this.TOKEN_KEY, res.accessToken);
-          this.currentUser.set({ email: res.email, role: res.role });
+          const payload = JSON.parse(atob(res.accessToken.split('.')[1]));
+          this.currentUser.set({ email: payload.sub ?? '', role: res.role });
         })
       );
   }
