@@ -31,9 +31,9 @@ export class LoginComponent {
     const { email, password } = this.loginForm.value;
 
     this.authService.login(email!, password!).subscribe({
-      next: (res) => {
+      next: () => {
         this.loading.set(false);
-        this.router.navigate([res.firstLogin ? '/change-password' : '/home']);
+        this.router.navigate(['/home']);
       },
       error: (err) => {
         this.loading.set(false);

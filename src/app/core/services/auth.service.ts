@@ -17,6 +17,7 @@ export class AuthService {
   currentUser = signal<{ email: string; role: string } | null>(
     this.loadUserFromStorage()
   );
+  firstLogin = signal(false);
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -28,6 +29,7 @@ export class AuthService {
           localStorage.setItem(this.TOKEN_KEY, res.accessToken);
           const payload = JSON.parse(atob(res.accessToken.split('.')[1]));
           this.currentUser.set({ email: payload.sub ?? '', role: res.role });
+          this.firstLogin.set(res.firstLogin);
         })
       );
   }
@@ -35,7 +37,12 @@ export class AuthService {
   logout() {
     localStorage.removeItem(this.TOKEN_KEY);
     this.currentUser.set(null);
+    this.firstLogin.set(false);
     this.router.navigate(['/login']);
+  }
+
+  clearFirstLogin(): void {
+    this.firstLogin.set(false);
   }
 
   getToken(): string | null {

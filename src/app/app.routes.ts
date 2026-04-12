@@ -17,6 +17,30 @@ export const routes: Routes = [
       import('./home/home.component').then((m) => m.HomeComponent),
   },
   {
+    path: 'activities',
+    loadComponent: () =>
+      import('./shared/coming-soon/coming-soon.component').then((m) => m.ComingSoonComponent),
+    data: { title: 'Activities' },
+  },
+  {
+    path: 'partners',
+    loadComponent: () =>
+      import('./shared/coming-soon/coming-soon.component').then((m) => m.ComingSoonComponent),
+    data: { title: 'Partners' },
+  },
+  {
+    path: 'vote',
+    loadComponent: () =>
+      import('./shared/coming-soon/coming-soon.component').then((m) => m.ComingSoonComponent),
+    data: { title: 'Vote' },
+  },
+  {
+    path: 'manage-booking',
+    loadComponent: () =>
+      import('./shared/coming-soon/coming-soon.component').then((m) => m.ComingSoonComponent),
+    data: { title: 'Manage Booking' },
+  },
+  {
     path: 'change-password',
     loadComponent: () =>
       import('./auth/change-password/change-password.component').then(
