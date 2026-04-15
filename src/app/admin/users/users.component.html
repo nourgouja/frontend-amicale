@@ -1,0 +1,283 @@
+<div class="users-page">
+
+  <!-- Toolbar -->
+  <div class="toolbar-card">
+    <div class="search-box">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search by name or email..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+      />
+    </div>
+
+    <div class="toolbar-right">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+        fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+      </svg>
+      <select class="role-select" [(ngModel)]="selectedRole" (change)="onRoleFilter()">
+        <option value="">All Roles</option>
+        @for (r of roles; track r.value) {
+          <option [value]="r.value">{{ r.label }}</option>
+        }
+      </select>
+      <button class="create-btn" (click)="openCreateModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="19" y1="8" x2="19" y2="14"/>
+          <line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+        Create User
+      </button>
+    </div>
+  </div>
+
+  <!-- Table card -->
+  <div class="table-card">
+    @if (loading()) {
+      <div class="table-loading">Chargement…</div>
+    } @else {
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.id) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="avatar">{{ initials(user) }}</div>
+                  <span class="user-name">{{ user.prenom }} {{ user.nom }}</span>
+                </div>
+              </td>
+              <td class="email-cell">{{ user.email }}</td>
+              <td>
+                <span [class]="roleBadgeClass(user.role)">{{ roleLabel(user.role) }}</span>
+              </td>
+              <td>
+                <span [class]="user.actif ? 'badge badge-active' : 'badge badge-inactive'">
+                  {{ user.actif ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td class="date-cell">{{ formatDate(user.createdAt) }}</td>
+              <td>
+                <div class="actions">
+                  <!-- Toggle status -->
+                  <button
+                    class="action-btn"
+                    [title]="user.actif ? 'Désactiver' : 'Activer'"
+                    (click)="onToggleStatus(user)"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="23 4 23 10 17 10"/>
+                      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                  </button>
+                  <!-- Reset password -->
+                  <button
+                    class="action-btn"
+                    title="Réinitialiser le mot de passe"
+                    (click)="onResetPassword(user.id)"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                  </button>
+                  <!-- Delete -->
+                  <button
+                    class="action-btn action-btn--danger"
+                    title="Supprimer"
+                    (click)="confirmDelete(user.id)"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6l-1 14H6L5 6"/>
+                      <path d="M10 11v6"/><path d="M14 11v6"/>
+                      <path d="M9 6V4h6v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-cell">Aucun utilisateur trouvé.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Pagination footer -->
+      <div class="table-footer">
+        <span class="footer-count">
+          Showing {{ users().length }} of {{ totalElements() }} users
+        </span>
+        <div class="pagination">
+          <button class="page-btn" (click)="prevPage()" [disabled]="currentPage() === 0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+          <span class="page-info">Page {{ currentPage() + 1 }} of {{ totalPages() }}</span>
+          <button class="page-btn" (click)="nextPage()" [disabled]="currentPage() + 1 >= totalPages()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+</div>
+
+<!-- ═══════════ Create User Modal ═══════════ -->
+@if (showCreateModal()) {
+  <div class="modal-overlay" (click)="closeCreateModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Create New User</h2>
+        <button class="modal-close" (click)="closeCreateModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form [formGroup]="createForm" (ngSubmit)="onCreateUser()" class="modal-form">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name <span class="req">*</span></label>
+            <input formControlName="prenom" type="text" placeholder="Nour" />
+            @if (hasError('prenom', 'required')) {
+              <span class="field-error">Requis</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Last Name <span class="req">*</span></label>
+            <input formControlName="nom" type="text" placeholder="Gouja" />
+            @if (hasError('nom', 'required')) {
+              <span class="field-error">Requis</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address <span class="req">*</span></label>
+          <input formControlName="email" type="email" placeholder="user@starassurances.com" />
+          @if (hasError('email', 'required')) { <span class="field-error">Requis</span> }
+          @if (hasError('email', 'email'))    { <span class="field-error">Email invalide</span> }
+        </div>
+
+        <div class="form-group">
+          <label>Role <span class="req">*</span></label>
+          <select formControlName="role">
+            @for (r of roles; track r.value) {
+              <option [value]="r.value">{{ r.label }}</option>
+            }
+          </select>
+        </div>
+
+        @if (selectedRoleValue === 'MEMBRE_BUREAU') {
+          <div class="form-group">
+            <label>Poste <span class="req">*</span></label>
+            <select formControlName="posteMembre">
+              <option value="">-- Choisir un poste --</option>
+              @for (p of postes; track p.value) {
+                <option [value]="p.value">{{ p.label }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <div class="form-group">
+          <label>Temporary Password <span class="req">*</span></label>
+          <div class="password-wrapper">
+            <input
+              formControlName="motDePasse"
+              [type]="showPassword() ? 'text' : 'password'"
+              placeholder="Enter temporary password"
+            />
+            <button type="button" class="toggle-pw" (click)="showPassword.update(v => !v)">
+              @if (showPassword()) {
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (hasError('motDePasse', 'required'))   { <span class="field-error">Requis</span> }
+          @if (hasError('motDePasse', 'minlength')) { <span class="field-error">Minimum 8 caractères</span> }
+          <p class="pw-hint">User will be required to change this password on first login</p>
+        </div>
+
+        @if (createError()) {
+          <p class="create-error">{{ createError() }}</p>
+        }
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" (click)="closeCreateModal()">Cancel</button>
+          <button type="submit" class="btn-create" [disabled]="createLoading()">
+            {{ createLoading() ? 'Creating…' : 'Create User' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}
+
+<!-- ═══════════ Delete Confirm Modal ═══════════ -->
+@if (showDeleteConfirm()) {
+  <div class="modal-overlay" (click)="cancelDelete()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Confirmer la suppression</h2>
+        <button class="modal-close" (click)="cancelDelete()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <p class="confirm-text">Cette action est irréversible. Voulez-vous vraiment supprimer cet utilisateur ?</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelDelete()">Annuler</button>
+        <button class="btn-danger" (click)="executeDelete()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+}

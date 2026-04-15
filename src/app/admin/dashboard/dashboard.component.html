@@ -1,0 +1,120 @@
+@if (loading()) {
+  <div class="loading-state">Chargement…</div>
+} @else if (error()) {
+  <div class="error-state">{{ error() }}</div>
+} @else if (data(); as d) {
+  <div class="dashboard">
+
+    <!-- Row 1: User stats -->
+    <p class="section-title">Vue d'ensemble</p>
+    <div class="stats-row">
+      <div class="stat-card accent-blue">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ d.totalUtilisateurs }}</span>
+          <span class="stat-label">Total utilisateurs</span>
+        </div>
+      </div>
+
+      <div class="stat-card accent-purple">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ d.parRole['ADMIN'] ?? 0 }}</span>
+          <span class="stat-label">Administrateurs</span>
+        </div>
+      </div>
+
+      <div class="stat-card accent-teal">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ d.parRole['MEMBRE_BUREAU'] ?? 0 }}</span>
+          <span class="stat-label">Membres bureau</span>
+        </div>
+      </div>
+
+      <div class="stat-card accent-green">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="stat-body">
+          <span class="stat-value">{{ d.parRole['ADHERENT'] ?? 0 }}</span>
+          <span class="stat-label">Adhérents</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Inscriptions + Paiements -->
+    <p class="section-title">Activité</p>
+    <div class="cards-row">
+
+      <!-- Inscriptions -->
+      <div class="info-card">
+        <h3 class="card-title">Inscriptions</h3>
+        <div class="card-big-value">{{ d.totalInscriptions }}</div>
+        <div class="breakdown">
+          <div class="breakdown-item">
+            <span class="dot dot-yellow"></span>
+            <span>En attente</span>
+            <span class="val">{{ d.enAttente }}</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="dot dot-green"></span>
+            <span>Confirmées</span>
+            <span class="val">{{ d.confirmees }}</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="dot dot-red"></span>
+            <span>Annulées</span>
+            <span class="val">{{ d.annulees }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paiements -->
+      <div class="info-card">
+        <h3 class="card-title">Paiements</h3>
+        <div class="card-big-value">{{ d.totalCollecte | number:'1.0-2' }} TND</div>
+        <p class="card-sub">collectés / {{ d.totalAttendu | number:'1.0-2' }} TND attendus</p>
+        <div class="breakdown">
+          <div class="breakdown-item">
+            <span class="dot dot-yellow"></span>
+            <span>En attente</span>
+            <span class="val">{{ d.echeancesEnAttente }}</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="dot dot-red"></span>
+            <span>En retard</span>
+            <span class="val">{{ d.echeancesEnRetard }}</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="dot dot-green"></span>
+            <span>Payées</span>
+            <span class="val">{{ d.echeancesPayees }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+}

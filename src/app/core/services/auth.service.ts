@@ -53,6 +53,13 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  getDashboardRoute(): string {
+    const role = this.currentUser()?.role;
+    if (role === 'ADMIN')         return '/admin/dashboard';
+    if (role === 'MEMBRE_BUREAU') return '/bureau/dashboard';
+    return '/adherent/dashboard';
+  }
+
   private loadUserFromStorage(): { email: string; role: string } | null {
     const token = localStorage.getItem('access_token');
     if (!token) return null;

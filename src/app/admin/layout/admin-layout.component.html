@@ -1,0 +1,64 @@
+<div class="admin-shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+
+    <div class="sidebar-brand">
+      <img src="logo.png" alt="STAR" class="brand-logo" />
+    </div>
+
+    <div class="sidebar-section">
+      <p class="section-label">Main Menu</p>
+      <nav class="sidebar-nav">
+        @for (item of navItems; track item.route) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            <span class="nav-icon" [innerHTML]="item.icon"></span>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+    </div>
+
+    <div style="flex:1"></div>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ── Main area ── -->
+  <div class="main-area">
+
+    <header class="top-bar">
+      <div class="breadcrumb">
+        <span>Admin</span>
+        <span class="crumb-sep">/</span>
+        <span class="crumb-current">{{ currentPageLabel() }}</span>
+      </div>
+      <div class="top-bar-actions">
+        <div class="user-chip">
+          <div class="user-avatar">{{ initials() }}</div>
+          <span class="user-email">{{ authService.currentUser()?.email }}</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+
+  </div>
+</div>

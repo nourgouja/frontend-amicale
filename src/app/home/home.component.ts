@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, HostListener, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { ResetPasswordModalComponent } from '../auth/reset-password-modal/reset-password-modal.component';
 
@@ -11,7 +11,39 @@ import { ResetPasswordModalComponent } from '../auth/reset-password-modal/reset-
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
-  constructor(public authService: AuthService) {}
+  profileOpen = signal(false);
+  notifOpen = signal(false);
+  language = signal<'EN' | 'FR'>('EN');
+
+  constructor(public authService: AuthService, private router: Router) {}
+
+  goToDashboard(): void {
+    this.profileOpen.set(false);
+    this.router.navigate([this.authService.getDashboardRoute()]);
+  }
+
+  toggleProfile(event: MouseEvent): void {
+    event.stopPropagation();
+    this.notifOpen.set(false);
+    this.profileOpen.update(v => !v);
+  }
+
+  toggleNotif(event: MouseEvent): void {
+    event.stopPropagation();
+    this.profileOpen.set(false);
+    this.notifOpen.update(v => !v);
+  }
+
+  setLanguage(lang: 'EN' | 'FR', event: MouseEvent): void {
+    event.stopPropagation();
+    this.language.set(lang);
+  }
+
+  @HostListener('document:click')
+  closeDropdowns(): void {
+    this.profileOpen.set(false);
+    this.notifOpen.set(false);
+  }
 
   navLinks = [
     { label: 'Home',           route: '/home' },

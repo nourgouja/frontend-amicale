@@ -9,10 +9,15 @@
       "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/java/tn/star/Pfe/service/auth/**)",
       "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/java/tn/star/Pfe/config/**)",
       "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/java/tn/star/Pfe/service/user/**)",
-      "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/java/tn/star/Pfe/repository/**)"
+      "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/java/tn/star/Pfe/repository/**)",
+      "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/java/tn/star/Pfe/**)",
+      "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/resources/**)",
+      "Bash(node_modules/.bin/tsc --noEmit -p tsconfig.app.json)",
+      "Bash(echo \"EXIT:$?\")"
     ],
     "additionalDirectories": [
-      "C:\\Users\\nourg\\IdeaProjects\\Backend\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\auth"
+      "C:\\Users\\nourg\\IdeaProjects\\Backend\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\auth",
+      "C:\\Users\\nourg\\IdeaProjects\\Backend\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\email"
     ]
   }
 }
