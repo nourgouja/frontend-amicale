@@ -1,45 +1,45 @@
 import { Component, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-forgot-password',
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
+  templateUrl: './forgot-password.component.html',
+  styleUrl: './forgot-password.component.scss',
 })
-export class LoginComponent {
-  loginForm = new FormGroup({
+export class ForgotPasswordComponent {
+  form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required]),
-    rememberMe: new FormControl(false),
   });
 
   loading = signal(false);
   errorMessage = signal('');
+  submitted = signal(false);
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   onSubmit(): void {
-    if (this.loginForm.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.loading.set(true);
     this.errorMessage.set('');
 
-    const { email, password } = this.loginForm.value;
-
-    this.authService.login(email!, password!).subscribe({
+    this.http.post('/api/auth/forgot-password', { email: this.form.value.email }).subscribe({
       next: () => {
         this.loading.set(false);
-        this.router.navigate(['/home']);
+        this.submitted.set(true);
       },
       error: (err) => {
         this.loading.set(false);
         this.errorMessage.set(
-          err.status === 401
-            ? 'Invalid email or password.'
+          err.status === 404
+            ? 'No account found with that email.'
             : 'An error occurred. Please try again.'
         );
       },

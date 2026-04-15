@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"from PIL import Image; print\\('Pillow available'\\)\")",
+      "Bash(pip install:*)",
+      "Bash(python3 -c \"from PIL import Image; print\\('ok'\\)\")",
+      "Bash(\"C:\\\\Users\\\\nourg\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\" -c \"from PIL import Image; print\\('ok'\\)\")",
+      "Bash(\"C:\\\\Users\\\\nourg\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\" -)",
+      "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/java/tn/star/Pfe/service/auth/**)",
+      "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/java/tn/star/Pfe/config/**)",
+      "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/java/tn/star/Pfe/service/user/**)",
+      "Read(//c/Users/nourg/IdeaProjects/Backend/Pfe/src/main/java/tn/star/Pfe/repository/**)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\nourg\\IdeaProjects\\Backend\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\auth"
+    ]
+  }
+}

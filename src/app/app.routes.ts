@@ -41,6 +41,13 @@ export const routes: Routes = [
     data: { title: 'Manage Booking' },
   },
   {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./auth/forgot-password/forgot-password.component').then(
+        (m) => m.ForgotPasswordComponent
+      ),
+  },
+  {
     path: 'change-password',
     loadComponent: () =>
       import('./auth/change-password/change-password.component').then(

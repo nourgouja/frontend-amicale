@@ -6,7 +6,8 @@
 <header class="header">
   <div class="header-inner">
     <div class="logo">
-      <img src="logo-white.png" alt="STAR Assurances" />
+      <img src="logo.png" alt="STAR Assurances" />
+      <img src="langage.png" alt="Language" class="langage-logo" />
     </div>
     <nav class="nav">
       @for (link of navLinks; track link.route) {
@@ -52,38 +53,38 @@
 </section>
 
 <!-- ═══════════════════════ SERVICES ═══════════════════════ -->
-<section class="services">
-  <div class="service-card">
-    <div class="service-icon service-icon--travel">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3d9a5c" stroke-width="1.5">
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-      </svg>
+<section class="benefits-section">
+  <h2 class="section-title">Your <span>Exclusive Benefits</span></h2>
+  
+  <div class="benefits-grid">
+    <!-- Travels & Tours -->
+    <div class="benefit-card">
+      <div class="icon-box">
+        <i class="fas fa-plane"></i>
+      </div>
+      <h3>Travels & Tours</h3>
+      <p>Exclusive packages and negotiated rates for flights, guided tours, and vacation getaways worldwide.</p>
+      <span class="benefit-tag"></span>
     </div>
-    <div class="service-text">
-      <h3>Travels &amp; Tours</h3>
-      <p>Discover the world's wonders with our personalized travel experiences.</p>
-    </div>
-  </div>
-  <div class="service-card">
-    <div class="service-icon service-icon--stays">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3d9a5c" stroke-width="1.5">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
-    </div>
-    <div class="service-text">
+
+    <!-- Stays -->
+    <div class="benefit-card">
+      <div class="icon-box">
+        <i class="fas fa-home"></i>
+      </div>
       <h3>Stays</h3>
-      <p>Discover the world's wonders with our personalized travel experiences.</p>
+      <p>Access exclusive deals on flights, curated tours, and global getaway packages tailored for business and leisure travelers.</p>
+      <span class="benefit-tag"></span>
     </div>
-  </div>
-  <div class="service-card">
-    <div class="service-icon service-icon--leisure">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3d9a5c" stroke-width="1.5">
-        <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
-      </svg>
-    </div>
-    <div class="service-text">
-      <h3>Leisure</h3>
-      <p>Discover the world's wonders with our personalized travel experiences.</p>
+
+    <!-- Leisure & Activities -->
+    <div class="benefit-card">
+      <div class="icon-box">
+        <i class="fas fa-smile"></i>
+      </div>
+      <h3>Leisure & Activities</h3>
+      <p>Enjoy reimbursable wellness and entertainment expenses.</p>
+      <span class="benefit-tag">  </span>
     </div>
   </div>
 </section>
@@ -129,7 +130,7 @@
 <footer class="footer">
   <div class="footer-main">
     <div class="footer-logo">
-      <img src="logo-white.png" alt="STAR Assurances" />
+      <img src="logo.png" alt="STAR Assurances" />
     </div>
     <nav class="footer-nav">
       @for (link of navLinks; track link.route) {

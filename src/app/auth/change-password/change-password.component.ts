@@ -9,6 +9,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../core/services/auth.service';
 
 function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   const newPwd = group.get('newPassword')?.value;
@@ -36,7 +37,11 @@ export class ChangePasswordComponent {
   errorMessage = signal('');
   successMessage = signal('');
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   onSubmit(): void {
     if (this.form.invalid) {
@@ -48,21 +53,23 @@ export class ChangePasswordComponent {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const { newPassword } = this.form.value;
+    const payload = {
+      currentPassword: 'temp',
+      newPassword: this.form.value.newPassword,
+      confirmPassword: this.form.value.confirmPassword,
+    };
 
-    this.http.post('/api/auth/change-password', { newPassword }).subscribe({
+    this.http.post('/api/auth/change-password', payload).subscribe({
       next: () => {
         this.loading.set(false);
         this.successMessage.set('Password changed successfully.');
-        setTimeout(() => this.router.navigate(['/login']), 1500);
+        this.authService.clearFirstLogin();
+        this.router.navigate(['/home']);
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorMessage.set(
-          err.status === 401
-            ? 'Session expired. Please log in again.'
-            : 'An error occurred. Please try again.'
-        );
+        this.errorMessage.set('An error occurred. Please try again.');
+        console.error(err);
       },
     });
   }
