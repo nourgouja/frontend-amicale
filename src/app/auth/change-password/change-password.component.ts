@@ -48,21 +48,24 @@ export class ChangePasswordComponent {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const { newPassword } = this.form.value;
+    const { newPassword, confirmPassword } = this.form.value;
 
-    this.http.post('/api/auth/change-password', { newPassword }).subscribe({
+    this.http.put('/api/utilisateurs/change-password', { newPassword, confirmPassword }).subscribe({
       next: () => {
         this.loading.set(false);
         this.successMessage.set('Password changed successfully.');
-        setTimeout(() => this.router.navigate(['/login']), 1500);
+        setTimeout(() => this.router.navigate(['/home']), 1500);
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorMessage.set(
-          err.status === 401
-            ? 'Session expired. Please log in again.'
-            : 'An error occurred. Please try again.'
-        );
+        const msg = err.error?.message ?? err.error ?? null;
+        if (err.status === 401) {
+          this.errorMessage.set('Session expired. Please log in again.');
+        } else if (err.status === 400 && msg) {
+          this.errorMessage.set(msg);
+        } else {
+          this.errorMessage.set('An error occurred. Please try again.');
+        }
       },
     });
   }

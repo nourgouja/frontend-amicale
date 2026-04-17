@@ -1,44 +1,51 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { NgStyle } from '@angular/common';
+import { Component, computed, inject } from '@angular/core';
+import { AuthService } from '../core/services/auth.service';
+import { SidebarService } from '../core/services/sidebar.service';
+import { SidebarComponent } from '../shared/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, NgStyle],
+  imports: [SidebarComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
-  navLinks = ['Home', 'Activities', 'Partners', 'Vote', 'Manage booking'];
+  private auth = inject(AuthService);
+  sidebar = inject(SidebarService);
 
-  destinations = [
-    { name: 'Rome', activities: 6, tours: 3 },
-    { name: 'Greece', activities: 1, tours: 0 },
-    { name: 'Italy', activities: 63, tours: 9 },
+  today = new Date();
+
+  dateLabel = this.today.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  }).toUpperCase();
+
+  userName = computed(() => {
+    const email = this.auth.currentUser()?.email ?? '';
+    const name = email.split('@')[0].replace(/[._]/g, ' ');
+    return name.replace(/\b\w/g, c => c.toUpperCase());
+  });
+
+  userRole = computed(() => this.auth.currentUser()?.role ?? '');
+
+  metrics = [
+    { value: '12', label: 'ACTIVE BOOKINGS', progress: 67 },
+    { value: '03', label: 'OPEN VOTES',      progress: 25 },
+    { value: '48', label: 'LOCAL PARTNERS',  progress: 80 },
+    { value: '07', label: 'ACTIVE COUPONS',  progress: 50 },
   ];
 
-  steps = [
-    {
-      number: 1,
-      color: '#2dafde',
-      title: 'Choose Activity',
-      description:
-        'Browse our activities page to explore what\'s available and pick the one that suits you best.',
-    },
-    {
-      number: 2,
-      color: '#ffac33',
-      title: 'Book Activity',
-      description:
-        'Fill in the booking form with your details and submit your request to reserve your spot.',
-    },
-    {
-      number: 3,
-      color: '#14435a',
-      title: 'Make Payment',
-      description:
-        'Contact a board member to complete your payment and confirm your booking.',
-    },
+  activities = [
+    { title: 'Lunch reservation confirmed', sub: 'Le Petit Bistro • Today, 12:30 PM',  color: 'rgba(2,102,84,0.1)' },
+    { title: 'Coupon redeemed',             sub: 'Cinema Gaumont • Yesterday',         color: 'rgba(183,213,53,0.1)' },
+    { title: 'Gym membership renewal',      sub: 'PureFit Studio • 3 days ago',        color: 'rgba(2,102,84,0.1)' },
   ];
+
+  events = [
+    { month: 'OCT', day: '18', title: 'Annual Gala Night',  time: '7:00 PM • MAIN HALL',  active: true  },
+    { month: 'OCT', day: '24', title: 'Summer Travel',     time: '9:00 AM • Turkey',   active: false },
+  ];
+
 }

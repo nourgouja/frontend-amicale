@@ -1,56 +1,80 @@
-<div class="login-wrapper">
-  <!-- Left Panel: Form -->
-  <div class="left-panel">
-    <div class="form-container">
-      <h1 class="title">LOGIN</h1>
-      <p class="subtitle">Please enter your details.</p>
+<div class="page-wrapper">
+  <div class="login-card">
+    <!-- Branding -->
+    <div class="branding">
+      <img src="logo.png" alt="STAR Assurances" class="logo" />
+      <h1 class="heading">Welcome back</h1>
+      <p class="subheading">Please enter your details to continue</p>
+    </div>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-          <label for="email">Email</label>
+    <!-- Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form">
+      <!-- Work Email -->
+      <div class="field">
+        <label class="field-label">WORK EMAIL</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 16" fill="none">
+            <path d="M18 0H2C.9 0 0 .9 0 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zm0 4-8 5-8-5V2l8 5 8-5v2z" fill="#6f7975"/>
+          </svg>
           <input
-            id="email"
             type="email"
             formControlName="email"
-            placeholder="Enter your email"
+            placeholder="name@company.com"
             autocomplete="email"
+            class="field-input"
           />
         </div>
+      </div>
 
-        <div class="form-group">
-          <label for="password">Password</label>
+      <!-- Password -->
+      <div class="field">
+        <div class="field-header">
+          <label class="field-label">PASSWORD</label>
+          <a href="#" class="forgot-link">FORGOT PASSWORD?</a>
+        </div>
+        <div class="input-wrapper">
+          <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 21" fill="none">
+            <path d="M14 7h-1V5A5 5 0 0 0 3 5v2H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm3.1-9H4.9V5a3.1 3.1 0 0 1 6.2 0v2z" fill="#6f7975"/>
+          </svg>
           <input
-            id="password"
-            type="password"
+            [type]="showPassword() ? 'text' : 'password'"
             formControlName="password"
-            placeholder="••••••••••"
+            placeholder="••••••••"
             autocomplete="current-password"
+            class="field-input"
           />
+          <button type="button" class="eye-btn" (click)="togglePassword()">
+            @if (showPassword()) {
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 16" fill="none">
+                <path d="M11 0C6 0 1.73 3.11 0 7.5 1.73 11.89 6 15 11 15s9.27-3.11 11-7.5C20.27 3.11 16 0 11 0zm0 12.5a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" fill="#6f7975"/>
+              </svg>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 19" fill="none">
+                <path d="M11 4.5c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.75C20.27 4.61 16 1.5 11 1.5c-1.27 0-2.49.2-3.64.57l2.17 2.17c.57-.23 1.18-.24 1.47-.24zM2 1.27 4.28 3.55l.46.46A10.97 10.97 0 0 0 1 9.5c1.73 4.39 6 7.5 10 7.5 1.52 0 2.97-.3 4.31-.82l.42.42L18.73 19 20 17.73 3.27 0 2 1.27zM7.53 6.8l1.55 1.55A2.82 2.82 0 0 0 9 9.5a3 3 0 0 0 3 3c.22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-2.76-2.24-5-5-5l-.17.01z" fill="#6f7975"/>
+              </svg>
+            }
+          </button>
         </div>
+      </div>
 
-        <div class="form-options">
-          <label class="remember-me">
-            <input type="checkbox" formControlName="rememberMe" />
-            <span>Remember me</span>
-          </label>
-          <a href="#" class="forgot-link">Forgot password</a>
-        </div>
+      @if (errorMessage()) {
+        <p class="error-msg">{{ errorMessage() }}</p>
+      }
 
-        @if (errorMessage()) {
-          <p class="error-msg">{{ errorMessage() }}</p>
+      <!-- Submit -->
+      <button type="submit" class="sign-in-btn" [disabled]="loading()">
+        <span>{{ loading() ? 'Signing in…' : 'Sign In' }}</span>
+        @if (!loading()) {
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" fill="none">
+            <path d="M1 7h12M7 1l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         }
+      </button>
+    </form>
 
-        <button type="submit" class="sign-in-btn" [disabled]="loading()">
-          {{ loading() ? 'Signing in…' : 'Sign in' }}
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Right Panel: Logo -->
-  <div class="right-panel">
-    <div class="logo-card">
-      <img src="logo.png" alt="STAR Assurances" class="logo-img" />
-    </div>
+    <!-- Footer -->
+    <p class="signup-text">
+      Don't have an account? <a href="#" class="signup-link">Sign Up</a>
+    </p>
   </div>
 </div>

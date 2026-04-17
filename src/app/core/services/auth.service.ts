@@ -25,9 +25,14 @@ export class AuthService {
       .post<AuthResponse>(`${this.API}/login`, { email, motDePasse })
       .pipe(
         tap((res) => {
+          if (!res?.accessToken) return;
           localStorage.setItem(this.TOKEN_KEY, res.accessToken);
-          const payload = JSON.parse(atob(res.accessToken.split('.')[1]));
-          this.currentUser.set({ email: payload.sub ?? '', role: res.role });
+          try {
+            const payload = JSON.parse(atob(res.accessToken.split('.')[1]));
+            this.currentUser.set({ email: payload.sub ?? '', role: res.role ?? '' });
+          } catch {
+            this.currentUser.set({ email: '', role: res.role ?? '' });
+          }
         })
       );
   }

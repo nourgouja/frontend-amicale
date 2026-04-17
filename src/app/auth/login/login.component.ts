@@ -19,6 +19,11 @@ export class LoginComponent {
 
   loading = signal(false);
   errorMessage = signal('');
+  showPassword = signal(false);
+
+  togglePassword(): void {
+    this.showPassword.update(v => !v);
+  }
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -33,15 +38,22 @@ export class LoginComponent {
     this.authService.login(email!, password!).subscribe({
       next: (res) => {
         this.loading.set(false);
-        this.router.navigate([res.firstLogin ? '/change-password' : '/home']);
+        this.router.navigate([res?.firstLogin ? '/change-password' : '/home']);
       },
       error: (err) => {
         this.loading.set(false);
-        this.errorMessage.set(
-          err.status === 401
-            ? 'Invalid email or password.'
-            : 'An error occurred. Please try again.'
-        );
+        console.error('Login error status:', err.status);
+        console.error('Login error body:', err.error);
+        if (err.status === 0) {
+          this.errorMessage.set('Cannot reach server. Is the backend running?');
+        } else if (err.status === 401 || err.status === 400) {
+          this.errorMessage.set(
+            err.error?.message ?? 'Invalid email or password.'
+          );
+        } else {
+          const msg = err.error?.message || err.error?.error || JSON.stringify(err.error);
+          this.errorMessage.set(`Error ${err.status}: ${msg}`);
+        }
       },
     });
   }
