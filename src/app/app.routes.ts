@@ -86,6 +86,24 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./admin/users/users.component').then((m) => m.AdminUsersComponent),
       },
+      {
+        path: 'activites',
+        loadComponent: () =>
+          import('./shared/coming-soon/coming-soon.component').then((m) => m.ComingSoonComponent),
+        data: { title: 'Activités' },
+      },
+      {
+        path: 'offres',
+        loadComponent: () =>
+          import('./shared/coming-soon/coming-soon.component').then((m) => m.ComingSoonComponent),
+        data: { title: 'Offres' },
+      },
+      {
+        path: 'calendrier',
+        loadComponent: () =>
+          import('./shared/coming-soon/coming-soon.component').then((m) => m.ComingSoonComponent),
+        data: { title: 'Calendrier' },
+      },
     ],
   },
 

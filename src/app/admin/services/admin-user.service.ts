@@ -9,6 +9,7 @@ export interface UserResponse {
   prenom: string;
   role: string;
   actif: boolean;
+  telephone?: string;
   createdAt: string;
 }
 
@@ -22,12 +23,20 @@ export interface PageResponse<T> {
 
 export interface CreateUserRequest {
   email: string;
-  motDePasse: string;
   nom: string;
   prenom: string;
   role: string;
+  telephone?: string;
   posteMembre?: string;
   poleId?: number;
+}
+
+export interface UpdateUserRequest {
+  nom?: string;
+  prenom?: string;
+  email?: string;
+  telephone?: string;
+  role?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -49,11 +58,19 @@ export class AdminUserService {
     return this.http.post<UserResponse>(this.API, req);
   }
 
+  updateUser(id: number, req: UpdateUserRequest): Observable<UserResponse> {
+    return this.http.put<UserResponse>(`${this.API}/${id}`, req);
+  }
+
   activateUser(id: number): Observable<void> {
     return this.http.put<void>(`${this.API}/${id}/activer`, {});
   }
 
   deactivateUser(id: number): Observable<void> {
+    return this.http.put<void>(`${this.API}/${id}/desactiver`, {});
+  }
+
+  archiveUser(id: number): Observable<void> {
     return this.http.put<void>(`${this.API}/${id}/desactiver`, {});
   }
 
