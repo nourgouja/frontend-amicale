@@ -21,7 +21,8 @@
       "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/Pfe/src/main/java/tn/star/Pfe/repository/**)",
       "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/Pfe/src/main/java/tn/star/Pfe/controller/auth/**)",
       "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/Pfe/src/main/java/tn/star/Pfe/controller/user/**)",
-      "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/Pfe/src/main/java/tn/star/Pfe/mapper/**)"
+      "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/Pfe/src/main/java/tn/star/Pfe/mapper/**)",
+      "Bash(npx tsc *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\nourg\\IdeaProjects\\Backend\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\auth",

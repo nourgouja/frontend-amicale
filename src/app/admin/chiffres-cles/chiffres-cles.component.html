@@ -1,0 +1,178 @@
+@if (loading()) {
+  <div class="loading-state">Chargement…</div>
+} @else if (error()) {
+  <div class="error-state">{{ error() }}</div>
+} @else {
+
+<div class="chiffres-page">
+
+  <!-- KPI cards -->
+  <div class="kpi-row">
+
+    <!-- Adhérents -->
+    <div class="kpi-card">
+      <div class="kpi-top">
+        <div class="kpi-icon icon-green">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <span class="kpi-label">ADHÉRENTS ACTIFS</span>
+      </div>
+      <div class="kpi-value">{{ totalUtilisateurs() }}</div>
+      <p class="kpi-desc">Membres inscrits à l'amicale</p>
+    </div>
+
+    <!-- Inscriptions -->
+    <div class="kpi-card">
+      <div class="kpi-top">
+        <div class="kpi-icon icon-purple">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <span class="kpi-label">INSCRIPTIONS TOTALES</span>
+      </div>
+      <div class="kpi-value">{{ totalInscriptions() }}</div>
+      <p class="kpi-desc">Participations enregistrées</p>
+    </div>
+
+    <!-- Taux confirmation -->
+    <div class="kpi-card">
+      <div class="kpi-top">
+        <div class="kpi-icon icon-blue">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <span class="kpi-label">CONFIRMÉES</span>
+      </div>
+      <div class="kpi-value">{{ confirmees() }}</div>
+      <p class="kpi-desc">Inscriptions confirmées</p>
+    </div>
+
+    <!-- Finances -->
+    <div class="kpi-card">
+      <div class="kpi-top">
+        <div class="kpi-icon icon-orange">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+        </div>
+        <span class="kpi-label">MONTANT COLLECTÉ</span>
+      </div>
+      <div class="kpi-value">{{ totalCollecte() }} <span class="kpi-unit">DT</span></div>
+      <p class="kpi-desc">Sur {{ totalAttendu() }} DT attendus</p>
+    </div>
+
+  </div>
+
+  <!-- Charts row -->
+  <div class="charts-row">
+
+    <!-- Line chart card -->
+    <div class="chart-card chart-main">
+      <div class="chart-card-head">
+        <h3 class="chart-title">Évolution des inscriptions</h3>
+        <div class="period-pills">
+          <button class="period-btn" [class.active]="activePeriod() === '6m'" (click)="setPeriod('6m')">6 mois</button>
+          <button class="period-btn" [class.active]="activePeriod() === '3m'" (click)="setPeriod('3m')">3 mois</button>
+          <button class="period-btn" [class.active]="activePeriod() === '1m'" (click)="setPeriod('1m')">1 mois</button>
+        </div>
+      </div>
+      @if (totalInscriptions() === 0) {
+        <div class="chart-empty">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+            fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+            <polyline points="16 7 22 7 22 13"/>
+          </svg>
+          <p>Aucune donnée disponible pour le moment</p>
+        </div>
+      } @else {
+        <div class="chart-placeholder">
+          <p class="chart-no-lib">Graphique disponible avec intégration Chart.js</p>
+        </div>
+      }
+    </div>
+
+    <!-- Donut chart card -->
+    <div class="chart-card chart-side">
+      <h3 class="chart-title">Répartition des inscriptions</h3>
+      @if (totalInscriptions() === 0) {
+        <div class="chart-empty">
+          <div class="donut-empty"></div>
+          <p>Aucune donnée disponible</p>
+        </div>
+      } @else {
+        <div class="donut-stats">
+          <div class="donut-row">
+            <span class="donut-dot" style="background:#026654"></span>
+            <span class="donut-label">Confirmées</span>
+            <span class="donut-val">{{ confirmees() }}</span>
+          </div>
+          <div class="donut-row">
+            <span class="donut-dot" style="background:#f59e0b"></span>
+            <span class="donut-label">En attente</span>
+            <span class="donut-val">{{ enAttente() }}</span>
+          </div>
+          <div class="donut-row">
+            <span class="donut-dot" style="background:#dc2626"></span>
+            <span class="donut-label">Annulées</span>
+            <span class="donut-val">{{ annulees() }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- Stats breakdown cards -->
+  <div class="breakdown-row">
+
+    <div class="breakdown-card">
+      <h4 class="breakdown-title">Taux de Confirmation</h4>
+      <div class="breakdown-big">
+        @if (totalInscriptions() > 0) {
+          {{ ((confirmees() / totalInscriptions()) * 100) | number:'1.0-0' }}%
+        } @else {
+          —
+        }
+      </div>
+      <p class="breakdown-sub">Inscriptions confirmées sur total</p>
+    </div>
+
+    <div class="breakdown-card">
+      <h4 class="breakdown-title">En Attente</h4>
+      <div class="breakdown-big warn">{{ enAttente() }}</div>
+      <p class="breakdown-sub">Inscriptions à traiter</p>
+    </div>
+
+    <div class="breakdown-card">
+      <h4 class="breakdown-title">Taux de Recouvrement</h4>
+      <div class="breakdown-big">
+        @if (totalAttendu() > 0) {
+          {{ ((totalCollecte() / totalAttendu()) * 100) | number:'1.0-0' }}%
+        } @else {
+          —
+        }
+      </div>
+      <p class="breakdown-sub">Paiements collectés sur attendus</p>
+    </div>
+
+  </div>
+
+</div>
+
+}

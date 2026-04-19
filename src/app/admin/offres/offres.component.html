@@ -1,0 +1,48 @@
+<div class="offres-page">
+
+  <!-- Page title + add button -->
+  <div class="page-header">
+    <h1 class="page-title">Nos Offres</h1>
+    <button class="btn-add">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Créer une offre
+    </button>
+  </div>
+
+  <!-- Category filters -->
+  <div class="category-filters">
+    @for (f of filters; track f.key) {
+      <button
+        class="filter-btn"
+        [class.active]="activeFilter() === f.key"
+        (click)="setFilter(f.key)"
+      >
+        {{ f.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state">
+    <div class="empty-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24"
+        fill="none" stroke="#026654" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+        <line x1="7" y1="7" x2="7.01" y2="7"/>
+      </svg>
+    </div>
+    <p class="empty-title">Aucune offre disponible pour le moment</p>
+    <p class="empty-sub">Créez votre première offre pour qu'elle apparaisse dans la grille.</p>
+    <button class="btn-add-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Créer une offre
+    </button>
+  </div>
+
+</div>

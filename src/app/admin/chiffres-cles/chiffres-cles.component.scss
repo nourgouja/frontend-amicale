@@ -1,0 +1,250 @@
+$primary: #026654;
+$primary-light: rgba(2, 102, 84, 0.10);
+$border: #e5e7eb;
+$text-dark: #1a2233;
+$text-muted: #6b7280;
+$bg: #f5f6fa;
+$font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.loading-state, .error-state {
+  padding: 48px;
+  text-align: center;
+  font-family: $font;
+  color: $text-muted;
+  font-size: 14px;
+}
+
+.chiffres-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: $font;
+}
+
+/* ── KPI row ── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.kpi-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.kpi-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.icon-green  { background: $primary-light; color: $primary; }
+  &.icon-purple { background: #ede9fe; color: #7c3aed; }
+  &.icon-blue   { background: #dbeafe; color: #2563eb; }
+  &.icon-orange { background: #ffedd5; color: #ea580c; }
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.kpi-value {
+  font-size: 34px;
+  font-weight: 700;
+  color: $text-dark;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.kpi-unit {
+  font-size: 18px;
+  font-weight: 400;
+  color: $text-muted;
+}
+
+.kpi-desc {
+  font-size: 12px;
+  color: $text-muted;
+}
+
+/* ── Charts row ── */
+.charts-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.chart-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.chart-main { flex: 1.6; }
+.chart-side { flex: 1; }
+
+.chart-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.period-pills {
+  display: flex;
+  gap: 4px;
+  background: $bg;
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.period-btn {
+  border: none;
+  background: transparent;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: $text-muted;
+  cursor: pointer;
+  font-family: $font;
+  transition: background 0.15s, color 0.15s;
+
+  &.active { background: $primary; color: #fff; }
+  &:hover:not(.active) { color: $text-dark; }
+}
+
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+
+  p {
+    font-size: 13px;
+    color: $text-muted;
+  }
+}
+
+.chart-placeholder {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg;
+  border-radius: 10px;
+}
+
+.chart-no-lib {
+  font-size: 12px;
+  color: $text-muted;
+}
+
+/* ── Donut empty ── */
+.donut-empty {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 14px solid #e5e7eb;
+  margin-bottom: 8px;
+}
+
+/* ── Donut stats ── */
+.donut-stats {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.donut-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.donut-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.donut-label {
+  flex: 1;
+  font-size: 13px;
+  color: $text-muted;
+}
+
+.donut-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+/* ── Breakdown row ── */
+.breakdown-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.breakdown-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.breakdown-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.breakdown-big {
+  font-size: 36px;
+  font-weight: 700;
+  color: $text-dark;
+  line-height: 1;
+  margin-bottom: 6px;
+
+  &.warn { color: #f59e0b; }
+}
+
+.breakdown-sub {
+  font-size: 12px;
+  color: $text-muted;
+}

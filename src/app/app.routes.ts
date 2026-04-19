@@ -87,16 +87,19 @@ export const routes: Routes = [
           import('./admin/users/users.component').then((m) => m.AdminUsersComponent),
       },
       {
+        path: 'chiffres-cles',
+        loadComponent: () =>
+          import('./admin/chiffres-cles/chiffres-cles.component').then((m) => m.ChiffresComponent),
+      },
+      {
         path: 'activites',
         loadComponent: () =>
-          import('./shared/coming-soon/coming-soon.component').then((m) => m.ComingSoonComponent),
-        data: { title: 'Activités' },
+          import('./admin/activites/activites.component').then((m) => m.ActivitesComponent),
       },
       {
         path: 'offres',
         loadComponent: () =>
-          import('./shared/coming-soon/coming-soon.component').then((m) => m.ComingSoonComponent),
-        data: { title: 'Offres' },
+          import('./admin/offres/offres.component').then((m) => m.OffresComponent),
       },
       {
         path: 'calendrier',
