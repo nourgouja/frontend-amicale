@@ -1,0 +1,178 @@
+<!-- ── Toast messages ── -->
+@if (successMsg()) {
+  <div class="toast toast--success">{{ successMsg() }}</div>
+}
+@if (errorMsg()) {
+  <div class="toast toast--error">{{ errorMsg() }}</div>
+}
+
+<div class="page">
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <button class="back-btn" type="button" (click)="cancel()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Retour
+      </button>
+      <h1 class="page-title">Nouvelle Offre</h1>
+    </div>
+    <div class="top-bar-right">
+      <button type="button" class="btn-outline" (click)="cancel()">Annuler</button>
+      <button type="button" class="btn-draft" [disabled]="submitting()" (click)="saveDraft()">
+        @if (submitting() && draftMode()) { Enregistrement… } @else { Brouillon }
+      </button>
+      <button type="button" class="btn-primary" [disabled]="submitting()" (click)="submit()">
+        @if (submitting() && !draftMode()) { Enregistrement… } @else { Créer }
+      </button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- LEFT: cover image -->
+    <div class="col-left">
+      <div class="cover-area" (click)="openUploadModal()">
+        @if (previewUrl()) {
+          <img [src]="previewUrl()" class="cover-preview" alt="Couverture" />
+        } @else {
+          <div class="cover-placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+              fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <span>Ajouter une photo</span>
+          </div>
+        }
+      </div>
+      <p class="cover-hint">Cliquez pour ajouter une photo de couverture</p>
+    </div>
+
+    <!-- RIGHT: form fields -->
+    <form class="col-right" [formGroup]="form" (ngSubmit)="submit()">
+
+      <div class="field">
+        <label class="label">Titre <span class="req">*</span></label>
+        <input class="input" [class.is-invalid]="isInvalid('titre')"
+          formControlName="titre" placeholder="Titre de l'offre" />
+        @if (isInvalid('titre')) { <span class="field-error">Le titre est requis.</span> }
+      </div>
+
+      <div class="field">
+        <label class="label">Type d'offre <span class="req">*</span></label>
+        <select class="input" [class.is-invalid]="isInvalid('typeOffre')" formControlName="typeOffre">
+          <option value="">-- Choisir un type --</option>
+          @for (t of offreTypes; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+        @if (isInvalid('typeOffre')) { <span class="field-error">Le type est requis.</span> }
+      </div>
+
+      <div class="field">
+        <label class="label">Description</label>
+        <textarea class="input" formControlName="description" rows="4"
+          placeholder="Description de l'offre"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="label">Lieu</label>
+        <input class="input" formControlName="lieu" placeholder="Lieu de l'offre" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="label">Date début <span class="req">*</span></label>
+          <input class="input" [class.is-invalid]="isInvalid('dateDebut')"
+            formControlName="dateDebut" type="date" />
+          @if (isInvalid('dateDebut')) { <span class="field-error">La date de début est requise.</span> }
+        </div>
+
+        @if (showDateFin) {
+          <div class="field">
+            <label class="label">Date fin</label>
+            <input class="input" formControlName="dateFin" type="date" />
+          </div>
+        }
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="label">Prix par personne (DT)</label>
+          <input class="input" formControlName="prixParPersonne" type="number" min="0" placeholder="0" />
+        </div>
+        <div class="field">
+          <label class="label">Capacité max</label>
+          <input class="input" formControlName="capaciteMax" type="number" min="1" placeholder="—" />
+        </div>
+      </div>
+
+      @if (showModePaiement) {
+        <div class="field">
+          <label class="label">Mode de paiement</label>
+          <select class="input" formControlName="modePaiement">
+            <option value="">-- Choisir --</option>
+            @for (m of paymentModes; track m.value) {
+              <option [value]="m.value">{{ m.label }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="field">
+        <label class="label">Avantages</label>
+        <textarea class="input" formControlName="avantages" rows="3"
+          placeholder="Avantages inclus..."></textarea>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ── Upload modal ── -->
+@if (showUploadModal()) {
+  <div class="modal-overlay" (click)="closeUploadModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Ajouter une photo de couverture</h2>
+        <button class="modal-close" (click)="closeUploadModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <label class="upload-zone">
+        <input type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+        @if (previewUrl()) {
+          <img [src]="previewUrl()" class="upload-preview" alt="Preview" />
+        } @else {
+          <div class="upload-placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"
+              fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16"/>
+              <line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+            </svg>
+            <p>
+              <span class="upload-link">Cliquez pour téléverser</span>
+              ou faites glisser et déposez
+            </p>
+            <p class="upload-hint">Format recommandé : 1920×1080</p>
+          </div>
+        }
+      </label>
+
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="closeUploadModal()">Annuler</button>
+        <button class="btn-primary" (click)="confirmUpload()" [disabled]="!previewUrl()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+}

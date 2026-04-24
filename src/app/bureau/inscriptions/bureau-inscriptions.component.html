@@ -1,0 +1,109 @@
+<div class="bureau-inscriptions">
+
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Inscriptions</h1>
+      <p class="page-sub">
+        @if (pendingCount() > 0) {
+          <span class="pending-badge">{{ pendingCount() }}</span>
+        }
+        Gérez les demandes d'inscription aux offres
+      </p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="search-wrap">
+      <lucide-icon name="search" [size]="15" class="search-icon"></lucide-icon>
+      <input type="search" class="search-input" placeholder="Rechercher par nom ou offre…"
+             [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
+    </div>
+    <select class="statut-select" [ngModel]="statutFilter()" (ngModelChange)="statutFilter.set($event)">
+      @for (s of statuts; track s.key) {
+        <option [value]="s.key">{{ s.label }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Table -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement…</p>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+      </svg>
+      <p>Aucune inscription trouvée</p>
+    </div>
+  } @else {
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Membre</th>
+            <th>Offre</th>
+            <th>Date d'inscription</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ins of filtered(); track ins.id) {
+            <tr>
+              <td>
+                <div class="member-cell">
+                  <div class="member-avatar">{{ initials(ins.membreNom, ins.membrePrenom) }}</div>
+                  <div class="member-info">
+                    <span class="member-name">{{ ins.membrePrenom }} {{ ins.membreNom }}</span>
+                    <span class="member-email">{{ ins.membreEmail }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="offre-name">{{ ins.offreTitre }}</span>
+              </td>
+              <td class="date-cell">{{ formatDate(ins.dateInscription) }}</td>
+              <td>
+                <app-status-badge [statut]="ins.statut" type="inscription" />
+              </td>
+              <td>
+                @if (ins.statut === 'EN_ATTENTE') {
+                  <div class="action-btns">
+                    <button class="btn-validate" (click)="openAction(ins, 'valider')" aria-label="Valider l'inscription">
+                      <lucide-icon name="check-circle" [size]="15"></lucide-icon>
+                      Valider
+                    </button>
+                    <button class="btn-refuse" (click)="openAction(ins, 'refuser')" aria-label="Refuser l'inscription">
+                      <lucide-icon name="x-circle" [size]="15"></lucide-icon>
+                      Refuser
+                    </button>
+                  </div>
+                } @else {
+                  <span class="no-action">—</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</div>
+
+@if (confirmTarget(); as t) {
+  <app-confirm-modal
+    [title]="t.action === 'valider' ? 'Valider l\'inscription' : 'Refuser l\'inscription'"
+    [message]="t.action === 'valider'
+      ? 'Confirmer l\'inscription de ' + t.ins.membrePrenom + ' ' + t.ins.membreNom + ' à « ' + t.ins.offreTitre + ' » ?'
+      : 'Refuser la demande de ' + t.ins.membrePrenom + ' ' + t.ins.membreNom + ' pour « ' + t.ins.offreTitre + ' » ?'"
+    [confirmLabel]="t.action === 'valider' ? 'Valider' : 'Refuser'"
+    [confirmColor]="t.action === 'valider' ? 'primary' : 'danger'"
+    [loading]="actionLoading()"
+    (confirmed)="confirmAction()"
+    (cancelled)="cancelAction()" />
+}

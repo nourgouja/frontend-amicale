@@ -1,0 +1,89 @@
+@use '../../../styles/variables' as *;
+
+.bureau-stats { display: flex; flex-direction: column; gap: $space-6; }
+
+.page-head { }
+.page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; }
+.page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin-top: 2px; }
+
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: $space-4;
+  @include tablet { grid-template-columns: repeat(2, 1fr); }
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.charts-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: $space-5;
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.chart-panel {
+  @include card; padding: $space-5;
+  display: flex; flex-direction: column; gap: $space-4;
+}
+
+.chart-title { font-size: $font-size-base; font-weight: 700; color: $color-text; }
+.chart-empty { font-size: $font-size-sm; color: $color-text-muted; text-align: center; padding: $space-6 0; }
+
+/* Bar chart */
+.bar-chart { display: flex; flex-direction: column; gap: $space-3; }
+
+.bar-row  { display: grid; grid-template-columns: 80px 1fr 36px; align-items: center; gap: $space-3; }
+.bar-label { font-size: $font-size-sm; color: $color-text-muted; text-align: right; }
+.bar-track { height: 10px; background: $color-bg; border-radius: $radius-full; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: $radius-full; transition: width 0.5s ease; @include reduced-motion { transition: none; } }
+.bar-value { font-size: $font-size-sm; font-weight: 600; color: $color-text; }
+
+/* Gauge */
+.gauge-list { display: flex; flex-direction: column; gap: $space-5; }
+
+.gauge-item { display: flex; flex-direction: column; gap: $space-2; }
+.gauge-head { display: flex; align-items: center; justify-content: space-between; }
+.gauge-label { font-size: $font-size-sm; color: $color-text-muted; }
+.gauge-pct   { font-size: $font-size-sm; font-weight: 700; color: $color-text; }
+.gauge-track { height: 8px; background: $color-bg; border-radius: $radius-full; overflow: hidden; }
+.gauge-fill  {
+  height: 100%; border-radius: $radius-full; transition: width 0.6s ease;
+  @include reduced-motion { transition: none; }
+  &--green { background: #10b981; }
+  &--blue  { background: #3b82f6; }
+}
+.gauge-sub { font-size: $font-size-xs; color: $color-text-muted; }
+
+/* Line-bars (column chart) */
+.line-bars {
+  display: flex; align-items: flex-end; gap: $space-4; height: 160px; padding-bottom: $space-5; position: relative;
+}
+
+.lb-col {
+  display: flex; flex-direction: column; align-items: center; gap: $space-1; flex: 1;
+}
+
+.lb-bar-wrap {
+  flex: 1; width: 100%; display: flex; align-items: flex-end;
+  position: relative; min-height: 120px;
+}
+
+.lb-bar {
+  width: 100%; background: $color-primary; border-radius: $radius-sm $radius-sm 0 0;
+  transition: height 0.5s ease; min-height: 4px; opacity: 0.85;
+  &:hover { opacity: 1; }
+  @include reduced-motion { transition: none; }
+}
+
+.lb-label { font-size: $font-size-xs; color: $color-text-muted; text-align: center; }
+.lb-val   { font-size: $font-size-xs; font-weight: 600; color: $color-text; }
+
+.loading-state {
+  display: flex; flex-direction: column; align-items: center; gap: $space-3;
+  padding: $space-8 $space-4; color: $color-text-muted; font-size: $font-size-sm; text-align: center;
+}
+
+.spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 3px solid $color-border; border-top-color: $color-primary;
+  animation: spin 0.7s linear infinite;
+  @include reduced-motion { animation: none; opacity: 0.5; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

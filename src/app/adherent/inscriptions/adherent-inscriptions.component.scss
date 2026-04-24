@@ -1,0 +1,74 @@
+@use '../../../styles/variables' as *;
+
+.adherent-inscriptions { display: flex; flex-direction: column; gap: $space-6; }
+
+.page-head { }
+.page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; }
+.page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin-top: 2px; }
+
+.filters-bar { display: flex; align-items: center; gap: $space-3; flex-wrap: wrap; }
+
+.search-wrap {
+  display: flex; align-items: center; gap: $space-2;
+  background: $color-surface; border: 1px solid $color-border; border-radius: $radius-md;
+  padding: 0 $space-3; height: 38px; flex: 1; max-width: 320px;
+  .search-icon { color: $color-text-muted; flex-shrink: 0; }
+}
+
+.search-input {
+  flex: 1; border: none; background: none; outline: none;
+  font-family: $font-base; font-size: $font-size-sm; color: $color-text;
+  &::placeholder { color: $color-text-muted; }
+}
+
+.statut-select {
+  height: 38px; padding: 0 $space-3; border: 1px solid $color-border; border-radius: $radius-md;
+  background: $color-surface; font-family: $font-base; font-size: $font-size-sm; color: $color-text;
+  cursor: pointer; outline: none; &:focus { border-color: $color-primary; }
+}
+
+.cards-list { display: flex; flex-direction: column; gap: $space-3; }
+
+.ins-card {
+  display: flex; @include card; overflow: hidden;
+  transition: box-shadow $transition-fast;
+  &:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); }
+  @include reduced-motion { transition: none; }
+}
+
+.ins-type-bar { width: 4px; flex-shrink: 0; }
+
+.ins-body { flex: 1; padding: $space-4 $space-5; }
+
+.ins-main { display: flex; align-items: center; gap: $space-4; }
+
+.ins-info { flex: 1; min-width: 0; }
+.ins-title { font-size: $font-size-base; font-weight: 600; color: $color-text; @include truncate; }
+.ins-meta  { font-size: $font-size-xs; color: $color-text-muted; margin-top: 3px; }
+
+.ins-right { display: flex; align-items: center; gap: $space-3; flex-shrink: 0; }
+
+.btn-cancel {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: $radius-sm; border: 1px solid rgba(220,38,38,0.25);
+  background: rgba(220,38,38,0.06); color: $color-error;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 600;
+  cursor: pointer; white-space: nowrap; transition: background $transition-fast;
+  &:hover { background: rgba(220,38,38,0.14); }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.loading-state, .empty-state {
+  display: flex; flex-direction: column; align-items: center; gap: $space-3;
+  padding: $space-8 $space-4; color: $color-text-muted; font-size: $font-size-sm; text-align: center;
+}
+
+.spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 3px solid $color-border; border-top-color: $color-primary;
+  animation: spin 0.7s linear infinite;
+  @include reduced-motion { animation: none; opacity: 0.5; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

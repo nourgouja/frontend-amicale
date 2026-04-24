@@ -1,0 +1,121 @@
+// ─── Colors ───────────────────────────────────────────────────────────────────
+$color-primary:       #026654;
+$color-primary-light: rgba(2, 102, 84, 0.10);
+$color-primary-dark:  #01473a;
+$color-bg:            #f4f5f7;
+$color-surface:       #ffffff;
+$color-border:        rgba(0, 0, 0, 0.09);
+$color-text:          #181818;
+$color-text-muted:    #7a7a7a;
+$color-error:         #dc2626;
+$color-warning:       #f59e0b;
+$color-info:          #3b82f6;
+$color-success:       #10b981;
+
+// Offer type colors
+$color-voyage:        #3b82f6;
+$color-sejour:        #10b981;
+$color-activite:      #f59e0b;
+$color-convention:    #8b5cf6;
+
+// Status colors
+$color-status-open:     #10b981;
+$color-status-closed:   #ef4444;
+$color-status-draft:    #9ca3af;
+$color-status-archived: #9ca3af;
+$color-status-pending:  #f59e0b;
+$color-status-active:   #10b981;
+$color-status-inactive: #ef4444;
+
+// ─── Typography ───────────────────────────────────────────────────────────────
+$font-base: 'Poppins', 'Inter', 'Segoe UI', Arial, sans-serif;
+
+$font-size-xs:   11px;
+$font-size-sm:   12px;
+$font-size-base: 13.5px;
+$font-size-md:   15px;
+$font-size-lg:   18px;
+$font-size-xl:   22px;
+$font-size-2xl:  28px;
+$font-size-3xl:  36px;
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
+$sidebar-width:    240px;
+$topbar-height:    64px;
+$content-padding:  28px;
+$content-max-width: 1200px;
+
+// ─── Elevation / Shadows ──────────────────────────────────────────────────────
+$shadow-card:     0 2px 12px rgba(0, 0, 0, 0.07);
+$shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.14);
+$shadow-modal:    0 20px 60px rgba(0, 0, 0, 0.18);
+
+// ─── Border radius ────────────────────────────────────────────────────────────
+$radius-sm:   6px;
+$radius-md:   10px;
+$radius-lg:   14px;
+$radius-xl:   16px;
+$radius-full: 9999px;
+
+// ─── Spacing ──────────────────────────────────────────────────────────────────
+$space-1:  4px;
+$space-2:  8px;
+$space-3:  12px;
+$space-4:  16px;
+$space-5:  20px;
+$space-6:  24px;
+$space-7:  28px;
+$space-8:  32px;
+
+// ─── Transitions ─────────────────────────────────────────────────────────────
+$transition-fast:   0.12s ease;
+$transition-base:   0.18s ease;
+$transition-slow:   0.3s ease;
+
+// ─── Breakpoints ─────────────────────────────────────────────────────────────
+$bp-sm:  480px;
+$bp-md:  768px;
+$bp-lg:  1024px;
+$bp-xl:  1280px;
+
+// ─── Mixins ───────────────────────────────────────────────────────────────────
+@mixin mobile {
+  @media (max-width: #{$bp-md - 1px}) { @content; }
+}
+
+@mixin tablet {
+  @media (min-width: $bp-md) and (max-width: #{$bp-lg - 1px}) { @content; }
+}
+
+@mixin desktop {
+  @media (min-width: $bp-lg) { @content; }
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) { @content; }
+}
+
+// ─── Utility mixins ──────────────────────────────────────────────────────────
+@mixin card {
+  background: $color-surface;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  border: 1px solid $color-border;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin focus-ring {
+  outline: 2px solid $color-primary;
+  outline-offset: 2px;
+}

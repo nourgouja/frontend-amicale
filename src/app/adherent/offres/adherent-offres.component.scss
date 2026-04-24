@@ -1,0 +1,55 @@
+@use '../../../styles/variables' as *;
+
+.adherent-offres { display: flex; flex-direction: column; gap: $space-6; }
+
+.page-head { }
+.page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; }
+.page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin-top: 2px; }
+
+.filters-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: $space-4; flex-wrap: wrap;
+}
+
+.tabs { display: flex; gap: $space-1; background: $color-bg; border-radius: $radius-md; padding: 3px; }
+
+.tab-btn {
+  padding: 6px $space-4; border-radius: calc(#{$radius-md} - 2px); border: none; background: none;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 500; color: $color-text-muted;
+  cursor: pointer; transition: background $transition-fast, color $transition-fast;
+  &.active { background: $color-surface; color: $color-primary; font-weight: 600; box-shadow: $shadow-card; }
+  &:hover:not(.active) { color: $color-text; }
+  @include reduced-motion { transition: none; }
+}
+
+.search-wrap {
+  display: flex; align-items: center; gap: $space-2;
+  background: $color-surface; border: 1px solid $color-border; border-radius: $radius-md;
+  padding: 0 $space-3; height: 38px;
+  .search-icon { color: $color-text-muted; flex-shrink: 0; }
+}
+
+.search-input {
+  border: none; background: none; outline: none;
+  font-family: $font-base; font-size: $font-size-sm; color: $color-text; width: 180px;
+  &::placeholder { color: $color-text-muted; }
+}
+
+.offres-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: $space-5;
+  @include tablet { grid-template-columns: repeat(2, 1fr); }
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.loading-state, .empty-state {
+  display: flex; flex-direction: column; align-items: center; gap: $space-3;
+  padding: $space-8 $space-4; color: $color-text-muted; font-size: $font-size-sm; text-align: center;
+}
+
+.spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 3px solid $color-border; border-top-color: $color-primary;
+  animation: spin 0.7s linear infinite;
+  @include reduced-motion { animation: none; opacity: 0.5; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

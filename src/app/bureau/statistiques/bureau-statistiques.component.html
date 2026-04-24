@@ -1,0 +1,100 @@
+<div class="bureau-stats">
+
+  <div class="page-head">
+    <h1 class="page-title">Statistiques</h1>
+    <p class="page-sub">Vue d'ensemble de l'activité de l'association</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement des données…</p>
+    </div>
+  } @else if (stats(); as s) {
+
+    <!-- KPI row -->
+    <div class="kpi-grid">
+      <app-kpi-card label="Membres"         [value]="s.totalMembres"          icon="users"          color="primary" [subtitle]="s.membresActifs + ' actifs'" />
+      <app-kpi-card label="Offres"          [value]="s.totalOffres"           icon="tag"            color="blue"    [subtitle]="s.offresOuvertes + ' ouvertes'" />
+      <app-kpi-card label="Inscriptions"    [value]="s.totalInscriptions"     icon="clipboard-list" color="orange"  [subtitle]="s.inscriptionsConfirmees + ' confirmées'" />
+      <app-kpi-card label="Montant perçu"   [value]="s.montantPercu"          icon="credit-card"    color="green"   unit="DT" [subtitle]="s.montantAttendu + ' DT attendus'" />
+    </div>
+
+    <!-- Charts row -->
+    <div class="charts-row">
+
+      <!-- Répartition offres -->
+      <div class="chart-panel">
+        <h3 class="chart-title">Répartition des offres par type</h3>
+        @if (s.repartitionOffres.length === 0) {
+          <div class="chart-empty">Aucune donnée disponible</div>
+        } @else {
+          <div class="bar-chart">
+            @for (item of s.repartitionOffres; track item.type) {
+              <div class="bar-row">
+                <span class="bar-label">{{ typeLabel(item.type) }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill"
+                       [style.width.%]="(item.count / maxOffreCount()) * 100"
+                       [style.background]="typeColor(item.type)">
+                  </div>
+                </div>
+                <span class="bar-value">{{ item.count }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Taux -->
+      <div class="chart-panel">
+        <h3 class="chart-title">Taux de performance</h3>
+        <div class="gauge-list">
+          <div class="gauge-item">
+            <div class="gauge-head">
+              <span class="gauge-label">Taux de paiement des cotisations</span>
+              <span class="gauge-pct">{{ tauxPaiement() }}%</span>
+            </div>
+            <div class="gauge-track">
+              <div class="gauge-fill gauge-fill--green" [style.width.%]="tauxPaiement()"></div>
+            </div>
+            <p class="gauge-sub">{{ s.cotisationsPayees }} / {{ s.totalCotisations }} cotisations payées</p>
+          </div>
+
+          <div class="gauge-item">
+            <div class="gauge-head">
+              <span class="gauge-label">Taux de confirmation des inscriptions</span>
+              <span class="gauge-pct">{{ tauxInscription() }}%</span>
+            </div>
+            <div class="gauge-track">
+              <div class="gauge-fill gauge-fill--blue" [style.width.%]="tauxInscription()"></div>
+            </div>
+            <p class="gauge-sub">{{ s.inscriptionsConfirmees }} / {{ s.totalInscriptions }} inscriptions confirmées</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Évolution inscriptions -->
+    @if (s.evolutionInscriptions.length > 0) {
+      <div class="chart-panel">
+        <h3 class="chart-title">Évolution des inscriptions (6 derniers mois)</h3>
+        <div class="line-bars">
+          @for (pt of s.evolutionInscriptions; track pt.mois) {
+            <div class="lb-col">
+              <div class="lb-bar-wrap">
+                <div class="lb-bar"
+                     [style.height.%]="maxInscCount() > 0 ? (pt.count / maxInscCount()) * 100 : 0">
+                </div>
+              </div>
+              <span class="lb-label">{{ pt.mois }}</span>
+              <span class="lb-val">{{ pt.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  }
+</div>

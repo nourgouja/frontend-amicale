@@ -1,0 +1,90 @@
+@use '../../../styles/variables' as *;
+
+.offre-detail { display: flex; flex-direction: column; gap: $space-5; max-width: 960px; margin: 0 auto; }
+
+.back-link {
+  font-size: $font-size-sm; color: $color-primary; text-decoration: none; font-weight: 500;
+  &:hover { text-decoration: underline; }
+}
+
+.detail-layout {
+  display: grid; grid-template-columns: 300px 1fr; gap: $space-6; align-items: start;
+  @include tablet { grid-template-columns: 1fr; }
+}
+
+.detail-aside { display: flex; flex-direction: column; gap: $space-4; }
+
+.detail-img {
+  width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: $radius-lg;
+  border: 1px solid $color-border;
+}
+
+.detail-img-placeholder {
+  width: 100%; aspect-ratio: 4/3; border-radius: $radius-lg; border: 1px solid $color-border;
+  background: $color-bg; @include flex-center; color: $color-text-muted;
+}
+
+.aside-card {
+  @include card; padding: $space-4; display: flex; flex-direction: column; gap: $space-3;
+}
+
+.price-row    { display: flex; align-items: baseline; gap: $space-2; }
+.price        { font-size: $font-size-2xl; font-weight: 700; color: $color-primary; }
+.price-label  { font-size: $font-size-xs; color: $color-text-muted; }
+
+.capacity-row { display: flex; justify-content: space-between; font-size: $font-size-sm; color: $color-text-muted; }
+.capacity-val { font-weight: 600; color: $color-text; }
+
+.capacity-bar { height: 6px; background: $color-bg; border-radius: $radius-full; overflow: hidden; }
+.capacity-fill { height: 100%; background: $color-primary; border-radius: $radius-full; transition: width 0.4s ease; @include reduced-motion { transition: none; } }
+
+.btn-inscr {
+  width: 100%; padding: 12px; border-radius: $radius-md; border: none;
+  background: $color-primary; color: #fff;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 700;
+  cursor: pointer; transition: background $transition-fast;
+  &:hover:not(:disabled) { background: $color-primary-dark; }
+  &--disabled { background: $color-bg; color: $color-text-muted; cursor: not-allowed; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.inscribed-msg {
+  display: flex; align-items: center; gap: $space-2;
+  padding: $space-3; border-radius: $radius-md;
+  background: rgba(16,185,129,0.10); color: #047857;
+  font-size: $font-size-sm; font-weight: 500; border: 1px solid rgba(16,185,129,0.2);
+}
+
+.detail-main { display: flex; flex-direction: column; gap: $space-5; }
+
+.detail-badges { display: flex; align-items: center; gap: $space-2; flex-wrap: wrap; }
+
+.type-badge {
+  display: inline-block; padding: 3px 10px; border-radius: $radius-full;
+  background: $color-primary-light; color: $color-primary;
+  font-size: $font-size-xs; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.detail-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; line-height: 1.25; }
+
+.detail-meta { display: flex; flex-wrap: wrap; gap: $space-4; }
+.meta-item   { display: flex; align-items: center; gap: 5px; font-size: $font-size-sm; color: $color-text-muted; }
+
+.detail-section { display: flex; flex-direction: column; gap: $space-2; }
+.section-title  { font-size: $font-size-base; font-weight: 700; color: $color-text; }
+.detail-desc    { font-size: $font-size-sm; color: $color-text-muted; line-height: 1.7; }
+
+.avantages-list { list-style: none; display: flex; flex-direction: column; gap: $space-2; }
+.avantage-item  { display: flex; align-items: center; gap: $space-2; font-size: $font-size-sm; color: $color-text; }
+
+.loading-state { display: flex; justify-content: center; padding: $space-8; }
+
+.spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 3px solid $color-border; border-top-color: $color-primary;
+  animation: spin 0.7s linear infinite;
+  @include reduced-motion { animation: none; opacity: 0.5; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

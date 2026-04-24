@@ -1,0 +1,269 @@
+@if (loading()) {
+  <div class="loading-state"><div class="spinner"></div></div>
+} @else if (editMode()) {
+
+  <!-- ═══════════════ EDIT MODE ═══════════════ -->
+  <div class="edit-page">
+
+    <div class="edit-header">
+      <div>
+        <h1 class="edit-title">Informations personnelles</h1>
+        <p class="edit-sub">Consultez et mettez à jour vos informations personnelles.</p>
+      </div>
+    </div>
+
+    <div class="edit-card">
+      <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+
+        <!-- Photo -->
+        <div class="edit-row edit-row--photo">
+          <div class="edit-row-label">
+            <span class="row-label-title">Photo de profil</span>
+            <span class="row-label-sub">Importez votre photo de profil pour personnaliser votre compte.</span>
+          </div>
+          <div class="photo-area">
+            <button class="avatar-upload-btn" type="button" (click)="openPhotoModal()" title="Modifier la photo">
+              @if (photoSrc()) {
+                <img [src]="photoSrc()!" class="avatar-lg avatar-lg--img" alt="Photo de profil" />
+              } @else {
+                <div class="avatar-lg">{{ initials() }}</div>
+              }
+              <span class="avatar-overlay">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </span>
+            </button>
+            <button class="btn-upload-photo" type="button" (click)="openPhotoModal()">
+              Changer la photo
+            </button>
+          </div>
+        </div>
+
+        <div class="edit-divider"></div>
+
+        <!-- Name -->
+        <div class="edit-row">
+          <div class="edit-row-label">
+            <span class="row-label-title">Nom</span>
+          </div>
+          <div class="edit-row-fields name-row">
+            <div class="field">
+              <input class="edit-input" type="text" formControlName="prenom" placeholder="Prénom"
+                     [class.edit-input--error]="form.get('prenom')?.invalid && form.get('prenom')?.touched" />
+            </div>
+            <div class="field">
+              <input class="edit-input" type="text" formControlName="nom" placeholder="Nom"
+                     [class.edit-input--error]="form.get('nom')?.invalid && form.get('nom')?.touched" />
+            </div>
+          </div>
+        </div>
+
+        <div class="edit-divider"></div>
+
+        <!-- Email (read-only) -->
+        <div class="edit-row">
+          <div class="edit-row-label">
+            <span class="row-label-title">Email <span class="req">*</span></span>
+            <span class="row-label-sub">Cet email est utilisé pour accéder à votre compte.</span>
+          </div>
+          <div class="edit-row-fields">
+            <div class="email-field">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+              <span class="email-value">{{ profil()?.email }}</span>
+              <svg class="verified-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#10b981"/>
+                <polyline points="9 12 11 14 15 10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="edit-divider"></div>
+
+        <!-- Téléphone -->
+        <div class="edit-row">
+          <div class="edit-row-label">
+            <span class="row-label-title">Numéro</span>
+          </div>
+          <div class="edit-row-fields">
+            <input class="edit-input" type="tel" formControlName="telephone" placeholder="+216 XX XXX XXX" />
+          </div>
+        </div>
+
+      </form>
+
+      @if (saveError()) {
+        <div class="edit-alert edit-alert--error">{{ saveError() }}</div>
+      }
+    </div>
+
+    <div class="edit-footer-actions">
+      <button class="btn-cancel" (click)="cancelEdit()">Annuler</button>
+      <button class="btn-save" (click)="save()" [disabled]="saving()">
+        {{ saving() ? 'Enregistrement…' : 'Enregistrer' }}
+      </button>
+    </div>
+
+  </div>
+
+} @else {
+
+  <!-- ═══════════════ VIEW MODE ═══════════════ -->
+  <div class="profil-page">
+
+    <!-- Left column -->
+    <div class="profil-left">
+
+      <div class="avatar-card">
+        @if (photoSrc()) {
+          <img [src]="photoSrc()!" class="avatar-circle avatar-circle--img" alt="Photo de profil" />
+        } @else {
+          <div class="avatar-circle">{{ initials() }}</div>
+        }
+        <h2 class="user-name">{{ profil()?.prenom }} {{ profil()?.nom }}</h2>
+        <span class="role-badge">{{ roleLabel(profil()?.role ?? '') }}</span>
+        @if (posteLabel(profil()?.posteMembre)) {
+          <span class="poste-badge">{{ posteLabel(profil()?.posteMembre) }}</span>
+        }
+        <button class="btn-edit-profil" (click)="enterEdit()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Modifier le profil
+        </button>
+      </div>
+
+      <div class="info-card">
+        <div class="info-item">
+          <span class="info-label">Email</span>
+          <span class="info-value">{{ profil()?.email }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Numéro</span>
+          <span class="info-value">{{ profil()?.telephone || '—' }}</span>
+        </div>
+        @if (profil()?.posteMembre) {
+          <div class="info-item">
+            <span class="info-label">Poste</span>
+            <span class="info-value">{{ posteLabel(profil()?.posteMembre) }}</span>
+          </div>
+        }
+        @if (profil()?.poleNom) {
+          <div class="info-item">
+            <span class="info-label">Pôle</span>
+            <span class="info-value">{{ profil()?.poleNom }}</span>
+          </div>
+        }
+        @if (profil()?.matriculeStar) {
+          <div class="info-item">
+            <span class="info-label">Matricule STAR</span>
+            <span class="info-value">{{ profil()?.matriculeStar }}</span>
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- Right column -->
+    <div class="profil-right">
+
+      @if (saveSuccess()) {
+        <div class="alert-success">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" fill="#10b981"/>
+            <polyline points="9 12 11 14 15 10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Profil mis à jour avec succès.
+        </div>
+      }
+
+      <div class="info-section">
+        <h3 class="section-title">Informations du compte</h3>
+        <div class="detail-card">
+          <div class="detail-row">
+            <span class="detail-label">Nom complet</span>
+            <span class="detail-value">{{ profil()?.prenom }} {{ profil()?.nom }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Adresse email</span>
+            <span class="detail-value">{{ profil()?.email }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Téléphone</span>
+            <span class="detail-value">{{ profil()?.telephone || '—' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Rôle</span>
+            <span class="detail-value">{{ roleLabel(profil()?.role ?? '') }}</span>
+          </div>
+          @if (profil()?.posteMembre) {
+            <div class="detail-row">
+              <span class="detail-label">Poste</span>
+              <span class="detail-value">{{ posteLabel(profil()?.posteMembre) }}</span>
+            </div>
+          }
+          @if (profil()?.poleNom) {
+            <div class="detail-row">
+              <span class="detail-label">Pôle</span>
+              <span class="detail-value">{{ profil()?.poleNom }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h3 class="section-title">Sécurité</h3>
+        <div class="detail-card">
+          <div class="detail-row">
+            <span class="detail-label">Mot de passe</span>
+            <span class="detail-value detail-value--muted">••••••••</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+}
+
+<!-- Photo upload modal -->
+@if (showPhotoModal()) {
+  <div class="modal-overlay" (click)="closePhotoModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h3>Modifier la photo de profil</h3>
+        <button class="modal-close" (click)="closePhotoModal()">✕</button>
+      </div>
+      <label class="upload-zone">
+        <input type="file" accept="image/*" hidden (change)="onPhotoSelected($event)" />
+        @if (photoPreviewUrl()) {
+          <img [src]="photoPreviewUrl()!" class="upload-preview" alt="Aperçu" />
+        } @else {
+          <div class="upload-placeholder">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+            </svg>
+            <p><span class="upload-link">Cliquez</span> ou glissez-déposez une image</p>
+            <span>Format recommandé : carré, 400×400px minimum</span>
+          </div>
+        }
+      </label>
+      @if (photoError()) {
+        <p class="upload-error">{{ photoError() }}</p>
+      }
+      <div class="modal-foot">
+        <button class="btn btn-ghost" (click)="closePhotoModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="confirmPhotoUpload()"
+                [disabled]="!photoPreviewUrl() || photoUploading()">
+          {{ photoUploading() ? 'Enregistrement…' : 'Confirmer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

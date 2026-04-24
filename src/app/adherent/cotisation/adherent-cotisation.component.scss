@@ -1,0 +1,82 @@
+@use '../../../styles/variables' as *;
+
+.adherent-cotisation { display: flex; flex-direction: column; gap: $space-6; max-width: 700px; }
+
+.page-head { }
+.page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; }
+.page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin-top: 2px; }
+
+.cot-card {
+  @include card; padding: $space-6;
+  border-left: 4px solid $color-border;
+  display: flex; flex-direction: column; gap: $space-4;
+
+  &--ok     { border-left-color: #10b981; }
+  &--retard { border-left-color: $color-error; }
+}
+
+.cot-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: $space-4; }
+.cot-year   { font-size: $font-size-base; font-weight: 700; color: $color-text; }
+.cot-amount { font-size: $font-size-2xl; font-weight: 700; color: $color-primary; margin-top: 4px; }
+
+.cot-dates { display: flex; gap: $space-6; }
+.cot-date-item { display: flex; flex-direction: column; gap: 2px; }
+.cot-date-label { font-size: $font-size-xs; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.cot-date-val   { font-size: $font-size-sm; font-weight: 600; color: $color-text; }
+.text-red   { color: $color-error !important; }
+.text-green { color: #10b981 !important; }
+
+.cot-alert {
+  display: flex; align-items: center; gap: $space-2;
+  padding: $space-3 $space-4; border-radius: $radius-md;
+  background: rgba(220,38,38,0.08); color: $color-error;
+  font-size: $font-size-sm; border: 1px solid rgba(220,38,38,0.2);
+}
+
+.cot-ok-msg {
+  display: flex; align-items: center; gap: $space-2;
+  padding: $space-3 $space-4; border-radius: $radius-md;
+  background: rgba(16,185,129,0.08); color: #047857;
+  font-size: $font-size-sm; border: 1px solid rgba(16,185,129,0.2);
+}
+
+.panel { @include card; overflow: hidden; }
+.panel-head { padding: $space-4 $space-5; border-bottom: 1px solid $color-border; }
+.panel-title { font-size: $font-size-base; font-weight: 700; color: $color-text; }
+
+.hist-list { list-style: none; }
+
+.hist-row {
+  display: flex; align-items: center; gap: $space-3;
+  padding: $space-4 $space-5; border-bottom: 1px solid $color-border;
+  &:last-child { border-bottom: none; }
+}
+
+.hist-icon {
+  width: 28px; height: 28px; border-radius: 50%; @include flex-center; flex-shrink: 0;
+  font-size: $font-size-xs; font-weight: 700;
+  background: $color-bg; color: $color-text-muted;
+  &--green { background: rgba(16,185,129,0.12); color: #047857; }
+  &--red   { background: rgba(220,38,38,0.10); color: $color-error; }
+}
+
+.hist-info  { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 2px; }
+.hist-year  { font-size: $font-size-sm; font-weight: 600; color: $color-text; }
+.hist-dates { font-size: $font-size-xs; color: $color-text-muted; }
+
+.hist-right { display: flex; flex-direction: column; align-items: flex-end; gap: $space-1; flex-shrink: 0; }
+.hist-amount { font-size: $font-size-sm; font-weight: 600; color: $color-text; }
+
+.loading-state, .empty-state {
+  display: flex; flex-direction: column; align-items: center; gap: $space-3;
+  padding: $space-8 $space-4; color: $color-text-muted; font-size: $font-size-sm; text-align: center;
+}
+
+.spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 3px solid $color-border; border-top-color: $color-primary;
+  animation: spin 0.7s linear infinite;
+  @include reduced-motion { animation: none; opacity: 0.5; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

@@ -1,0 +1,66 @@
+<div class="bureau-dash">
+
+  <div class="greeting">
+    <p class="greeting-date">{{ today }}</p>
+    <h1 class="greeting-title">Bonjour, {{ displayName() }}</h1>
+  </div>
+
+  <!-- KPI row -->
+  <div class="kpi-grid">
+    <app-kpi-card label="Offres actives"          [value]="offresActives()"       icon="tag"            color="primary" />
+    <app-kpi-card label="Inscriptions en attente" [value]="inscriptionsPending()" icon="clipboard-list" [color]="inscriptionsPending() > 0 ? 'orange' : 'primary'" />
+    <app-kpi-card label="Cotisations en retard"   [value]="cotisationsImpayees()" icon="dollar-sign"    [color]="cotisationsImpayees() > 0 ? 'red' : 'green'" />
+    <app-kpi-card label="Calendrier"              value="Voir"                    icon="calendar-days"  color="blue" />
+  </div>
+
+  <!-- Inscriptions à valider -->
+  <div class="panel">
+    <div class="panel-head">
+      <h3 class="panel-title">Inscriptions à valider</h3>
+      @if (inscriptionsPending() > 0) {
+        <span class="badge-count">{{ inscriptionsPending() }}</span>
+      }
+      <a class="panel-link" routerLink="/bureau/inscriptions">Voir tout →</a>
+    </div>
+
+    @if (loading()) {
+      <div class="panel-loading"><div class="spinner"></div></div>
+    } @else if (pendingList().length === 0) {
+      <div class="panel-empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <p>Aucune inscription à valider ✓</p>
+      </div>
+    } @else {
+      <ul class="item-list">
+        @for (ins of pendingList(); track ins.id) {
+          <li class="item-row">
+            <div class="item-avatar">{{ initials(ins.mailAdherent) }}</div>
+            <div class="item-info">
+              <span class="item-name">{{ ins.mailAdherent }}</span>
+              <span class="item-sub">{{ ins.offreTitre }} · {{ formatDate(ins.dateInscription) }}</span>
+            </div>
+            <button class="btn-validate" (click)="valider(ins.id)">✓ Valider</button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <!-- Cotisations en retard (count only — no list endpoint available) -->
+  @if (cotisationsImpayees() > 0) {
+    <div class="panel panel--alert">
+      <div class="panel-head">
+        <h3 class="panel-title">Cotisations en retard</h3>
+        <span class="badge-count badge-count--red">{{ cotisationsImpayees() }}</span>
+        <a class="panel-link" routerLink="/bureau/cotisations">Gérer →</a>
+      </div>
+      <div class="alert-message">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>{{ cotisationsImpayees() }} cotisation(s) en retard. Consultez la section cotisations pour plus de détails.</span>
+      </div>
+    </div>
+  }
+
+</div>

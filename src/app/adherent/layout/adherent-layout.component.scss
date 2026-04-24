@@ -1,0 +1,75 @@
+@use '../../../styles/variables' as *;
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.adherent-shell {
+  display: flex; flex-direction: column; min-height: 100vh;
+  font-family: $font-base; background: $color-bg;
+}
+
+.top-nav {
+  height: $topbar-height; background: $color-surface; border-bottom: 1px solid $color-border;
+  display: flex; align-items: center; padding: 0 $space-7; gap: $space-6;
+  position: sticky; top: 0; z-index: 200; flex-shrink: 0;
+}
+
+.nav-brand { flex-shrink: 0; }
+.nav-logo  { height: 36px; object-fit: contain; }
+
+.nav-links {
+  display: flex; align-items: center; gap: $space-1; flex: 1;
+  @include mobile { display: none; }
+}
+
+.nav-link {
+  display: flex; align-items: center; gap: $space-2;
+  padding: 8px $space-3; border-radius: $radius-md;
+  color: $color-text-muted; text-decoration: none;
+  font-size: $font-size-sm; font-weight: 500; white-space: nowrap;
+  transition: background $transition-fast, color $transition-fast;
+
+  .nav-icon { opacity: 0.7; flex-shrink: 0; }
+  &:hover  { background: $color-primary-light; color: $color-primary; .nav-icon { opacity: 1; } }
+  &.active { background: $color-primary-light; color: $color-primary; font-weight: 600; .nav-icon { opacity: 1; } }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.nav-actions { display: flex; align-items: center; gap: $space-3; flex-shrink: 0; }
+
+.icon-wrap { position: relative; }
+
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; color: $color-text-muted;
+  @include flex-center; cursor: pointer; transition: color $transition-fast;
+  &:hover { color: $color-primary; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.avatar-btn { background: none; border: none; cursor: pointer; padding: 0; &:focus-visible { @include focus-ring; border-radius: 50%; } }
+
+.top-avatar {
+  width: 34px; height: 34px; border-radius: 50%; background: $color-primary; color: #fff;
+  font-size: $font-size-sm; font-weight: 700; @include flex-center; font-family: $font-base;
+}
+
+.avatar-name { font-size: $font-size-sm; font-weight: 500; color: $color-text; @include mobile { display: none; } }
+
+.dropdown {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  background: $color-surface; border-radius: $radius-xl; box-shadow: $shadow-dropdown;
+  padding: $space-2 0; z-index: 500; animation: dropIn 0.15s ease;
+  @include reduced-motion { animation: none; }
+}
+.notif-dropdown { width: 280px; }
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-header { padding: $space-3 $space-4 $space-2; font-size: $font-size-base; font-weight: 700; color: $color-text; }
+.dropdown-empty  { padding: $space-6 $space-4; text-align: center; font-size: $font-size-sm; color: $color-text-muted; }
+
+.content { flex: 1; padding: $content-padding; overflow-y: auto; }

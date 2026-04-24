@@ -1,0 +1,99 @@
+@use '../../../styles/variables' as *;
+
+.bureau-inscriptions { display: flex; flex-direction: column; gap: $space-6; }
+
+.page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: $space-4; }
+.page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; }
+.page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin-top: 4px; display: flex; align-items: center; gap: $space-2; }
+
+.pending-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 6px; border-radius: $radius-full;
+  background: rgba(245,158,11,0.15); color: #92400e;
+  font-size: $font-size-xs; font-weight: 700;
+}
+
+.filters-bar { display: flex; align-items: center; gap: $space-3; flex-wrap: wrap; }
+
+.search-wrap {
+  display: flex; align-items: center; gap: $space-2;
+  background: $color-surface; border: 1px solid $color-border; border-radius: $radius-md;
+  padding: 0 $space-3; height: 38px; flex: 1; max-width: 360px;
+  .search-icon { color: $color-text-muted; flex-shrink: 0; }
+}
+
+.search-input {
+  flex: 1; border: none; background: none; outline: none;
+  font-family: $font-base; font-size: $font-size-sm; color: $color-text;
+  &::placeholder { color: $color-text-muted; }
+}
+
+.statut-select {
+  height: 38px; padding: 0 $space-3; border: 1px solid $color-border; border-radius: $radius-md;
+  background: $color-surface; font-family: $font-base; font-size: $font-size-sm; color: $color-text;
+  cursor: pointer; outline: none;
+  &:focus { border-color: $color-primary; }
+}
+
+.table-card { @include card; overflow: hidden; }
+
+.data-table {
+  width: 100%; border-collapse: collapse;
+
+  thead tr { background: $color-bg; }
+  th {
+    padding: $space-3 $space-4; text-align: left;
+    font-size: $font-size-xs; font-weight: 700; color: $color-text-muted;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid $color-border;
+  }
+  td {
+    padding: $space-4; border-bottom: 1px solid $color-border;
+    font-size: $font-size-sm; color: $color-text; vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background $transition-fast; &:hover { background: rgba(2,102,84,0.025); } }
+  @include reduced-motion { tbody tr { transition: none; } }
+}
+
+.member-cell  { display: flex; align-items: center; gap: $space-3; }
+.member-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: $color-primary-light; color: $color-primary;
+  font-size: $font-size-xs; font-weight: 700; @include flex-center; flex-shrink: 0;
+}
+.member-info  { display: flex; flex-direction: column; min-width: 0; }
+.member-name  { font-weight: 600; @include truncate; }
+.member-email { font-size: $font-size-xs; color: $color-text-muted; @include truncate; }
+.offre-name   { font-weight: 500; }
+.date-cell    { color: $color-text-muted; white-space: nowrap; }
+
+.action-btns { display: flex; gap: $space-2; }
+
+.btn-validate, .btn-refuse {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: $radius-sm; border: none;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 600;
+  cursor: pointer; white-space: nowrap; transition: background $transition-fast;
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.btn-validate { background: rgba(16,185,129,0.12); color: #047857; &:hover { background: rgba(16,185,129,0.22); } }
+.btn-refuse   { background: rgba(220,38,38,0.10);  color: $color-error; &:hover { background: rgba(220,38,38,0.18); } }
+
+.no-action { color: $color-text-muted; }
+
+.loading-state, .empty-state {
+  display: flex; flex-direction: column; align-items: center; gap: $space-3;
+  padding: $space-8 $space-4; color: $color-text-muted; font-size: $font-size-sm; text-align: center;
+}
+
+.spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 3px solid $color-border; border-top-color: $color-primary;
+  animation: spin 0.7s linear infinite;
+  @include reduced-motion { animation: none; opacity: 0.5; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

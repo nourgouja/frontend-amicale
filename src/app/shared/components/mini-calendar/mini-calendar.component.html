@@ -1,0 +1,36 @@
+<div class="mini-cal">
+  <div class="cal-nav">
+    <button class="cal-nav-btn" (click)="prevMonth()" aria-label="Mois précédent">&#8249;</button>
+    <span class="cal-month">{{ monthLabel() }}</span>
+    <button class="cal-nav-btn" (click)="nextMonth()" aria-label="Mois suivant">&#8250;</button>
+  </div>
+
+  <div class="cal-weekdays">
+    @for (d of WEEKDAYS; track d) {
+      <span>{{ d }}</span>
+    }
+  </div>
+
+  <div class="cal-body">
+    @for (week of weeks(); track $index) {
+      @for (day of week; track day.getTime()) {
+        <button
+          class="cal-day"
+          [class.today]="isToday(day)"
+          [class.other-month]="!isCurrentMonth(day)"
+          [class.has-events]="offresForDay(day).length > 0"
+          (click)="onDayClick(day)"
+          [attr.aria-label]="day.toLocaleDateString('fr-FR')"
+        >
+          <span class="day-num">{{ day.getDate() }}</span>
+          @for (item of labelsForDay(day).slice(0, 2); track item.label) {
+            <span class="event-pill" [style.background]="item.color">{{ item.label }}</span>
+          }
+          @if (labelsForDay(day).length > 2) {
+            <span class="event-more">+{{ labelsForDay(day).length - 2 }}</span>
+          }
+        </button>
+      }
+    }
+  </div>
+</div>

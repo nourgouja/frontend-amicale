@@ -1,0 +1,96 @@
+<div class="adherent-cotisation">
+
+  <div class="page-head">
+    <h1 class="page-title">Ma cotisation</h1>
+    <p class="page-sub">Suivez l'état de votre cotisation annuelle</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement…</p>
+    </div>
+  } @else {
+
+    <!-- Current cotisation card -->
+    @if (cotisation(); as cot) {
+      <div class="cot-card" [class.cot-card--retard]="cot.statut === 'EN_RETARD'" [class.cot-card--ok]="cot.statut === 'PAYEE'">
+        <div class="cot-card-head">
+          <div>
+            <h2 class="cot-year">Cotisation {{ cot.anneeCotisation }}</h2>
+            <p class="cot-amount">{{ cot.montant | number }} DT</p>
+          </div>
+          <app-status-badge [statut]="cot.statut" type="cotisation" />
+        </div>
+
+        <div class="cot-dates">
+          <div class="cot-date-item">
+            <span class="cot-date-label">Échéance</span>
+            <span class="cot-date-val" [class.text-red]="cot.statut === 'EN_RETARD'">{{ formatDate(cot.dateEcheance) }}</span>
+          </div>
+          @if (cot.datePaiement) {
+            <div class="cot-date-item">
+              <span class="cot-date-label">Payée le</span>
+              <span class="cot-date-val text-green">{{ formatDate(cot.datePaiement) }}</span>
+            </div>
+          }
+        </div>
+
+        @if (cot.statut === 'EN_RETARD') {
+          <div class="cot-alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>Votre cotisation est en retard. Veuillez contacter le bureau pour régulariser votre situation.</span>
+          </div>
+        }
+
+        @if (cot.statut === 'PAYEE') {
+          <div class="cot-ok-msg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Votre cotisation est à jour. Merci !</span>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+        <p>Aucune cotisation enregistrée pour cette année</p>
+      </div>
+    }
+
+    <!-- Historique -->
+    @if (historique().length > 0) {
+      <div class="panel">
+        <div class="panel-head">
+          <h3 class="panel-title">Historique des cotisations</h3>
+        </div>
+        <ul class="hist-list">
+          @for (h of historique(); track h.id) {
+            <li class="hist-row">
+              <span class="hist-icon" [class.hist-icon--green]="h.statut === 'PAYEE'" [class.hist-icon--red]="h.statut === 'EN_RETARD'">
+                {{ statusIcon(h.statut) }}
+              </span>
+              <div class="hist-info">
+                <span class="hist-year">Cotisation {{ h.anneeCotisation }}</span>
+                <span class="hist-dates">
+                  Échéance: {{ formatDate(h.dateEcheance) }}
+                  @if (h.datePaiement) { · Payée: {{ formatDate(h.datePaiement) }} }
+                </span>
+              </div>
+              <div class="hist-right">
+                <span class="hist-amount">{{ h.montant | number }} DT</span>
+                <app-status-badge [statut]="h.statut" type="cotisation" />
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  }
+
+</div>

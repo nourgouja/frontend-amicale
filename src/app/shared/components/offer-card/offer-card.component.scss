@@ -1,0 +1,224 @@
+@use '../../../../styles/variables' as *;
+
+.offer-card {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow $transition-base, transform $transition-base;
+
+  &:hover {
+    box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+  }
+
+  @include reduced-motion {
+    transition: none;
+    &:hover { transform: none; }
+  }
+}
+
+/* ── Image ── */
+.card-img {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+  background: #f0f2f5;
+  flex-shrink: 0;
+
+  img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform $transition-slow;
+
+    @include reduced-motion { transition: none; }
+  }
+
+  &:hover img { transform: scale(1.03); }
+}
+
+.img-placeholder {
+  width: 100%; height: 100%;
+  @include flex-center;
+  color: #c0c4cc;
+  background: linear-gradient(135deg, #f0f2f5 0%, #e8eaf0 100%);
+}
+
+.type-badge {
+  position: absolute;
+  top: $space-3; left: $space-3;
+  color: #fff;
+  font-size: $font-size-xs;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: $radius-full;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* ── Three-dot menu ── */
+.card-menu-wrapper {
+  position: absolute;
+  top: $space-3; right: $space-3;
+}
+
+.card-menu-btn {
+  width: 28px; height: 28px;
+  border-radius: $radius-md;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  cursor: pointer;
+  @include flex-center;
+  color: $color-text;
+  transition: background $transition-fast;
+
+  &:hover { background: #fff; }
+  &:focus-visible { @include focus-ring; }
+}
+
+.card-menu {
+  position: absolute;
+  top: 32px; right: 0;
+  background: $color-surface;
+  border-radius: $radius-md;
+  box-shadow: $shadow-dropdown;
+  padding: $space-1 0;
+  min-width: 140px;
+  z-index: 10;
+  animation: dropIn 0.12s ease;
+
+  @include reduced-motion { animation: none; }
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  width: 100%;
+  padding: 9px $space-4;
+  background: none;
+  border: none;
+  font-family: $font-base;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-text;
+  cursor: pointer;
+  text-align: left;
+
+  svg { flex-shrink: 0; color: $color-text-muted; }
+  &:hover { background: #f5f5f5; }
+  &:focus-visible { @include focus-ring; }
+  &--danger { color: $color-error; svg { color: $color-error; } }
+}
+
+/* ── Body ── */
+.card-body {
+  padding: $space-4;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  flex: 1;
+}
+
+.card-row-top {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}
+
+.card-title {
+  font-size: $font-size-md;
+  font-weight: 700;
+  color: $color-text;
+  line-height: 1.3;
+  @include truncate;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+
+  svg { flex-shrink: 0; color: #b0b8c1; }
+}
+
+.card-price {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $color-primary;
+  margin-top: $space-1;
+
+  span {
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $color-text-muted;
+  }
+}
+
+/* ── Capacity bar ── */
+.capacity-bar {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.capacity-track {
+  height: 5px;
+  background: #e8eaf0;
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.capacity-fill {
+  height: 100%;
+  background: $color-primary;
+  border-radius: $radius-full;
+  transition: width $transition-slow;
+
+  @include reduced-motion { transition: none; }
+}
+
+.capacity-label {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+  font-weight: 500;
+}
+
+/* ── Footer ── */
+.card-footer {
+  padding: $space-3 $space-4 $space-4;
+  border-top: 1px solid $color-border;
+}
+
+.btn-register {
+  width: 100%;
+  padding: 10px;
+  border-radius: $radius-md;
+  border: none;
+  font-family: $font-base;
+  font-size: $font-size-base;
+  font-weight: 600;
+  cursor: pointer;
+  background: $color-primary;
+  color: #fff;
+  transition: background $transition-fast;
+
+  &:hover { background: $color-primary-dark; }
+  &:focus-visible { @include focus-ring; }
+
+  &--full, &--closed {
+    background: #e5e7eb;
+    color: $color-text-muted;
+    cursor: not-allowed;
+  }
+
+  @include reduced-motion { transition: none; }
+}

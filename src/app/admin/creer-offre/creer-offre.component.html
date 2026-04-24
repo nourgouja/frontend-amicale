@@ -1,0 +1,280 @@
+@if (successMsg()) {
+  <div class="toast toast--success" role="alert" aria-live="polite">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    {{ successMsg() }}
+  </div>
+}
+@if (errorMsg()) {
+  <div class="toast toast--error" role="alert" aria-live="polite">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    {{ errorMsg() }}
+  </div>
+}
+
+<div class="creer-page">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="cancel()" aria-label="Retour">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </button>
+      <div>
+        <h1 class="page-title">{{ isEditMode() ? 'Modifier l\'offre' : 'Nouvelle offre' }}</h1>
+        <p class="page-sub">Remplissez les informations ci-dessous</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost" (click)="cancel()" [disabled]="submitting()">Annuler</button>
+      <button class="btn btn-outline" (click)="saveDraft()" [disabled]="submitting()">
+        @if (submitting() && draftMode()) { <span class="btn-spinner"></span> } Brouillon
+      </button>
+      <button class="btn btn-primary" (click)="submit()" [disabled]="submitting()">
+        @if (submitting() && !draftMode()) { <span class="btn-spinner"></span> }
+        {{ isEditMode() ? 'Mettre à jour' : 'Publier l\'offre' }}
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form-body">
+
+    <div class="form-main">
+
+      <!-- Informations générales -->
+      <div class="form-section">
+        <h2 class="section-title">Informations générales</h2>
+
+        <div class="field">
+          <label class="label" for="titre">Titre de l'offre <span class="req">*</span></label>
+          <input id="titre" class="input input--lg" [class.is-invalid]="isInvalid('titre')"
+            formControlName="titre" placeholder="Ex: Voyage à Djerba — Été 2026" autocomplete="off" />
+          @if (isInvalid('titre')) { <span class="field-error">Le titre est requis.</span> }
+        </div>
+
+        <div class="field">
+          <label class="label">Type d'offre <span class="req">*</span></label>
+          <div class="type-cards" role="radiogroup">
+            @for (t of offreTypes(); track t.value) {
+              <button type="button" class="type-card"
+                [class.selected]="typeCtrl.value === t.value"
+                [style.--accent]="t.color"
+                (click)="form.get('typeOffre')!.setValue(t.value)"
+                [attr.aria-pressed]="typeCtrl.value === t.value">
+
+                <!-- SVG icon per type -->
+                @switch (t.value) {
+                  @case ('VOYAGE') {
+                    <svg class="type-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2A1 1 0 0 0 3.9 6l2.3 3.5L4 12l1.5 1.5L8 12l2 1 2.5 2.5-1 2.5 1.5 1.5 3.5-2.3L19 17l-.8-.8z"/>
+                    </svg>
+                  }
+                  @case ('SEJOUR') {
+                    <svg class="type-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                  }
+                  @case ('ACTIVITE') {
+                    <svg class="type-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                  }
+                  @case ('CONVENTION') {
+                    <svg class="type-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                  }
+                }
+                <span class="type-label">{{ t.label }}</span>
+              </button>
+            }
+          </div>
+          @if (isInvalid('typeOffre')) { <span class="field-error">Veuillez choisir un type.</span> }
+        </div>
+
+        @if (typeCtrl.value && selectedTypeName()) {
+          <div class="pole-chip">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Pôle assigné automatiquement pour les offres de type <strong>{{ selectedTypeName() }}</strong>
+          </div>
+        }
+
+        <div class="field">
+          <label class="label" for="description">Description</label>
+          <textarea id="description" class="input" formControlName="description" rows="4"
+            placeholder="Décrivez l'offre — programme, ambiance, points forts..."></textarea>
+        </div>
+      </div>
+
+      <!-- Dates et lieu -->
+      <div class="form-section">
+        <h2 class="section-title">Dates et lieu</h2>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="dateDebut">
+              Date de début @if (!isConvention) { <span class="req">*</span> }
+            </label>
+            <input id="dateDebut" class="input" type="date" formControlName="dateDebut"
+              [class.is-invalid]="isInvalid('dateDebut')" />
+            @if (isInvalid('dateDebut')) { <span class="field-error">La date de début est requise.</span> }
+          </div>
+          @if (showDateFin) {
+            <div class="field">
+              <label class="label" for="dateFin">Date de fin</label>
+              <input id="dateFin" class="input" type="date" formControlName="dateFin" />
+            </div>
+          }
+        </div>
+
+        <div class="field">
+          <label class="label" for="lieu">Lieu</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <input id="lieu" class="input input--icon" formControlName="lieu" placeholder="Ville, pays ou adresse" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Capacité et tarif -->
+      <div class="form-section">
+        <h2 class="section-title">Capacité et tarif</h2>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="cap">Capacité maximale</label>
+            <div class="number-ctrl">
+              <button type="button" class="num-btn" (click)="form.get('capaciteMax')!.setValue((form.get('capaciteMax')!.value || 0) - 1)">−</button>
+              <input id="cap" class="input input--num" type="number" min="1" formControlName="capaciteMax" placeholder="—" />
+              <button type="button" class="num-btn" (click)="form.get('capaciteMax')!.setValue((form.get('capaciteMax')!.value || 0) + 1)">+</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="prix">Prix par personne</label>
+            <div class="input-icon-wrap input-suffix-wrap">
+              <input id="prix" class="input input--suffix" type="number" min="0" formControlName="prixParPersonne" placeholder="0" />
+              <span class="input-suffix">DT</span>
+            </div>
+          </div>
+        </div>
+
+        @if (showModePaiement) {
+          <div class="field">
+            <label class="label">Mode de paiement</label>
+            <div class="radio-group" role="radiogroup">
+              @for (m of paymentModes; track m.value) {
+                <label class="radio-label">
+                  <input type="radio" [value]="m.value" formControlName="modePaiement" />
+                  <span>{{ m.label }}</span>
+                </label>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Avantages -->
+      <div class="form-section">
+        <h2 class="section-title">Avantages inclus</h2>
+        <div class="field">
+          <label class="label" for="avantages">Ce qui est inclus dans l'offre</label>
+          <textarea id="avantages" class="input" formControlName="avantages" rows="3"
+            placeholder="Ex: Transport, hébergement, repas, guide touristique..."></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <div class="form-sidebar">
+
+      <!-- Cover image -->
+      <div class="form-section">
+        <h2 class="section-title">Image de couverture</h2>
+
+        <div class="cover-zone" (click)="openUploadModal()" role="button" tabindex="0"
+          (keydown.enter)="openUploadModal()" aria-label="Ajouter une image de couverture">
+          @if (previewUrl()) {
+            <img [src]="previewUrl()" alt="Aperçu" class="cover-preview" />
+          } @else {
+            <div class="cover-placeholder">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+              </svg>
+              <p>Cliquer pour ajouter une image</p>
+              <span>JPG, PNG, WEBP — max 5 Mo</span>
+            </div>
+          }
+        </div>
+
+        @if (previewUrl()) {
+          <button type="button" class="btn-remove-img" (click)="removeImage()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+            Supprimer
+          </button>
+        }
+      </div>
+
+      <!-- Extra photos -->
+      <div class="form-section">
+        <div class="gallery-head">
+          <h2 class="section-title">Images supplémentaires</h2>
+          <span class="gallery-count">{{ extraFiles().length }}/5</span>
+        </div>
+        <p class="gallery-hint">Ajoutez jusqu'à 5 photos de l'offre</p>
+
+        <div class="gallery-grid">
+          @for (prev of extraPreviews(); track $index) {
+            <div class="gallery-thumb">
+              <img [src]="prev" alt="Image {{ $index + 1 }}" />
+              <button type="button" class="thumb-remove" (click)="removeExtra($index)" aria-label="Supprimer">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          }
+          @if (canAddExtra) {
+            <label class="gallery-add" aria-label="Ajouter une image">
+              <input type="file" accept="image/*" multiple hidden (change)="onExtraFilesSelected($event)" />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </label>
+          }
+        </div>
+      </div>
+
+    </div>
+
+  </form>
+</div>
+
+<!-- Upload modal -->
+@if (showUploadModal()) {
+  <div class="modal-overlay" (click)="closeUploadModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h3>Ajouter une image de couverture</h3>
+        <button class="modal-close" (click)="closeUploadModal()">✕</button>
+      </div>
+      <label class="upload-zone">
+        <input type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+        @if (previewUrl()) {
+          <img [src]="previewUrl()" class="upload-preview" alt="Aperçu" />
+        } @else {
+          <div class="upload-placeholder">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+            </svg>
+            <p><span class="upload-link">Cliquez</span> ou glissez-déposez une image</p>
+            <span>Format recommandé : 1920×1080px</span>
+          </div>
+        }
+      </label>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" (click)="closeUploadModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="confirmUpload()" [disabled]="!previewUrl()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+}

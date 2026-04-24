@@ -1,0 +1,140 @@
+$primary: #026654;
+$border: #e9ecef;
+$text-dark: #0f172a;
+$text-muted: #64748b;
+$font: 'Poppins', sans-serif;
+
+.profile-card {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 500;
+  width: 260px;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid $border;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+  padding: 6px 0;
+  font-family: $font;
+  animation: dropIn 0.15s ease;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 12px;
+}
+
+.card-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #94a3b8;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-avatar-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.card-email {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $text-dark;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-role {
+  font-size: 11px;
+  font-weight: 500;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card-divider {
+  border: none;
+  border-top: 1px solid $border;
+  margin: 4px 0;
+}
+
+/* Buttons */
+.card-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: $text-dark;
+  cursor: pointer;
+  font-family: $font;
+  text-align: left;
+  transition: background 0.12s;
+
+  svg { flex-shrink: 0; color: #6b7280; }
+
+  &:hover { background: #f8fafc; }
+
+  &--lang {
+    cursor: default;
+    &:hover { background: transparent; }
+  }
+
+  &--logout {
+    color: #dc2626;
+    svg { color: #dc2626; }
+    &:hover { background: #fff1f2; }
+  }
+}
+
+.lang-label { flex: 1; }
+
+.lang-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.lang-opt {
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1.5px solid #d1d5db;
+  background: none;
+  font-family: $font;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &.active {
+    background: $primary;
+    color: #fff;
+    border-color: $primary;
+  }
+
+  &:not(.active):hover { background: #f0f0f0; }
+}

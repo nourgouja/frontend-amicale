@@ -1,0 +1,220 @@
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
+
+interface Pole { id: number; nom: string; typeOffre: string; }
+
+@Component({
+  selector: 'app-creer-offre',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './creer-offre.component.html',
+  styleUrl: './creer-offre.component.scss',
+})
+export class CreerOffreComponent implements OnInit {
+  private fb          = inject(FormBuilder);
+  private router      = inject(Router);
+  private route       = inject(ActivatedRoute);
+  private http        = inject(HttpClient);
+  private authService = inject(AuthService);
+
+  readonly isBureauMode = this.router.url.startsWith('/bureau');
+
+  poles           = signal<Pole[]>([]);
+  previewUrl      = signal<string | null>(null);
+  coverFile       = signal<File | null>(null);
+
+  /* Up to 5 extra gallery images */
+  extraFiles    = signal<File[]>([]);
+  extraPreviews = signal<string[]>([]);
+
+  showUploadModal = signal(false);
+  submitting      = signal(false);
+  draftMode       = signal(false);
+  successMsg      = signal('');
+  errorMsg        = signal('');
+  isEditMode      = signal(false);
+
+  private readonly allTypes = [
+    { value: 'VOYAGE',     label: 'Voyage',     color: '#3b82f6' },
+    { value: 'SEJOUR',     label: 'Séjour',     color: '#10b981' },
+    { value: 'ACTIVITE',   label: 'Activité',   color: '#f59e0b' },
+    { value: 'CONVENTION', label: 'Convention', color: '#8b5cf6' },
+  ] as const;
+
+  userPoleTypeOffre = signal<string | null>(null);
+  offreTypes = computed(() => {
+    const pole = this.userPoleTypeOffre();
+    if (this.isBureauMode && pole) {
+      return this.allTypes.filter(t => t.value === pole);
+    }
+    return [...this.allTypes];
+  });
+
+  readonly paymentModes = [
+    { value: 'FULL',       label: 'Comptant — paiement intégral' },
+    { value: 'SEMESTRIEL', label: 'Semestriel — 2 versements' },
+    { value: 'TIERS',      label: 'Tiers — 3 versements' },
+  ];
+
+  form!: FormGroup;
+
+  get typeCtrl(): AbstractControl { return this.form.get('typeOffre')!; }
+  get showDateFin(): boolean { const t = this.typeCtrl.value; return t === 'VOYAGE' || t === 'SEJOUR'; }
+  get showModePaiement(): boolean { return this.typeCtrl.value === 'VOYAGE'; }
+  get isConvention(): boolean { return this.typeCtrl.value === 'CONVENTION'; }
+  get canAddExtra(): boolean { return this.extraFiles().length < 5; }
+
+  ngOnInit(): void {
+    this.form = this.fb.group({
+      titre:           ['', Validators.required],
+      typeOffre:       ['', Validators.required],
+      description:     [''],
+      lieu:            [''],
+      dateDebut:       ['', Validators.required],
+      dateFin:         [''],
+      prixParPersonne: [null, [Validators.min(0)]],
+      capaciteMax:     [null, [Validators.min(1)]],
+      modePaiement:    [''],
+      avantages:       [''],
+      poleId:          [null],
+    });
+
+    this.http.get<Pole[]>('/api/poles').subscribe({
+      next: poles => { this.poles.set(poles); this.autoSetPole(this.typeCtrl.value); },
+    });
+
+    if (this.isBureauMode) {
+      this.http.get<any>('/api/utilisateurs/profil').subscribe({
+        next: p => {
+          if (p.poleTypeOffre) {
+            this.userPoleTypeOffre.set(p.poleTypeOffre);
+            this.form.patchValue({ typeOffre: p.poleTypeOffre });
+          }
+        },
+      });
+    }
+
+    this.form.get('typeOffre')!.valueChanges.subscribe(type => {
+      this.autoSetPole(type);
+      const dateCtrl = this.form.get('dateDebut')!;
+      if (type === 'CONVENTION') {
+        dateCtrl.removeValidators(Validators.required);
+      } else {
+        dateCtrl.addValidators(Validators.required);
+      }
+      dateCtrl.updateValueAndValidity({ emitEvent: false });
+    });
+
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) { this.isEditMode.set(true); this.loadOffre(+id); }
+  }
+
+  private loadOffre(id: number): void {
+    this.http.get<any>(`/api/offres/${id}`).subscribe({
+      next: offre => {
+        this.form.patchValue({
+          titre: offre.titre, typeOffre: offre.typeOffre, description: offre.description,
+          lieu: offre.lieu, dateDebut: offre.dateDebut?.slice(0, 10), dateFin: offre.dateFin?.slice(0, 10),
+          prixParPersonne: offre.prixParPersonne, capaciteMax: offre.capaciteMax,
+          modePaiement: offre.modePaiement, avantages: offre.avantages, poleId: offre.poleId,
+        });
+        if (offre.imageBase64 && offre.imageType) {
+          this.previewUrl.set(`data:${offre.imageType};base64,${offre.imageBase64}`);
+        }
+      },
+    });
+  }
+
+  private autoSetPole(type: string): void {
+    if (!type || !this.poles().length) return;
+    const match = this.poles().find(p => p.typeOffre === type);
+    this.form.patchValue({ poleId: match?.id ?? null });
+  }
+
+  selectedTypeName(): string {
+    return this.offreTypes().find(t => t.value === this.typeCtrl.value)?.label ?? '';
+  }
+
+  /* Cover image */
+  openUploadModal(): void  { this.showUploadModal.set(true); }
+  closeUploadModal(): void { this.showUploadModal.set(false); }
+
+  onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.coverFile.set(file);
+    const reader = new FileReader();
+    reader.onload = e => this.previewUrl.set(e.target?.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void { this.previewUrl.set(null); this.coverFile.set(null); }
+  confirmUpload(): void { this.showUploadModal.set(false); }
+
+  /* Extra gallery images */
+  onExtraFilesSelected(event: Event): void {
+    const files = Array.from((event.target as HTMLInputElement).files ?? []);
+    const remaining = 5 - this.extraFiles().length;
+    const toAdd = files.slice(0, remaining);
+    this.extraFiles.update(cur => [...cur, ...toAdd]);
+    toAdd.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => this.extraPreviews.update(cur => [...cur, e.target?.result as string]);
+      reader.readAsDataURL(file);
+    });
+    (event.target as HTMLInputElement).value = '';
+  }
+
+  removeExtra(idx: number): void {
+    this.extraFiles.update(f => f.filter((_, i) => i !== idx));
+    this.extraPreviews.update(p => p.filter((_, i) => i !== idx));
+  }
+
+  cancel(): void {
+    const returnUrl = this.router.url.startsWith('/bureau') ? '/bureau/offres' : '/admin/offres';
+    this.router.navigate([returnUrl]);
+  }
+
+  saveDraft(): void { this.draftMode.set(true); this.submitWithStatus('BROUILLON'); }
+  submit():    void { this.draftMode.set(false); this.submitWithStatus('OUVERTE'); }
+
+  private submitWithStatus(statut: 'OUVERTE' | 'BROUILLON'): void {
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    this.submitting.set(true);
+    this.errorMsg.set('');
+    this.successMsg.set('');
+
+    const fd = new FormData();
+    if (this.coverFile()) fd.append('image', this.coverFile()!);
+    this.extraFiles().forEach(f => fd.append('images', f));
+
+    const payload = { ...this.form.value, statut };
+    if (!this.showDateFin)      delete payload.dateFin;
+    if (!this.showModePaiement) delete payload.modePaiement;
+    fd.append('req', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+
+    const id = this.route.snapshot.paramMap.get('id');
+    const req$ = id ? this.http.put(`/api/offres/${id}`, fd) : this.http.post('/api/offres/creer', fd);
+
+    req$.subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.successMsg.set(id ? 'Offre mise à jour avec succès.' : 'Offre créée avec succès.');
+        setTimeout(() => this.cancel(), 1200);
+      },
+      error: (err) => {
+        this.submitting.set(false);
+        this.errorMsg.set(err.error?.message ?? 'Une erreur est survenue. Veuillez réessayer.');
+      },
+    });
+  }
+
+  isInvalid(field: string): boolean {
+    const c = this.form.get(field)!;
+    return c.invalid && (c.dirty || c.touched);
+  }
+}

@@ -1,0 +1,340 @@
+$primary: #026654;
+$primary-light: rgba(2, 102, 84, 0.10);
+$border: #e2e8f0;
+$bg: #f8fafc;
+$text-dark: #0f172a;
+$text-muted: #64748b;
+$danger: #ef4444;
+$font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.page {
+  min-height: 100vh;
+  background: $bg;
+  font-family: $font;
+}
+
+/* ── Top bar ── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-bottom: 1px solid $border;
+  padding: 0 28px;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: $text-muted;
+  cursor: pointer;
+  font-family: $font;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.13s, color 0.13s;
+  &:hover { background: $primary-light; color: $primary; }
+}
+
+.page-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: $text-dark;
+}
+
+.top-bar-right {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-draft {
+  height: 38px;
+  padding: 0 20px;
+  border: 1.5px solid #6b7280;
+  color: #6b7280;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: $font;
+  transition: background 0.13s, color 0.13s;
+  &:hover:not(:disabled) { background: #f3f4f6; color: #374151; border-color: #374151; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+
+.btn-outline {
+  height: 38px;
+  padding: 0 20px;
+  border: 1.5px solid $primary;
+  color: $primary;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: $font;
+  transition: background 0.13s;
+  &:hover { background: $primary-light; }
+}
+
+.btn-primary {
+  height: 38px;
+  padding: 0 24px;
+  background: $primary;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: $font;
+  transition: opacity 0.13s;
+  &:hover:not(:disabled) { opacity: 0.88; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+
+/* ── Body layout ── */
+.body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 28px;
+  padding: 28px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* ── Cover column ── */
+.col-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.cover-area {
+  width: 160px;
+  height: 160px;
+  border-radius: 12px;
+  border: 2px dashed $border;
+  background: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+
+  &:hover { border-color: $primary; }
+}
+
+.cover-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.cover-hint {
+  font-size: 11px;
+  color: $text-muted;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Form column ── */
+.col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.field-row {
+  display: flex;
+  gap: 16px;
+  & > .field { flex: 1; }
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.req { color: $danger; }
+
+.input {
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid $border;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-family: $font;
+  color: $text-dark;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  appearance: auto;
+
+  &::placeholder { color: #94a3b8; }
+  &:focus { border-color: $primary; box-shadow: 0 0 0 3px $primary-light; }
+
+  &.is-invalid { border-color: $danger; }
+}
+
+textarea.input {
+  height: auto;
+  padding: 10px 14px;
+  resize: vertical;
+}
+
+.field-error {
+  font-size: 12px;
+  color: $danger;
+}
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 999;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: $font;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+
+  &--success { background: #026654; color: #fff; }
+  &--error   { background: $danger;  color: #fff; }
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 480px;
+  max-width: 95vw;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid $border;
+}
+
+.modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: $text-dark;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  &:hover { color: $text-dark; }
+}
+
+.upload-zone {
+  display: block;
+  margin: 20px;
+  border: 2px dashed $border;
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+  &:hover { border-color: $primary; }
+}
+
+.upload-preview {
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px;
+  text-align: center;
+  color: $text-muted;
+  font-size: 13px;
+}
+
+.upload-link {
+  color: $primary;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.upload-hint { font-size: 11px; color: #94a3b8; }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid $border;
+}

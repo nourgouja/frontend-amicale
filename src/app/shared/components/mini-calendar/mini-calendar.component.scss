@@ -1,0 +1,122 @@
+@use '../../../../styles/variables' as *;
+
+.mini-cal {
+  width: 100%;
+  font-family: $font-base;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-3;
+}
+
+.cal-nav-btn {
+  background: none;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  width: 28px; height: 28px;
+  @include flex-center;
+  font-size: 16px;
+  color: $color-text-muted;
+  cursor: pointer;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover { background: $color-primary-light; color: $color-primary; border-color: $color-primary; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.cal-month {
+  font-size: $font-size-base;
+  font-weight: 600;
+  color: $color-text;
+  text-transform: capitalize;
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: $space-1;
+
+  span {
+    text-align: center;
+    font-size: $font-size-xs;
+    font-weight: 600;
+    color: $color-text-muted;
+    padding: $space-1 0;
+  }
+}
+
+.cal-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 4px 3px 3px;
+  border-radius: $radius-sm;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background $transition-fast;
+  min-height: 72px;
+  gap: 2px;
+
+  &:hover:not(.other-month) { background: $color-primary-light; }
+  &:focus-visible { @include focus-ring; }
+  &.other-month { opacity: 0.3; pointer-events: none; }
+
+  &.today .day-num {
+    background: $color-primary;
+    color: #fff;
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    @include flex-center;
+  }
+
+  @include reduced-motion { transition: none; }
+}
+
+.day-num {
+  font-size: $font-size-xs;
+  font-weight: 500;
+  color: $color-text;
+  line-height: 1;
+  width: 20px; height: 20px;
+  @include flex-center;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* Event pills */
+.event-pill {
+  display: block;
+  width: 100%;
+  padding: 1px 3px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  line-height: 14px;
+  flex-shrink: 0;
+}
+
+.event-more {
+  font-size: 9px;
+  font-weight: 600;
+  color: $color-text-muted;
+  text-align: center;
+  padding: 1px 0;
+  line-height: 1;
+}

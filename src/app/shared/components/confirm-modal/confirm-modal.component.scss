@@ -1,0 +1,125 @@
+@use '../../../../styles/variables' as *;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  @include flex-center;
+  z-index: 1000;
+  padding: $space-4;
+  animation: fadeIn 0.15s ease;
+
+  @include reduced-motion { animation: none; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-card {
+  background: $color-surface;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-modal;
+  padding: $space-8 $space-7;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  animation: slideUp 0.18s ease;
+
+  @include reduced-motion { animation: none; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal-icon {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  @include flex-center;
+  margin: 0 auto $space-4;
+
+  &--danger  { background: rgba(220,38,38,0.10);  color: $color-error; }
+  &--warning { background: rgba(245,158,11,0.12); color: $color-warning; }
+  &--primary { background: $color-primary-light;   color: $color-primary; }
+}
+
+.modal-title {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $color-text;
+  margin-bottom: $space-2;
+}
+
+.modal-message {
+  font-size: $font-size-base;
+  color: $color-text-muted;
+  line-height: 1.6;
+  margin-bottom: $space-6;
+}
+
+.modal-actions {
+  display: flex;
+  gap: $space-3;
+  justify-content: center;
+}
+
+.btn {
+  padding: 10px $space-6;
+  border-radius: $radius-md;
+  border: none;
+  font-family: $font-base;
+  font-size: $font-size-base;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity $transition-fast, background $transition-fast;
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  min-width: 110px;
+  justify-content: center;
+
+  &:focus-visible { @include focus-ring; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+  @include reduced-motion { transition: none; }
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  color: $color-text;
+  &:hover:not(:disabled) { background: #e5e7eb; }
+}
+
+.btn-danger {
+  background: $color-error;
+  color: #fff;
+  &:hover:not(:disabled) { background: #b91c1c; }
+}
+
+.btn-warning {
+  background: $color-warning;
+  color: #fff;
+  &:hover:not(:disabled) { background: #d97706; }
+}
+
+.btn-primary {
+  background: $color-primary;
+  color: #fff;
+  &:hover:not(:disabled) { background: $color-primary-dark; }
+}
+
+.btn-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+
+  @include reduced-motion { animation: none; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

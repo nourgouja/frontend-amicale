@@ -1,0 +1,46 @@
+<div class="adherent-shell">
+
+  <header class="top-nav">
+    <div class="nav-brand">
+      <img src="logo.png" alt="AmicaleStar" class="nav-logo" />
+    </div>
+
+    <nav class="nav-links" aria-label="Navigation adhérent">
+      @for (item of navItems; track item.route) {
+        <a [routerLink]="item.route" routerLinkActive="active" class="nav-link">
+          <lucide-icon [name]="item.icon" [size]="16" class="nav-icon"></lucide-icon>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="nav-actions">
+      <div class="icon-wrap">
+        <button class="icon-btn" aria-label="Notifications" (click)="toggleNotif($event)">
+          <lucide-icon name="bell" [size]="20"></lucide-icon>
+        </button>
+        @if (notifOpen()) {
+          <div class="dropdown notif-dropdown" (click)="$event.stopPropagation()" role="menu">
+            <div class="dropdown-header">Notifications</div>
+            <div class="dropdown-empty">Aucune notification</div>
+          </div>
+        }
+      </div>
+
+      <div class="icon-wrap">
+        <button class="avatar-btn" aria-label="Mon compte" (click)="toggleProfile($event)">
+          <div class="top-avatar">{{ initials() }}</div>
+        </button>
+        <span class="avatar-name">{{ displayName() }}</span>
+        @if (profileOpen()) {
+          <app-profile-card (close)="profileOpen.set(false)" />
+        }
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+
+</div>
