@@ -1,4 +1,5 @@
-/* You can add global styles to this file, and also import other style files */
+@use 'styles/variables' as *;
+
 *,
 *::before,
 *::after {
@@ -12,6 +13,33 @@ body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
-  font-family: 'Poppins', 'Inter', 'Segoe UI', Arial, sans-serif;
+  font-family: $font-base;
   -webkit-font-smoothing: antialiased;
+  background: $color-bg;
+  color: $color-text;
+}
+
+// Global focus style
+*:focus-visible {
+  @include focus-ring;
+  border-radius: $radius-sm;
+}
+
+// Global scrollbar
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+
+// Screen-reader only utility
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
 }

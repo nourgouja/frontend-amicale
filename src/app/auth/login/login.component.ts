@@ -19,6 +19,7 @@ export class LoginComponent {
 
   loading = signal(false);
   errorMessage = signal('');
+  showPwd = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -33,7 +34,11 @@ export class LoginComponent {
     this.authService.login(email!, password!).subscribe({
       next: () => {
         this.loading.set(false);
-        this.router.navigate([this.authService.getDashboardRoute()]);
+        if (this.authService.firstLogin()) {
+          this.router.navigate(['/change-password']);
+        } else {
+          this.router.navigate([this.authService.getDashboardRoute()]);
+        }
       },
       error: (err) => {
         this.loading.set(false);

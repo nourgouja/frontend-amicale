@@ -77,7 +77,6 @@ export class ResetPasswordModalComponent {
         this.errorMessage.set(
           err.error?.message || 'An error occurred. Please try again.'
         );
-        console.error('Password reset error:', err);
       },
     });
   }

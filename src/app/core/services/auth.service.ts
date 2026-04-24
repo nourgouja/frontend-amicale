@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
@@ -14,10 +14,18 @@ export class AuthService {
   private readonly TOKEN_KEY = 'access_token';
   private readonly API = '/api/auth';
 
-  currentUser = signal<{ email: string; role: string } | null>(
+  currentUser = signal<{ email: string; role: string; prenom: string; nom: string } | null>(
     this.loadUserFromStorage()
   );
   firstLogin = signal(false);
+  photoUrl   = signal<string | null>(null);
+
+  setPhoto(dataUrl: string | null): void { this.photoUrl.set(dataUrl); }
+
+  // Computed role signals
+  isAdmin    = computed(() => this.currentUser()?.role === 'ADMIN');
+  isBureau   = computed(() => this.currentUser()?.role === 'MEMBRE_BUREAU');
+  isAdherent = computed(() => this.currentUser()?.role === 'ADHERENT');
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -28,7 +36,12 @@ export class AuthService {
         tap((res) => {
           localStorage.setItem(this.TOKEN_KEY, res.accessToken);
           const payload = JSON.parse(atob(res.accessToken.split('.')[1]));
-          this.currentUser.set({ email: payload.sub ?? '', role: res.role });
+          this.currentUser.set({
+            email:  payload.sub   ?? '',
+            role:   res.role,
+            prenom: payload.prenom ?? '',
+            nom:    payload.nom    ?? '',
+          });
           this.firstLogin.set(res.firstLogin);
         })
       );
@@ -38,6 +51,7 @@ export class AuthService {
     localStorage.removeItem(this.TOKEN_KEY);
     this.currentUser.set(null);
     this.firstLogin.set(false);
+    this.photoUrl.set(null);
     this.router.navigate(['/login']);
   }
 
@@ -60,12 +74,17 @@ export class AuthService {
     return '/adherent/dashboard';
   }
 
-  private loadUserFromStorage(): { email: string; role: string } | null {
+  private loadUserFromStorage(): { email: string; role: string; prenom: string; nom: string } | null {
     const token = localStorage.getItem('access_token');
     if (!token) return null;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return { email: payload.sub ?? '', role: payload.role ?? '' };
+      return {
+        email:  payload.sub    ?? '',
+        role:   payload.role   ?? '',
+        prenom: payload.prenom ?? '',
+        nom:    payload.nom    ?? '',
+      };
     } catch {
       return null;
     }

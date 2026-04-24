@@ -22,12 +22,32 @@
       "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/Pfe/src/main/java/tn/star/Pfe/controller/auth/**)",
       "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/Pfe/src/main/java/tn/star/Pfe/controller/user/**)",
       "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/Pfe/src/main/java/tn/star/Pfe/mapper/**)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npx ng *)",
+      "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/Pfe/src/**)",
+      "Bash(npm run *)",
+      "Bash(xargs grep *)",
+      "Bash(xargs cat *)",
+      "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/**)",
+      "Read(//c/Users/nourg/IdeaProjects/**)",
+      "Bash(grep -E \"\\\\.java$\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\nourg\\IdeaProjects\\Backend\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\auth",
       "C:\\Users\\nourg\\IdeaProjects\\Backend\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\email",
-      "c:\\Users\\nourg\\IdeaProjects\\Backend\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\config"
+      "c:\\Users\\nourg\\IdeaProjects\\Backend\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\config",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\auth",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\adhesion",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\controller\\adhesion",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\config",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\controller\\offre",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\offre",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\mapper",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\user",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\security",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\entity",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\controller\\user",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\resources"
     ]
   }
 }

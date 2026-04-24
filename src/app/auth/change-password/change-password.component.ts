@@ -36,6 +36,8 @@ export class ChangePasswordComponent {
   loading = signal(false);
   errorMessage = signal('');
   successMessage = signal('');
+  showNew = false;
+  showConfirm = false;
 
   constructor(
     private http: HttpClient,
@@ -54,7 +56,6 @@ export class ChangePasswordComponent {
     this.successMessage.set('');
 
     const payload = {
-      currentPassword: 'temp',
       newPassword: this.form.value.newPassword,
       confirmPassword: this.form.value.confirmPassword,
     };
@@ -66,10 +67,9 @@ export class ChangePasswordComponent {
         this.authService.clearFirstLogin();
         this.router.navigate(['/home']);
       },
-      error: (err) => {
+      error: () => {
         this.loading.set(false);
         this.errorMessage.set('An error occurred. Please try again.');
-        console.error(err);
       },
     });
   }

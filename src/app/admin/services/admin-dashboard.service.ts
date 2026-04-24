@@ -2,9 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface OffreDashboardItem {
+  id: number;
+  titre: string;
+  statut: string;
+  placesRestantes: number;
+  totalInscrits: number;
+}
+
 export interface AdminDashboardResponse {
   totalUtilisateurs: number;
-  parRole: Record<string, number>;
+  parRole: { [key: string]: number | undefined };
+  offres: OffreDashboardItem[];
   totalInscriptions: number;
   enAttente: number;
   confirmees: number;

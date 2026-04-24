@@ -31,6 +31,7 @@
             <th>Nom</th>
             <th>Email</th>
             <th>Numéro</th>
+            <th>Matricule STAR</th>
             <th>Date</th>
             <th>Actions</th>
           </tr>
@@ -46,6 +47,7 @@
               </td>
               <td class="text-muted">{{ d.email }}</td>
               <td class="text-muted">{{ d.telephone || '—' }}</td>
+              <td class="text-muted">{{ d.matriculeStar || '—' }}</td>
               <td class="text-muted">{{ formatDate(d.createdAt) }}</td>
               <td>
                 <div class="demande-actions">
@@ -104,7 +106,9 @@
             <th>Nom</th>
             <th>Email</th>
             <th>Numéro</th>
+            <th>Matricule STAR</th>
             <th>Rôle</th>
+            <th>Pôle</th>
             <th></th>
           </tr>
         </thead>
@@ -119,8 +123,17 @@
               </td>
               <td class="text-muted">{{ user.email }}</td>
               <td class="text-muted">{{ user.telephone || '—' }}</td>
+              <td class="text-muted">{{ user.matriculeStar || '—' }}</td>
               <td>
                 <span [class]="roleBadgeClass(user.role)">{{ roleLabel(user.role) }}</span>
+                @if (user.role === 'MEMBRE_BUREAU' && user.posteMembre) {
+                  <span class="poste-sub">{{ posteLabel(user.posteMembre) }}</span>
+                }
+              </td>
+              <td class="text-muted">
+                @if (user.poleNom) {
+                  <span class="pole-chip">{{ user.poleNom }}</span>
+                } @else { — }
               </td>
               <td class="actions-cell">
                 <div class="menu-wrap" (click)="$event.stopPropagation()">
@@ -167,7 +180,7 @@
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="5" class="empty-cell">Aucun utilisateur trouvé.</td></tr>
+            <tr><td colspan="7" class="empty-cell">Aucun utilisateur trouvé.</td></tr>
           }
         </tbody>
       </table>
@@ -249,12 +262,55 @@
 
         <div class="form-group">
           <label>Rôle <span class="req">*</span></label>
-          <select formControlName="role">
+          <select formControlName="role" (change)="onCreateRoleChange()">
             @for (r of roles; track r.value) {
               <option [value]="r.value">{{ r.label }}</option>
             }
           </select>
         </div>
+
+        <!-- Membre Bureau: Poste field -->
+        @if (createIsBureau()) {
+          <div class="bureau-section">
+            <div class="bureau-section-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              Affectation Bureau
+            </div>
+
+            <div class="form-group">
+              <label>Poste <span class="req">*</span></label>
+              <select formControlName="poste" (change)="onCreatePosteChange()">
+                <option value="">— Sélectionner un poste —</option>
+                @for (p of postes; track p.value) {
+                  <option [value]="p.value">{{ p.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Responsable de Pôle: Pôle selector -->
+            @if (createIsResponsable()) {
+              <div class="form-group">
+                <label>Pôle <span class="req">*</span></label>
+                <select formControlName="poleId">
+                  <option value="">— Sélectionner un pôle —</option>
+                  @for (pole of poles(); track pole.id) {
+                    <option [value]="pole.id">{{ pole.nom }}</option>
+                  }
+                </select>
+                <span class="field-hint">
+                  @switch (createForm.get('poleId')?.value?.toString()) {
+                    @case (poles()[0]?.id?.toString()) { Activités, événements &amp; loisirs }
+                    @case (poles()[1]?.id?.toString()) { Voyages &amp; séjours }
+                    @case (poles()[2]?.id?.toString()) { Conventions, séminaires &amp; annonces }
+                  }
+                </span>
+              </div>
+            }
+          </div>
+        }
 
         <p class="pw-hint">
           Un mot de passe temporaire sera généré automatiquement et envoyé par email à l'utilisateur.
@@ -321,12 +377,47 @@
 
         <div class="form-group">
           <label>Rôle <span class="req">*</span></label>
-          <select formControlName="role">
+          <select formControlName="role" (change)="onEditRoleChange()">
             @for (r of roles; track r.value) {
               <option [value]="r.value">{{ r.label }}</option>
             }
           </select>
         </div>
+
+        <!-- Membre Bureau: Poste + Pôle -->
+        @if (editIsBureau()) {
+          <div class="bureau-section">
+            <div class="bureau-section-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              Affectation Bureau
+            </div>
+
+            <div class="form-group">
+              <label>Poste <span class="req">*</span></label>
+              <select formControlName="poste" (change)="onEditPosteChange()">
+                <option value="">— Sélectionner un poste —</option>
+                @for (p of postes; track p.value) {
+                  <option [value]="p.value">{{ p.label }}</option>
+                }
+              </select>
+            </div>
+
+            @if (editIsResponsable()) {
+              <div class="form-group">
+                <label>Pôle <span class="req">*</span></label>
+                <select formControlName="poleId">
+                  <option value="">— Sélectionner un pôle —</option>
+                  @for (pole of poles(); track pole.id) {
+                    <option [value]="pole.id">{{ pole.nom }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
+        }
 
         @if (editError()) { <p class="form-error">{{ editError() }}</p> }
 

@@ -268,6 +268,25 @@ $text-muted:    #7a7a7a;
 .badge-bureau   { background: #dbeafe; color: #2563eb; }
 .badge-adherent { background: $primary-light; color: $primary; }
 
+.poste-sub {
+  display: block;
+  font-size: 11px;
+  color: $text-muted;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.pole-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(2, 102, 84, 0.10);
+  color: $primary;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
 /* ── Actions cell / three-dots ── */
 .actions-cell { width: 40px; text-align: center; }
 
@@ -563,6 +582,38 @@ $text-muted:    #7a7a7a;
   align-items: center;
 
   &:hover { color: $text-muted; }
+}
+
+.bureau-section {
+  background: rgba(13, 106, 99, 0.04);
+  border: 1px solid rgba(13, 106, 99, 0.18);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bureau-section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: $primary;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.bureau-section .form-group { margin-bottom: 0; }
+
+.field-hint {
+  font-size: 11px;
+  color: $primary;
+  font-style: italic;
+  margin-top: 3px;
+  display: block;
+  min-height: 14px;
 }
 
 .pw-hint {

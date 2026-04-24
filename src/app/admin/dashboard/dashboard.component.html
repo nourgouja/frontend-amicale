@@ -1,212 +1,238 @@
 @if (loading()) {
-  <div class="loading-state">Chargement…</div>
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement du tableau de bord…</p>
+  </div>
 } @else if (error()) {
-  <div class="error-state">{{ error() }}</div>
+  <div class="error-state">
+    <p>{{ error() }}</p>
+    <button class="btn-retry" (click)="loadDashboard()">Réessayer</button>
+  </div>
 } @else if (data(); as d) {
   <div class="dashboard">
 
-    <!-- Greeting -->
     <div class="greeting">
-      <h1 class="greeting-title">Bonjour {{ adminDisplayName() }} !</h1>
+      <p class="greeting-date">{{ today }}</p>
+      <h1 class="greeting-title">Bonjour, {{ adminDisplayName() }} 👋</h1>
     </div>
 
-    <!-- Row 1: 3 stat cards -->
-    <div class="stats-row">
-
-      <!-- Utilisateurs -->
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <div class="stat-icon-wrap icon-blue">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Utilisateurs</span>
-            <span class="stat-value">{{ d.totalUtilisateurs }}</span>
-          </div>
-          <div class="stat-arrow">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="7" y1="17" x2="17" y2="7"/>
-              <polyline points="7 7 17 7 17 17"/>
-            </svg>
-          </div>
-        </div>
-        <div class="stat-breakdown">
-          <div class="breakdown-row">
-            <span>Administrateur</span>
-            <span class="bval">{{ d.parRole['ADMIN'] ?? 0 }}</span>
-          </div>
-          <div class="breakdown-row">
-            <span>Membre Bureau</span>
-            <span class="bval">{{ d.parRole['MEMBRE_BUREAU'] ?? 0 }}</span>
-          </div>
-          <div class="breakdown-row">
-            <span>Adhérent</span>
-            <span class="bval">{{ d.parRole['ADHERENT'] ?? 0 }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Activités -->
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <div class="stat-icon-wrap icon-green">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Activités</span>
-            <span class="stat-value">0</span>
-          </div>
-          <div class="stat-arrow">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="7" y1="17" x2="17" y2="7"/>
-              <polyline points="7 7 17 7 17 17"/>
-            </svg>
-          </div>
-        </div>
-        <div class="stat-breakdown">
-          <div class="breakdown-row">
-            <span>En attente</span>
-            <span class="bval">0</span>
-          </div>
-          <div class="breakdown-row">
-            <span>Confirmées</span>
-            <span class="bval">0</span>
-          </div>
-          <div class="breakdown-row">
-            <span>Terminées</span>
-            <span class="bval">0</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Offres -->
-      <div class="stat-card">
-        <div class="stat-card-header">
-          <div class="stat-icon-wrap icon-purple">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-              <line x1="8" y1="21" x2="16" y2="21"/>
-              <line x1="12" y1="17" x2="12" y2="21"/>
-            </svg>
-          </div>
-          <div class="stat-info">
-            <span class="stat-label">Offres</span>
-            <span class="stat-value">0</span>
-          </div>
-          <div class="stat-arrow">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="7" y1="17" x2="17" y2="7"/>
-              <polyline points="7 7 17 7 17 17"/>
-            </svg>
-          </div>
-        </div>
-        <div class="stat-breakdown">
-          <div class="breakdown-row">
-            <span>En attente</span>
-            <span class="bval">0</span>
-          </div>
-          <div class="breakdown-row">
-            <span>Confirmées</span>
-            <span class="bval">0</span>
-          </div>
-          <div class="breakdown-row">
-            <span>Terminées</span>
-            <span class="bval">0</span>
-          </div>
-        </div>
-      </div>
-
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <app-kpi-card label="Utilisateurs" [value]="d.totalUtilisateurs" icon="users" color="primary"
+        [subtitle]="(d.parRole['ADMIN'] ?? 0) + ' admins · ' + (d.parRole['ADHERENT'] ?? 0) + ' adhérents'" />
+      <app-kpi-card label="Inscriptions" [value]="d.totalInscriptions" icon="clipboard-list" color="purple"
+        [subtitle]="d.enAttente + ' en attente · ' + d.confirmees + ' confirmées'" />
+      <app-kpi-card label="Offres actives" [value]="offresOuvertes()" icon="tag" color="blue"
+        [subtitle]="offresBrouillon() + ' brouillons · ' + totalOffres() + ' total'" />
+      <app-kpi-card label="Collecté" [value]="d.totalCollecte" icon="dollar-sign" color="green" unit="DT"
+        [subtitle]="d.echeancesEnRetard + ' échéances en retard'" />
     </div>
 
-    <!-- Row 2: Activities table + Calendar -->
+    <!-- Mid row -->
     <div class="mid-row">
-
-      <!-- Recent activities table -->
       <div class="table-card">
         <div class="card-head">
-          <h3 class="card-head-title">Les activités récentes</h3>
-          <a class="card-head-link" href="/admin/activites">Voir Plus</a>
+          <h3 class="card-head-title">Activités récentes</h3>
+          <a class="card-head-link" routerLink="/admin/activites">Voir tout →</a>
         </div>
-        <table class="mini-table">
-          <thead>
-            <tr>
-              <th>Activité</th>
-              <th>Du</th>
-              <th>Jusqu'à</th>
-              <th>État</th>
-            </tr>
-          </thead>
+        <table class="mini-table" aria-label="Activités récentes">
+          <thead><tr><th>Activité</th><th>Du</th><th>Jusqu'à</th><th>État</th></tr></thead>
           <tbody>
             <tr class="empty-row">
               <td colspan="4">
-                <div class="empty-placeholder">Aucune activité récente</div>
+                <div class="empty-placeholder">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>
+                  </svg>
+                  Aucune activité récente
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Calendar placeholder -->
       <div class="calendar-card">
         <div class="card-head">
           <h3 class="card-head-title">Calendrier</h3>
+          <a class="card-head-link" routerLink="/admin/calendrier">Voir →</a>
         </div>
-        <div class="calendar-placeholder">
-          <div class="cal-month-header">
-            <button class="cal-nav">&#8249;</button>
-            <span class="cal-month-label">Avril 2026</span>
-            <button class="cal-nav">&#8250;</button>
-          </div>
-          <div class="cal-days-header">
-            <span>Lun</span><span>Mar</span><span>Mer</span>
-            <span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
-          </div>
-          <div class="cal-grid">
-            <span class="cal-offset"></span>
-            <span class="cal-offset"></span>
-            @for (day of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]; track day) {
-              <span class="cal-day" [class.today]="day === 17">{{ day }}</span>
-            }
-          </div>
+        <div class="calendar-body">
+          <app-mini-calendar [offres]="calendarOffres()" />
         </div>
       </div>
-
     </div>
 
-    <!-- Row 3: Recent offers cards -->
+    <!-- Recent offers — cards -->
     <div class="cards-section">
       <div class="cards-section-head">
-        <h3 class="card-head-title">Les offres récentes</h3>
-        <a class="card-head-link" href="/admin/offres">Gérer le Catalogue</a>
+        <h3 class="card-head-title">Offres récentes</h3>
+        <a class="card-head-link" routerLink="/admin/offres">Gérer le catalogue →</a>
       </div>
-      <div class="offers-grid">
-        <div class="offer-empty">
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
-            fill="none" stroke="#c0c0c0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-            <line x1="8" y1="21" x2="16" y2="21"/>
-            <line x1="12" y1="17" x2="12" y2="21"/>
-          </svg>
-          <p>Aucune offre disponible pour le moment</p>
+
+      @if (recentOffres().length === 0) {
+        <div class="empty-placeholder">Aucune offre disponible pour le moment</div>
+      } @else {
+        <div class="offres-scroll">
+          @for (offre of recentOffres(); track offre.id) {
+            <div class="offre-card" (click)="openDetail(offre.id)" role="button" tabindex="0"
+                 (keydown.enter)="openDetail(offre.id)" (keydown.space)="openDetail(offre.id)">
+              <div class="offre-card-cover offre-card-cover--{{ offre.statut.toLowerCase() }}">
+                @if (getOffreImage(offre.id); as src) {
+                  <img [src]="src" [alt]="offre.titre" class="offre-card-img" />
+                } @else {
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/>
+                    <path d="M12 22V7"/>
+                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+                  </svg>
+                }
+              </div>
+              <div class="offre-card-body">
+                <app-status-badge [statut]="offre.statut" type="offre" />
+                <p class="offre-card-title">{{ offre.titre }}</p>
+                <div class="offre-card-meta">
+                  <span class="meta-item">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                    </svg>
+                    {{ offre.totalInscrits }} inscrits
+                  </span>
+                  <span class="meta-item">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    {{ offre.placesRestantes }} places
+                  </span>
+                </div>
+              </div>
+              <div class="offre-card-actions" (click)="$event.stopPropagation()">
+                <a class="btn-action btn-edit" [routerLink]="['/admin/offres', offre.id, 'edit']">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Modifier
+                </a>
+                @if (offre.statut !== 'ARCHIVEE' && offre.statut !== 'ANNULEE') {
+                  <button class="btn-action btn-archive" (click)="archiver(offre.id)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/>
+                      <line x1="10" y1="12" x2="14" y2="12"/>
+                    </svg>
+                    Archiver
+                  </button>
+                }
+              </div>
+            </div>
+          }
         </div>
-      </div>
+      }
     </div>
+
+  </div>
+}
+
+<!-- ─── Detail panel ─── -->
+@if (showDetail()) {
+  <div class="detail-backdrop" (click)="closeDetail()"></div>
+  <div class="detail-panel" role="dialog" aria-modal="true" aria-label="Détails de l'offre">
+
+    <div class="dp-header">
+      <span class="dp-header-title">Détails de l'offre</span>
+      <button class="dp-close" (click)="closeDetail()" aria-label="Fermer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    @if (detailLoading()) {
+      <div class="dp-spinner-wrap">
+        <div class="spinner"></div>
+      </div>
+    } @else if (selectedOffre(); as o) {
+      <div class="dp-body">
+
+        <h2 class="dp-title">{{ o.titre }}</h2>
+        @if (o.description) {
+          <p class="dp-desc">{{ o.description }}</p>
+        }
+
+        <div class="dp-sep"></div>
+
+        <div class="dp-fields">
+          <div class="dp-row">
+            <span class="dp-label">Status:</span>
+            <app-status-badge [statut]="o.statutOffre" type="offre" />
+          </div>
+          @if (o.lieu) {
+            <div class="dp-row">
+              <span class="dp-label">Lieu:</span>
+              <span class="dp-value">{{ o.lieu }}</span>
+            </div>
+          }
+          @if (o.prixParPersonne != null) {
+            <div class="dp-row">
+              <span class="dp-label">Prix:</span>
+              <span class="dp-value">{{ o.prixParPersonne }} DT / pers.</span>
+            </div>
+          }
+          @if (o.poleNom) {
+            <div class="dp-row">
+              <span class="dp-label">Pôle:</span>
+              <span class="dp-value">{{ o.poleNom }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Info box -->
+        @if (o.statutOffre !== 'BROUILLON') {
+          <div class="dp-info-box">
+            <div class="dp-row">
+              <span class="dp-label">Date:</span>
+              <span class="dp-value dp-value--bold">
+                {{ fmtDate(o.dateDebut) }}@if (o.dateFin) { – {{ fmtDate(o.dateFin) }} }
+              </span>
+            </div>
+            @if (o.capaciteMax != null) {
+              <div class="dp-row">
+                <span class="dp-label">Capacité:</span>
+                <span class="dp-value dp-value--bold">{{ o.capaciteMax }} places</span>
+              </div>
+            }
+            <div class="dp-row">
+              <span class="dp-label">Nb inscrits:</span>
+              <span class="dp-value dp-value--bold">{{ inscrits(o) }}</span>
+            </div>
+            @if (o.statutOffre === 'OUVERTE') {
+              <a class="dp-participants-btn" [routerLink]="['/admin/offres', o.id, 'inscriptions']" (click)="closeDetail()">
+                Voir la liste des inscrits
+              </a>
+            }
+          </div>
+        } @else {
+          <div class="dp-info-box dp-info-box--draft">
+            <p class="dp-draft-note">Cette offre est en brouillon et n'est pas encore visible par les adhérents.</p>
+          </div>
+        }
+
+      </div>
+
+      <div class="dp-footer">
+        <button class="dp-btn dp-btn--ghost" (click)="closeDetail()">Fermer</button>
+        <a class="dp-btn dp-btn--primary" [routerLink]="['/admin/offres', o.id, 'edit']" (click)="closeDetail()">
+          Modifier
+        </a>
+        @if (o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'ANNULEE') {
+          <button class="dp-btn dp-btn--danger" (click)="archiver(o.id)">
+            Archiver
+          </button>
+        }
+      </div>
+    }
 
   </div>
 }

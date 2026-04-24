@@ -10,6 +10,10 @@ export interface UserResponse {
   role: string;
   actif: boolean;
   telephone?: string;
+  matriculeStar?: string;
+  posteMembre?: string;
+  poleId?: number;
+  poleNom?: string;
   createdAt: string;
 }
 
@@ -37,6 +41,8 @@ export interface UpdateUserRequest {
   email?: string;
   telephone?: string;
   role?: string;
+  posteMembre?: string;
+  poleId?: number;
 }
 
 @Injectable({ providedIn: 'root' })
