@@ -14,6 +14,7 @@ export interface UserResponse {
   posteMembre?: string;
   poleId?: number;
   poleNom?: string;
+  poleTypesOffre?: string[];
   createdAt: string;
 }
 
@@ -33,6 +34,7 @@ export interface CreateUserRequest {
   telephone?: string;
   posteMembre?: string;
   poleId?: number;
+  typesAutorisees?: string[];
 }
 
 export interface UpdateUserRequest {
@@ -43,6 +45,7 @@ export interface UpdateUserRequest {
   role?: string;
   posteMembre?: string;
   poleId?: number;
+  typesAutorisees?: string[];
 }
 
 @Injectable({ providedIn: 'root' })

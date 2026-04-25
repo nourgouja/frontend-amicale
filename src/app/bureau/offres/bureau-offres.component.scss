@@ -152,6 +152,25 @@
   background: #f9fafb; border-radius: $radius-md; padding: 14px 16px;
   display: flex; flex-direction: column; gap: 8px;
 }
+.dp-participants { padding: 0 20px 12px; }
+
+.dp-participants-btn {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 10px 14px; border-radius: $radius-md;
+  border: 1px solid $color-primary; background: $color-primary-light;
+  color: $color-primary; font-family: $font-base; font-size: $font-size-sm;
+  font-weight: 600; cursor: pointer; transition: background $transition-fast;
+  &:hover { background: rgba(2,102,84,0.12); }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.dp-participants-count {
+  margin-left: auto; background: $color-primary; color: #fff;
+  border-radius: $radius-full; font-size: $font-size-xs;
+  font-weight: 700; padding: 1px 8px;
+}
+
 .dp-footer {
   display: flex; gap: $space-2; padding: 14px 20px 18px;
   border-top: 1px solid $color-border; flex-shrink: 0;

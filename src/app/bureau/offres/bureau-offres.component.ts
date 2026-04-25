@@ -1,11 +1,11 @@
 import { Component, computed, inject, signal, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, DatePipe } from '@angular/common';
 import { OfferCardComponent, Offre } from '../../shared/components/offer-card/offer-card.component';
 import { getOffreTypeColor } from '../../shared/utils/format.utils';
 
-type CategoryFilter = 'tout' | 'VOYAGE' | 'SEJOUR' | 'ACTIVITE' | 'CONVENTION' | 'archivees';
+type CategoryFilter = 'mes-offres' | 'tout' | 'VOYAGE' | 'SEJOUR' | 'ACTIVITE' | 'CONVENTION' | 'archivees';
 type StatusFilter   = 'tous' | 'OUVERTE' | 'FERMEE' | 'BROUILLON';
 
 const ALL_CAT_FILTERS: { key: CategoryFilter; label: string }[] = [
@@ -20,7 +20,7 @@ const ALL_CAT_FILTERS: { key: CategoryFilter; label: string }[] = [
 @Component({
   selector: 'app-bureau-offres',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterLink, OfferCardComponent],
+  imports: [CommonModule, DatePipe, OfferCardComponent],
   templateUrl: './bureau-offres.component.html',
   styleUrl:    './bureau-offres.component.scss',
 })
@@ -37,16 +37,21 @@ export class BureauOffresComponent implements OnInit {
   showDetail    = signal(false);
   selectedOffre = signal<Offre | null>(null);
 
-  /** TypeOffre of the current member's pole — null means no restriction */
-  poleTypeOffre = signal<string | null>(null);
+  /** Types this bureau member is allowed to manage — empty means no restriction */
+  poleTypesOffre = signal<string[]>([]);
 
-  /** Only show category tabs relevant to this member's pole */
   catFilters = computed<{ key: CategoryFilter; label: string }[]>(() => {
-    const pole = this.poleTypeOffre();
-    if (!pole) return ALL_CAT_FILTERS;
-    return ALL_CAT_FILTERS.filter(f =>
-      f.key === 'tout' || f.key === 'archivees' || f.key === pole
-    );
+    const types = this.poleTypesOffre();
+    if (!types.length) return ALL_CAT_FILTERS;
+    return [
+      { key: 'mes-offres', label: 'Mes offres' },
+      { key: 'VOYAGE',     label: 'Voyages' },
+      { key: 'SEJOUR',     label: 'Séjours' },
+      { key: 'ACTIVITE',   label: 'Activités' },
+      { key: 'CONVENTION', label: 'Conventions' },
+      { key: 'tout',       label: 'Toutes les offres' },
+      { key: 'archivees',  label: 'Archivées' },
+    ];
   });
 
   readonly statusFilters: { key: StatusFilter; label: string }[] = [
@@ -58,22 +63,19 @@ export class BureauOffresComponent implements OnInit {
 
   filteredOffres = computed(() => {
     let data = this.offres();
-    const pole = this.poleTypeOffre();
-    const cat  = this.activeFilter();
-    const st   = this.statusFilter();
-    const q    = this.searchTerm().toLowerCase().trim();
+    const types = this.poleTypesOffre();
+    const cat   = this.activeFilter();
+    const st    = this.statusFilter();
+    const q     = this.searchTerm().toLowerCase().trim();
 
-    // Restrict to own pole's type (and archived) when pole exists
-    if (pole) {
-      data = data.filter(o => o.typeOffre === pole || o.statutOffre === 'ARCHIVEE');
-    }
-
-    if (cat === 'archivees') {
+    if (cat === 'mes-offres') {
+      data = data.filter(o => types.includes(o.typeOffre) && o.statutOffre !== 'ARCHIVEE');
+    } else if (cat === 'archivees') {
       data = data.filter(o => o.statutOffre === 'ARCHIVEE');
-    } else if (cat !== 'tout') {
-      data = data.filter(o => o.typeOffre === cat && o.statutOffre !== 'ARCHIVEE');
-    } else {
+    } else if (cat === 'tout') {
       data = data.filter(o => o.statutOffre !== 'ARCHIVEE');
+    } else {
+      data = data.filter(o => o.typeOffre === cat && o.statutOffre !== 'ARCHIVEE');
     }
 
     if (st !== 'tous') data = data.filter(o => o.statutOffre === st);
@@ -85,7 +87,13 @@ export class BureauOffresComponent implements OnInit {
 
   ngOnInit(): void {
     this.http.get<any>('/api/utilisateurs/profil').subscribe({
-      next: p => { if (p.poleTypeOffre) this.poleTypeOffre.set(p.poleTypeOffre); },
+      next: p => {
+        const types: string[] = p.poleTypesOffre ?? [];
+        this.poleTypesOffre.set(types);
+        if (types.length > 0) {
+          this.activeFilter.set('mes-offres');
+        }
+      },
     });
     this.loadOffres();
   }
@@ -112,8 +120,9 @@ export class BureauOffresComponent implements OnInit {
   typeColor(t: string): string { return getOffreTypeColor(t); }
   inscrits(o: Offre): number   { return Math.max(0, (o.capaciteMax ?? 0) - (o.placesRestantes ?? 0)); }
 
-  goToCreate(): void           { this.router.navigate(['/bureau/offres/creer']); }
-  onModifier(id: number): void { this.closeDetail(); this.router.navigate(['/bureau/offres', id, 'edit']); }
+  goToCreate(): void               { this.router.navigate(['/bureau/offres/creer']); }
+  onModifier(id: number): void     { this.closeDetail(); this.router.navigate(['/bureau/offres', id, 'edit']); }
+  goToParticipants(id: number): void { this.closeDetail(); this.router.navigate(['/bureau/offres', id, 'inscriptions']); }
 
   onArchive(id: number): void {
     this.http.patch(`/api/offres/archiver/${id}`, {}).subscribe({

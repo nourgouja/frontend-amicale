@@ -45,14 +45,19 @@ export class CreerOffreComponent implements OnInit {
     { value: 'CONVENTION', label: 'Convention', color: '#8b5cf6' },
   ] as const;
 
-  userPoleTypeOffre = signal<string | null>(null);
+  userPoleTypesOffre = signal<string[]>([]);
   offreTypes = computed(() => {
-    const pole = this.userPoleTypeOffre();
-    if (this.isBureauMode && pole) {
-      return this.allTypes.filter(t => t.value === pole);
-    }
-    return [...this.allTypes];
+    const allowed = this.userPoleTypesOffre();
+    return this.allTypes.map(t => ({
+      ...t,
+      prohibited: this.isBureauMode && allowed.length > 0 && !allowed.includes(t.value),
+    }));
   });
+
+  isProhibited(type: string): boolean {
+    const allowed = this.userPoleTypesOffre();
+    return this.isBureauMode && allowed.length > 0 && !allowed.includes(type);
+  }
 
   readonly paymentModes = [
     { value: 'FULL',       label: 'Comptant — paiement intégral' },
@@ -90,9 +95,10 @@ export class CreerOffreComponent implements OnInit {
     if (this.isBureauMode) {
       this.http.get<any>('/api/utilisateurs/profil').subscribe({
         next: p => {
-          if (p.poleTypeOffre) {
-            this.userPoleTypeOffre.set(p.poleTypeOffre);
-            this.form.patchValue({ typeOffre: p.poleTypeOffre });
+          const types: string[] = p.poleTypesOffre ?? [];
+          this.userPoleTypesOffre.set(types);
+          if (types.length > 0 && !this.typeCtrl.value) {
+            this.form.patchValue({ typeOffre: types[0] });
           }
         },
       });

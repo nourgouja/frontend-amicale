@@ -124,6 +124,16 @@ textarea.input { resize: vertical; min-height: 80px; }
     .type-label { color: var(--accent, #{$color-primary}); }
   }
 
+  &.prohibited {
+    opacity: 0.38;
+    cursor: not-allowed !important;
+    background: $color-surface;
+    border-color: $color-border;
+    .type-svg   { stroke: $color-text-muted; }
+    .type-label { color: $color-text-muted; }
+    &:hover { border-color: $color-border; background: $color-surface; }
+  }
+
   &:focus-visible { @include focus-ring; }
   @include reduced-motion { transition: none; }
 }

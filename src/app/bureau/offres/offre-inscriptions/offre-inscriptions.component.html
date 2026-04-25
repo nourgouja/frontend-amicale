@@ -1,0 +1,222 @@
+<!-- Toast -->
+@if (toast(); as t) {
+  <div class="page-toast" [class.page-toast--error]="t.type === 'error'" role="alert">
+    @if (t.type === 'success') {
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    } @else {
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    }
+    {{ t.msg }}
+  </div>
+}
+
+<div class="page-layout">
+
+  <!-- ── Left: participants list ── -->
+  <div class="main-col">
+
+    <!-- Header -->
+    <div class="page-header">
+      <button class="back-btn" (click)="goBack()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Offres
+      </button>
+      <div class="header-title-wrap">
+        <h1 class="page-title">
+          Participants
+          @if (offre(); as o) { — <span class="offer-name">{{ o.titre }}</span> }
+        </h1>
+        <div class="header-stats">
+          <span class="stat-chip stat-chip--total">{{ counts().total }} inscrits</span>
+          @if (counts().attente > 0) {
+            <span class="stat-chip stat-chip--attente">{{ counts().attente }} en attente</span>
+          }
+          <span class="stat-chip stat-chip--ok">{{ counts().confirmee }} confirmés</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <div class="stat-tabs">
+        @for (f of statutFilters; track f.key) {
+          <button class="stat-tab" [class.active]="statutFilter() === f.key" (click)="setStatut(f.key)">{{ f.label }}</button>
+        }
+      </div>
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="search" placeholder="Rechercher un participant…" (input)="onSearch($event)" />
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      @if (loading()) {
+        <div class="table-loading">
+          <div class="spinner"></div>
+          <p>Chargement des participants…</p>
+        </div>
+      } @else if (filtered().length === 0) {
+        <div class="table-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <p>Aucun participant trouvé</p>
+        </div>
+      } @else {
+        <table class="participants-table">
+          <thead>
+            <tr>
+              <th>Participant</th>
+              <th>Email</th>
+              <th>Date d'inscription</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ins of filtered(); track ins.id) {
+              <tr>
+                <td>
+                  <div class="member-cell">
+                    <div class="avatar">{{ initials(ins.adherentNom, ins.adherentPrenom) }}</div>
+                    <span class="member-name">{{ ins.adherentPrenom }} {{ ins.adherentNom }}</span>
+                  </div>
+                </td>
+                <td class="email-cell">{{ ins.mailAdherent }}</td>
+                <td class="date-cell">{{ fmtDate(ins.dateInscription) }}</td>
+                <td>
+                  <span class="status-badge"
+                    [class.status--attente]="ins.statut === 'EN_ATTENTE'"
+                    [class.status--ok]="ins.statut === 'CONFIRMEE'"
+                    [class.status--rejet]="ins.statut === 'REJETEE'"
+                    [class.status--annul]="ins.statut === 'ANNULEE'">
+                    @switch (ins.statut) {
+                      @case ('EN_ATTENTE') { En attente }
+                      @case ('CONFIRMEE')  { Confirmée }
+                      @case ('REJETEE')    { Rejetée }
+                      @case ('ANNULEE')    { Annulée }
+                      @default             { {{ ins.statut }} }
+                    }
+                  </span>
+                </td>
+                <td>
+                  @if (ins.statut === 'EN_ATTENTE') {
+                    <div class="action-btns">
+                      <button class="btn-approve"
+                        [disabled]="actionLoading() === ins.id"
+                        (click)="confirmer(ins.id)">
+                        @if (actionLoading() === ins.id) { … } @else {
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          Approuver
+                        }
+                      </button>
+                      <button class="btn-reject"
+                        [disabled]="actionLoading() === ins.id"
+                        (click)="refuser(ins.id)">
+                        @if (actionLoading() === ins.id) { … } @else {
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          Rejeter
+                        }
+                      </button>
+                    </div>
+                  } @else {
+                    <span class="no-action">—</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  </div>
+
+  <!-- ── Right: offer detail panel ── -->
+  @if (offre(); as o) {
+    <aside class="detail-panel">
+
+      @if (imageUrl(o); as src) {
+        <img [src]="src" [alt]="o.titre" class="panel-cover-img" />
+      } @else {
+        <div class="panel-cover-fallback" [style.background]="typeColor(o.typeOffre)">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          </svg>
+        </div>
+      }
+
+      <div class="panel-body">
+        <span class="type-badge" [style.background]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span>
+        <h2 class="panel-title">{{ o.titre }}</h2>
+        @if (o.description) { <p class="panel-desc">{{ o.description }}</p> }
+
+        <div class="panel-sep"></div>
+
+        <div class="detail-rows">
+          <div class="detail-row">
+            <span class="detail-label">Statut</span>
+            <span class="offre-status"
+              [class.open]="o.statutOffre === 'OUVERTE'"
+              [class.draft]="o.statutOffre === 'BROUILLON'"
+              [class.closed]="o.statutOffre === 'FERMEE'">
+              {{ o.statutOffre }}
+            </span>
+          </div>
+          @if (o.lieu) {
+            <div class="detail-row">
+              <span class="detail-label">Lieu</span>
+              <span class="detail-value">{{ o.lieu }}</span>
+            </div>
+          }
+          @if (o.dateDebut) {
+            <div class="detail-row">
+              <span class="detail-label">Date</span>
+              <span class="detail-value">
+                {{ fmtDate(o.dateDebut) }}
+                @if (o.dateFin) { → {{ fmtDate(o.dateFin) }} }
+              </span>
+            </div>
+          }
+          @if (o.prixParPersonne != null) {
+            <div class="detail-row">
+              <span class="detail-label">Prix</span>
+              <span class="detail-value detail-price">{{ o.prixParPersonne | number:'1.0-0' }} TND</span>
+            </div>
+          }
+        </div>
+
+        <!-- Capacity info -->
+        <div class="capacity-box">
+          <div class="cap-row">
+            <span class="cap-label">Capacité totale</span>
+            <span class="cap-value">{{ o.capaciteMax ?? '—' }} places</span>
+          </div>
+          <div class="cap-row">
+            <span class="cap-label">Inscrits confirmés</span>
+            <span class="cap-value cap-ok">{{ counts().confirmee }}</span>
+          </div>
+          <div class="cap-row">
+            <span class="cap-label">En attente</span>
+            <span class="cap-value cap-warn">{{ counts().attente }}</span>
+          </div>
+          <div class="cap-row">
+            <span class="cap-label">Places restantes</span>
+            <span class="cap-value">{{ o.placesRestantes ?? '—' }}</span>
+          </div>
+          @if (o.capaciteMax) {
+            <div class="cap-bar-wrap">
+              <div class="cap-bar"
+                [style.width.%]="(inscrits() / (o.capaciteMax || 1)) * 100">
+              </div>
+            </div>
+            <p class="cap-hint">{{ inscrits() }}/{{ o.capaciteMax }} places occupées</p>
+          }
+        </div>
+
+      </div>
+    </aside>
+  }
+
+</div>

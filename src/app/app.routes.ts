@@ -107,6 +107,10 @@ export const routes: Routes = [
         loadComponent: () => import('./admin/creer-offre/creer-offre.component').then(m => m.CreerOffreComponent),
       },
       {
+        path: 'offres/:id/inscriptions',
+        loadComponent: () => import('./bureau/offres/offre-inscriptions/offre-inscriptions.component').then(m => m.OffreInscriptionsComponent),
+      },
+      {
         path: 'inscriptions',
         loadComponent: () => import('./bureau/inscriptions/bureau-inscriptions.component').then(m => m.BureauInscriptionsComponent),
       },

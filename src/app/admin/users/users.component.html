@@ -290,6 +290,22 @@
               </select>
             </div>
 
+            <!-- Types d'offres autorisés -->
+            <div class="form-group">
+              <label>Types d'offres autorisés</label>
+              <div class="types-check-group">
+                @for (t of offreTypeOptions; track t.value) {
+                  <label class="type-check-label">
+                    <input type="checkbox"
+                      [checked]="createTypesAutorisees().includes(t.value)"
+                      (change)="toggleCreateType(t.value)" />
+                    {{ t.label }}
+                  </label>
+                }
+              </div>
+              <span class="field-hint">Laissez vide pour n'autoriser aucun type.</span>
+            </div>
+
             <!-- Responsable de Pôle: Pôle selector -->
             @if (createIsResponsable()) {
               <div class="form-group">
@@ -403,6 +419,21 @@
                   <option [value]="p.value">{{ p.label }}</option>
                 }
               </select>
+            </div>
+
+            <!-- Types d'offres autorisés -->
+            <div class="form-group">
+              <label>Types d'offres autorisés</label>
+              <div class="types-check-group">
+                @for (t of offreTypeOptions; track t.value) {
+                  <label class="type-check-label">
+                    <input type="checkbox"
+                      [checked]="editTypesAutorisees().includes(t.value)"
+                      (change)="toggleEditType(t.value)" />
+                    {{ t.label }}
+                  </label>
+                }
+              </div>
             </div>
 
             @if (editIsResponsable()) {

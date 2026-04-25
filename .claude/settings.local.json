@@ -47,7 +47,11 @@
       "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\security",
       "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\entity",
       "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\controller\\user",
-      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\resources"
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\resources",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\enums",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\inscription",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\inscription",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\controller\\inscription"
     ]
   }
 }

@@ -57,9 +57,13 @@
             @for (t of offreTypes(); track t.value) {
               <button type="button" class="type-card"
                 [class.selected]="typeCtrl.value === t.value"
+                [class.prohibited]="t.prohibited"
                 [style.--accent]="t.color"
-                (click)="form.get('typeOffre')!.setValue(t.value)"
-                [attr.aria-pressed]="typeCtrl.value === t.value">
+                [disabled]="t.prohibited || null"
+                (click)="t.prohibited ? $event.preventDefault() : form.get('typeOffre')!.setValue(t.value)"
+                [attr.aria-pressed]="typeCtrl.value === t.value"
+                [attr.aria-disabled]="t.prohibited"
+                [attr.title]="t.prohibited ? 'Non autorisé pour votre pôle' : null">
 
                 <!-- SVG icon per type -->
                 @switch (t.value) {

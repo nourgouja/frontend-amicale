@@ -89,10 +89,32 @@ export class AdminUsersComponent implements OnInit {
   editRole    = signal('');
   editPoste   = signal('');
 
+  createTypesAutorisees = signal<string[]>([]);
+  editTypesAutorisees   = signal<string[]>([]);
+
+  readonly offreTypeOptions = [
+    { value: 'VOYAGE',     label: 'Voyage' },
+    { value: 'SEJOUR',     label: 'Séjour' },
+    { value: 'ACTIVITE',   label: 'Activité' },
+    { value: 'CONVENTION', label: 'Convention' },
+  ];
+
   createIsBureau      = computed(() => this.createRole() === 'MEMBRE_BUREAU');
   createIsResponsable = computed(() => this.createIsBureau() && this.createPoste() === 'RESPONSABLE_POLE');
   editIsBureau        = computed(() => this.editRole() === 'MEMBRE_BUREAU');
   editIsResponsable   = computed(() => this.editIsBureau() && this.editPoste() === 'RESPONSABLE_POLE');
+
+  toggleCreateType(type: string): void {
+    this.createTypesAutorisees.update(types =>
+      types.includes(type) ? types.filter(t => t !== type) : [...types, type]
+    );
+  }
+
+  toggleEditType(type: string): void {
+    this.editTypesAutorisees.update(types =>
+      types.includes(type) ? types.filter(t => t !== type) : [...types, type]
+    );
+  }
 
   constructor(
     private userService: AdminUserService,
@@ -223,6 +245,7 @@ export class AdminUsersComponent implements OnInit {
     this.createForm.reset({ role: 'ADHERENT', poste: '', poleId: '' });
     this.createRole.set('ADHERENT');
     this.createPoste.set('');
+    this.createTypesAutorisees.set([]);
     this.createError.set('');
     this.showCreateModal.set(true);
   }
@@ -235,13 +258,14 @@ export class AdminUsersComponent implements OnInit {
     this.createError.set('');
     const val = this.createForm.value;
     this.userService.createUser({
-      email:        val.email,
-      nom:          val.nom,
-      prenom:       val.prenom,
-      role:         val.role,
-      telephone:    val.telephone || undefined,
-      posteMembre:  val.role === 'MEMBRE_BUREAU' ? val.poste || undefined : undefined,
-      poleId:       (val.role === 'MEMBRE_BUREAU' && val.poste === 'RESPONSABLE_POLE' && val.poleId) ? Number(val.poleId) : undefined,
+      email:           val.email,
+      nom:             val.nom,
+      prenom:          val.prenom,
+      role:            val.role,
+      telephone:       val.telephone || undefined,
+      posteMembre:     val.role === 'MEMBRE_BUREAU' ? val.poste || undefined : undefined,
+      poleId:          (val.role === 'MEMBRE_BUREAU' && val.poste === 'RESPONSABLE_POLE' && val.poleId) ? Number(val.poleId) : undefined,
+      typesAutorisees: val.role === 'MEMBRE_BUREAU' ? this.createTypesAutorisees() : undefined,
     }).subscribe({
       next: () => { this.createLoading.set(false); this.closeCreateModal(); this.currentPage.set(0); this.loadUsers(); },
       error: (err) => { this.createLoading.set(false); this.createError.set(err?.error?.message ?? 'Un utilisateur avec cet email existe déjà.'); },
@@ -254,6 +278,7 @@ export class AdminUsersComponent implements OnInit {
     this.editingUser.set(user);
     this.editRole.set(user.role);
     this.editPoste.set(user.posteMembre ?? '');
+    this.editTypesAutorisees.set(user.poleTypesOffre ?? []);
     this.editForm.patchValue({
       prenom:    user.prenom,
       nom:       user.nom,
@@ -277,13 +302,14 @@ export class AdminUsersComponent implements OnInit {
     this.editError.set('');
     const val = this.editForm.value;
     this.userService.updateUser(user.id, {
-      nom:          val.nom,
-      prenom:       val.prenom,
-      email:        val.email,
-      telephone:    val.telephone || undefined,
-      role:         val.role,
-      posteMembre:  val.role === 'MEMBRE_BUREAU' ? val.poste || undefined : undefined,
-      poleId:       (val.role === 'MEMBRE_BUREAU' && val.poste === 'RESPONSABLE_POLE' && val.poleId) ? Number(val.poleId) : undefined,
+      nom:             val.nom,
+      prenom:          val.prenom,
+      email:           val.email,
+      telephone:       val.telephone || undefined,
+      role:            val.role,
+      posteMembre:     val.role === 'MEMBRE_BUREAU' ? val.poste || undefined : undefined,
+      poleId:          (val.role === 'MEMBRE_BUREAU' && val.poste === 'RESPONSABLE_POLE' && val.poleId) ? Number(val.poleId) : undefined,
+      typesAutorisees: val.role === 'MEMBRE_BUREAU' ? this.editTypesAutorisees() : undefined,
     }).subscribe({
       next: () => { this.editLoading.set(false); this.closeEditModal(); this.loadUsers(); },
       error: (err) => { this.editLoading.set(false); this.editError.set(err?.error?.message ?? 'Une erreur est survenue.'); },
