@@ -87,6 +87,8 @@ private autoSetPole(type: string): void {
 }
 
 
+  readonly MAX_IMAGE_SIZE = 1_000_000;
+
   openUploadModal(): void  { this.showUploadModal.set(true);  }
   closeUploadModal(): void { this.showUploadModal.set(false); }
 
@@ -94,6 +96,11 @@ private autoSetPole(type: string): void {
     const input = event.target as HTMLInputElement;
     const file  = input.files?.[0];
     if (!file) return;
+    if (file.size > this.MAX_IMAGE_SIZE) {
+      this.errorMsg.set('Image trop volumineuse. La taille maximale est 1 Mo.');
+      input.value = '';
+      return;
+    }
     this.coverFile.set(file);
     const reader = new FileReader();
     reader.onload = e => this.previewUrl.set(e.target?.result as string);

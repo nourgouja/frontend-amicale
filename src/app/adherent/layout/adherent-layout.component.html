@@ -5,15 +5,6 @@
       <img src="logo.png" alt="AmicaleStar" class="nav-logo" />
     </div>
 
-    <nav class="nav-links" aria-label="Navigation adhérent">
-      @for (item of navItems; track item.route) {
-        <a [routerLink]="item.route" routerLinkActive="active" class="nav-link">
-          <lucide-icon [name]="item.icon" [size]="16" class="nav-icon"></lucide-icon>
-          <span>{{ item.label }}</span>
-        </a>
-      }
-    </nav>
-
     <div class="nav-actions">
       <div class="icon-wrap">
         <button class="icon-btn" aria-label="Notifications" (click)="toggleNotif($event)">
@@ -27,11 +18,16 @@
         }
       </div>
 
+      <div class="nav-divider"></div>
+
       <div class="icon-wrap">
-        <button class="avatar-btn" aria-label="Mon compte" (click)="toggleProfile($event)">
+        <button class="user-btn" aria-label="Mon compte" (click)="toggleProfile($event)">
+          <div class="user-info">
+            <span class="user-name">{{ fullName() }}</span>
+            <span class="user-role">{{ roleLabel() }}</span>
+          </div>
           <div class="top-avatar">{{ initials() }}</div>
         </button>
-        <span class="avatar-name">{{ displayName() }}</span>
         @if (profileOpen()) {
           <app-profile-card (close)="profileOpen.set(false)" />
         }
@@ -42,5 +38,14 @@
   <main class="content">
     <router-outlet />
   </main>
+
+  <footer class="site-footer">
+    <span>© 2026 AMICALE STAR</span>
+    <div class="footer-links">
+      <a href="#">PRIVACY POLICY</a>
+      <a href="#">TERMS OF SERVICE</a>
+      <a href="#">SECURITY</a>
+    </div>
+  </footer>
 
 </div>

@@ -8,68 +8,68 @@
 }
 
 .top-nav {
-  height: $topbar-height; background: $color-surface; border-bottom: 1px solid $color-border;
-  display: flex; align-items: center; padding: 0 $space-7; gap: $space-6;
-  position: sticky; top: 0; z-index: 200; flex-shrink: 0;
+  height: 64px; background: $color-surface; border-bottom: 1px solid $color-border;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 $space-7; position: sticky; top: 0; z-index: 200; flex-shrink: 0;
 }
 
 .nav-brand { flex-shrink: 0; }
-.nav-logo  { height: 36px; object-fit: contain; }
+.nav-logo  { height: 50px; object-fit: contain; }
 
-.nav-links {
-  display: flex; align-items: center; gap: $space-1; flex: 1;
-  @include mobile { display: none; }
-}
-
-.nav-link {
-  display: flex; align-items: center; gap: $space-2;
-  padding: 8px $space-3; border-radius: $radius-md;
-  color: $color-text-muted; text-decoration: none;
-  font-size: $font-size-sm; font-weight: 500; white-space: nowrap;
-  transition: background $transition-fast, color $transition-fast;
-
-  .nav-icon { opacity: 0.7; flex-shrink: 0; }
-  &:hover  { background: $color-primary-light; color: $color-primary; .nav-icon { opacity: 1; } }
-  &.active { background: $color-primary-light; color: $color-primary; font-weight: 600; .nav-icon { opacity: 1; } }
-  &:focus-visible { @include focus-ring; }
-  @include reduced-motion { transition: none; }
-}
-
-.nav-actions { display: flex; align-items: center; gap: $space-3; flex-shrink: 0; }
-
-.icon-wrap { position: relative; }
+.nav-actions { display: flex; align-items: center; gap: $space-4; }
+.icon-wrap   { position: relative; }
 
 .icon-btn {
-  width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; color: $color-text-muted;
-  @include flex-center; cursor: pointer; transition: color $transition-fast;
+  width: 36px; height: 36px; border-radius: 50%; border: none;
+  background: transparent; color: $color-text-muted;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: color $transition-fast;
   &:hover { color: $color-primary; }
-  &:focus-visible { @include focus-ring; }
-  @include reduced-motion { transition: none; }
 }
 
-.avatar-btn { background: none; border: none; cursor: pointer; padding: 0; &:focus-visible { @include focus-ring; border-radius: 50%; } }
+.nav-divider { width: 1px; height: 28px; background: $color-border; flex-shrink: 0; }
+
+.user-btn {
+  display: flex; align-items: center; gap: $space-3;
+  background: none; border: none; cursor: pointer; padding: 4px 6px;
+  border-radius: $radius-md;
+  &:hover { background: $color-primary-light; }
+}
+
+.user-info {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+  @media (max-width: 480px) { display: none; }
+}
+
+.user-name { font-size: 13px; font-weight: 600; color: $color-text; white-space: nowrap; }
+.user-role { font-size: 10.5px; font-weight: 500; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.5px; }
 
 .top-avatar {
-  width: 34px; height: 34px; border-radius: 50%; background: $color-primary; color: #fff;
-  font-size: $font-size-sm; font-weight: 700; @include flex-center; font-family: $font-base;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: $color-primary; color: #fff;
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  font-family: $font-base; flex-shrink: 0;
 }
-
-.avatar-name { font-size: $font-size-sm; font-weight: 500; color: $color-text; @include mobile { display: none; } }
 
 .dropdown {
   position: absolute; top: calc(100% + 10px); right: 0;
-  background: $color-surface; border-radius: $radius-xl; box-shadow: $shadow-dropdown;
-  padding: $space-2 0; z-index: 500; animation: dropIn 0.15s ease;
-  @include reduced-motion { animation: none; }
+  background: $color-surface; border-radius: $radius-xl;
+  box-shadow: $shadow-dropdown; padding: $space-2 0; z-index: 500;
 }
 .notif-dropdown { width: 280px; }
-
-@keyframes dropIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
 .dropdown-header { padding: $space-3 $space-4 $space-2; font-size: $font-size-base; font-weight: 700; color: $color-text; }
 .dropdown-empty  { padding: $space-6 $space-4; text-align: center; font-size: $font-size-sm; color: $color-text-muted; }
 
-.content { flex: 1; padding: $content-padding; overflow-y: auto; }
+.content { flex: 1; padding: $content-padding; overflow-y: auto; overflow-x: hidden; }
+
+.site-footer {
+  background: $color-primary; color: rgba(255,255,255,.85);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 $space-7; height: 52px; flex-shrink: 0;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.5px;
+  .footer-links {
+    display: flex; gap: 28px;
+    a { color: rgba(255,255,255,.85); text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: 0.5px; &:hover { color: #fff; } }
+  }
+}

@@ -2,35 +2,29 @@ import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { KpiCardComponent } from '../../shared/components/kpi-card/kpi-card.component';
-import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
-import { getDisplayName, formatDate } from '../../shared/utils/format.utils';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, Tag, ClipboardList, CreditCard, CalendarDays } from 'lucide-angular';
+import { getDisplayName } from '../../shared/utils/format.utils';
 
-interface Inscription {
-  id: number;
-  offreTitre: string;
-  typeOffre: string;
-  dateInscription: string;
-  statut: string;
+interface Offre {
+  id: number; titre: string; description: string; typeOffre: string;
+  lieu: string; dateDebut: string; dateFin: string; prixParPersonne: number;
+  imageBase64: string | null; imageType: string | null; statutOffre: string;
 }
 
-interface Cotisation {
-  id: number;
-  montant: number;
-  dateEcheance: string;
-  statut: string;
-  anneeCotisation: number;
+interface MembreBureau {
+  id: number; nom: string; prenom: string; poste: string | null; poleNom: string | null;
 }
+
+const TYPE_LABELS: Record<string, string> = {
+  VOYAGE: 'Voyage', SEJOUR: 'Séjour', ACTIVITE: 'Activité',
+  CONVENTION: 'Convention', EVENEMENT: 'Événement', LOISIRS: 'Loisirs',
+};
 
 @Component({
   selector: 'app-adherent-dashboard',
   standalone: true,
-  imports: [RouterLink, CommonModule, KpiCardComponent, StatusBadgeComponent, LucideAngularModule],
-  providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ Tag, ClipboardList, CreditCard, CalendarDays }) },
-  ],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './adherent-dashboard.component.html',
   styleUrl: './adherent-dashboard.component.scss',
 })
@@ -38,10 +32,11 @@ export class AdherentDashboardComponent implements OnInit {
   private http        = inject(HttpClient);
   private authService = inject(AuthService);
 
-  inscriptions  = signal<Inscription[]>([]);
-  cotisation    = signal<Cotisation | null>(null);
-  offresCount   = signal(0);
-  loading       = signal(true);
+  offres       = signal<Offre[]>([]);
+  membres      = signal<MembreBureau[]>([]);
+  searchQuery  = signal('');
+  activeFilter = signal('');
+  loading      = signal(true);
 
   displayName = computed(() => {
     const u = this.authService.currentUser();
@@ -49,50 +44,54 @@ export class AdherentDashboardComponent implements OnInit {
     return full || getDisplayName(u?.email ?? '');
   });
 
-  inscriptionsConfirmees = computed(() => this.inscriptions().filter(i => i.statut === 'CONFIRMEE').length);
-  inscriptionsAttente    = computed(() => this.inscriptions().filter(i => i.statut === 'EN_ATTENTE').length);
-  cotisationStatus       = computed(() => this.cotisation()?.statut ?? 'AUCUNE');
+  readonly filters = [
+    { value: '', label: 'Tout' },
+    { value: 'VOYAGE',     label: 'Voyage' },
+    { value: 'SEJOUR',     label: 'Séjour' },
+    { value: 'ACTIVITE',   label: 'Activité' },
+    { value: 'CONVENTION', label: 'Convention' },
+    { value: 'EVENEMENT',  label: 'Événement' },
+    { value: 'LOISIRS',    label: 'Loisirs' },
+  ];
 
-  readonly today = new Intl.DateTimeFormat('fr-FR', {
-    weekday: 'long', day: 'numeric', month: 'long',
-  }).format(new Date()).replace(/^\w/, c => c.toUpperCase());
+  filteredOffres = computed(() => {
+    const type = this.activeFilter();
+    const q    = this.searchQuery().toLowerCase().trim();
+    return this.offres().filter(o => {
+      const matchType  = !type || o.typeOffre === type;
+      const matchQuery = !q || o.titre.toLowerCase().includes(q) || (o.description ?? '').toLowerCase().includes(q);
+      return matchType && matchQuery;
+    });
+  });
 
   ngOnInit(): void {
-    this.http.get<Inscription[]>('/api/inscriptions/mesinscriptions').subscribe({
-      next:  list => { this.inscriptions.set(list); this.loading.set(false); },
-      error: ()   => this.loading.set(false),
+    this.http.get<Offre[]>('/api/offres').subscribe({
+      next: list => { this.offres.set(list); this.loading.set(false); },
+      error: ()  => this.loading.set(false),
     });
-
-    this.http.get<any>('/api/adherent/dashboard').subscribe({
-      next: data => {
-        const next = data.prochainesEcheances?.[0];
-        if (next) {
-          this.cotisation.set({
-            id:               next.echeanceId,
-            montant:          next.montant,
-            dateEcheance:     next.dateEcheance,
-            statut:           next.statut,
-            anneeCotisation:  new Date(next.dateEcheance).getFullYear(),
-          });
-        }
-        this.offresCount.set(data.offresDisponibles?.length ?? 0);
-      },
-      error: () => {},
+    this.http.get<MembreBureau[]>('/api/utilisateurs/membres-bureau').subscribe({
+      next: list => this.membres.set(list),
+      error: ()  => {},
     });
   }
 
-  formatDate(s: string): string { return formatDate(s); }
+  setFilter(value: string): void { this.activeFilter.set(value); }
 
-  cotisationKpiColor(): 'primary' | 'blue' | 'green' | 'orange' | 'purple' | 'red' {
-    const s = this.cotisationStatus();
-    if (s === 'PAYEE') return 'green';
-    if (s === 'EN_RETARD') return 'red';
-    return 'orange';
+  coverUrl(o: Offre): string | null {
+    return o.imageBase64 && o.imageType ? `data:${o.imageType};base64,${o.imageBase64}` : null;
   }
 
-  cotisationKpiValue(): string | number {
-    const c = this.cotisation();
-    if (!c) return '—';
-    return c.statut === 'PAYEE' ? 'À jour' : `${c.montant} DT`;
+  typeLabel(type: string): string { return TYPE_LABELS[type] ?? type; }
+
+  initiales(m: MembreBureau): string {
+    return ((m.prenom?.[0] ?? '') + (m.nom?.[0] ?? '')).toUpperCase();
+  }
+
+  posteLabel(poste: string | null): string {
+    const map: Record<string, string> = {
+      PRESIDENT: 'Président', TRESORIER: 'Trésorier',
+      SECRETAIRE: 'Secrétaire', RESPONSABLE_POLE: 'Responsable de Pôle',
+    };
+    return poste ? (map[poste] ?? poste) : '—';
   }
 }

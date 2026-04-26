@@ -1,16 +1,15 @@
 import { Component, signal, inject, computed, HostListener } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { getDisplayName, getInitials } from '../../shared/utils/format.utils';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, ClipboardList, CreditCard, User, Bell } from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, Bell } from 'lucide-angular';
 
 @Component({
   selector: 'app-adherent-layout',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, ProfileCardComponent, LucideAngularModule],
+  imports: [RouterOutlet, ProfileCardComponent, LucideAngularModule],
   providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, ClipboardList, CreditCard, User, Bell }) },
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ Bell }) },
   ],
   templateUrl: './adherent-layout.component.html',
   styleUrl: './adherent-layout.component.scss',
@@ -21,16 +20,23 @@ export class AdherentLayoutComponent {
   profileOpen = signal(false);
   notifOpen   = signal(false);
 
-  displayName = computed(() => getDisplayName(this.authService.currentUser()?.email ?? ''));
-  initials    = computed(() => getInitials(this.authService.currentUser()?.email ?? ''));
+  fullName = computed(() => {
+    const u = this.authService.currentUser();
+    return `${u?.prenom ?? ''} ${u?.nom ?? ''}`.trim() || (u?.email ?? '');
+  });
 
-  readonly navItems = [
-    { route: '/adherent/dashboard',    label: 'Tableau de bord', icon: 'layout-dashboard' },
-    { route: '/adherent/offres',       label: 'Offres',           icon: 'tag' },
-    { route: '/adherent/inscriptions', label: 'Mes inscriptions', icon: 'clipboard-list' },
-    { route: '/adherent/cotisation',   label: 'Ma cotisation',    icon: 'credit-card' },
-    { route: '/adherent/profil',       label: 'Mon profil',       icon: 'user' },
-  ];
+  roleLabel = computed(() => {
+    const role = this.authService.currentUser()?.role ?? '';
+    const map: Record<string, string> = {
+      ADMIN: 'Admin', MEMBRE_BUREAU: 'Membre Bureau', ADHERENT: 'Adhérent',
+    };
+    return map[role] ?? role;
+  });
+
+  initials = computed(() => {
+    const u = this.authService.currentUser();
+    return ((u?.prenom?.[0] ?? '') + (u?.nom?.[0] ?? '')).toUpperCase() || (u?.email?.[0]?.toUpperCase() ?? '?');
+  });
 
   toggleProfile(e: MouseEvent): void { e.stopPropagation(); this.notifOpen.set(false); this.profileOpen.update(v => !v); }
   toggleNotif(e: MouseEvent): void   { e.stopPropagation(); this.profileOpen.set(false); this.notifOpen.update(v => !v); }

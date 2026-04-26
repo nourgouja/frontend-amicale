@@ -46,10 +46,6 @@ export class ProfileCardComponent {
     else                          this.router.navigate(['/adherent/profil']);
   }
 
-  accountSettings(): void {
-    this.close.emit();
-    this.router.navigate(['/change-password']);
-  }
 
   logout(): void {
     this.auth.logout();

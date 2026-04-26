@@ -131,6 +131,11 @@ export class CreerOffreComponent implements OnInit {
         if (offre.imageBase64 && offre.imageType) {
           this.previewUrl.set(`data:${offre.imageType};base64,${offre.imageBase64}`);
         }
+        if (offre.imagesSupplementaires?.length) {
+          this.extraPreviews.set(
+            offre.imagesSupplementaires.map((img: any) => `data:${img.type};base64,${img.base64}`)
+          );
+        }
       },
     });
   }
@@ -145,13 +150,21 @@ export class CreerOffreComponent implements OnInit {
     return this.offreTypes().find(t => t.value === this.typeCtrl.value)?.label ?? '';
   }
 
+  readonly MAX_IMAGE_SIZE = 1_000_000;
+
   /* Cover image */
   openUploadModal(): void  { this.showUploadModal.set(true); }
   closeUploadModal(): void { this.showUploadModal.set(false); }
 
   onFileSelected(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
+    if (file.size > this.MAX_IMAGE_SIZE) {
+      this.errorMsg.set('Image trop volumineuse. La taille maximale est 1 Mo.');
+      input.value = '';
+      return;
+    }
     this.coverFile.set(file);
     const reader = new FileReader();
     reader.onload = e => this.previewUrl.set(e.target?.result as string);

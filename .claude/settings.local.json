@@ -30,7 +30,9 @@
       "Bash(xargs cat *)",
       "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/**)",
       "Read(//c/Users/nourg/IdeaProjects/**)",
-      "Bash(grep -E \"\\\\.java$\")"
+      "Bash(grep -E \"\\\\.java$\")",
+      "Bash(git restore *)",
+      "Bash(rm -f src/styles/_auth.scss)"
     ],
     "additionalDirectories": [
       "C:\\Users\\nourg\\IdeaProjects\\Backend\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\auth",

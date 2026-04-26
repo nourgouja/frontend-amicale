@@ -1,29 +1,30 @@
-import { Component, computed, inject, signal, HostListener } from '@angular/core';
+import { Component, computed, inject, signal, HostListener, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter, map, startWith } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { DatePipe, LowerCasePipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
 import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, TrendingUp, Users, Activity, Tag, CalendarDays } from 'lucide-angular';
 
 const ROLE_LABELS: Record<string, string> = {
-  ADMIN: 'Administrateur',
-  MEMBRE_BUREAU: 'Membre Bureau',
-  ADHERENT: 'Adhérent',
+  ADMIN: 'Administrateur', MEMBRE_BUREAU: 'Membre Bureau', ADHERENT: 'Adhérent',
 };
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, ProfileCardComponent, LucideAngularModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, ProfileCardComponent, LucideAngularModule, DatePipe, LowerCasePipe],
   providers: [
     { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, TrendingUp, Users, Activity, Tag, CalendarDays }) },
   ],
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.scss',
 })
-export class AdminLayoutComponent {
-  authService = inject(AuthService);
+export class AdminLayoutComponent implements OnInit {
+  authService  = inject(AuthService);
+  notifService = inject(NotificationService);
   private router = inject(Router);
 
   private url = toSignal(
@@ -49,9 +50,7 @@ export class AdminLayoutComponent {
   initials = computed(() => {
     const email = this.authService.currentUser()?.email ?? '';
     const parts = email.split('@')[0].split('.');
-    return parts.length >= 2
-      ? (parts[0][0] + parts[1][0]).toUpperCase()
-      : email.slice(0, 2).toUpperCase();
+    return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : email.slice(0, 2).toUpperCase();
   });
 
   adminDisplayName = computed(() => {
@@ -70,6 +69,10 @@ export class AdminLayoutComponent {
 
   readonly icons = { LayoutDashboard, TrendingUp, Users, Activity, Tag, CalendarDays };
 
+  ngOnInit(): void {
+    this.notifService.init();
+  }
+
   navItems = [
     { label: 'Dashboard',     route: '/admin/dashboard',    icon: 'LayoutDashboard' },
     { label: 'Chiffres Clés', route: '/admin/chiffres-cles',icon: 'TrendingUp'      },
@@ -79,16 +82,11 @@ export class AdminLayoutComponent {
     { label: 'Calendrier',    route: '/admin/calendrier',   icon: 'CalendarDays'    },
   ];
 
-  /* ── Dropdown state ── */
   profileOpen = signal(false);
   notifOpen   = signal(false);
   language    = signal<'FR' | 'EN'>('FR');
 
-  toggleProfile(event: MouseEvent): void {
-    event.stopPropagation();
-    this.notifOpen.set(false);
-    this.profileOpen.update(v => !v);
-  }
+  toggleProfile(event: MouseEvent): void { event.stopPropagation(); this.notifOpen.set(false); this.profileOpen.update(v => !v); }
 
   toggleNotif(event: MouseEvent): void {
     event.stopPropagation();
@@ -96,23 +94,22 @@ export class AdminLayoutComponent {
     this.notifOpen.update(v => !v);
   }
 
-  setLanguage(lang: 'FR' | 'EN', event: MouseEvent): void {
+  clearNotifs(event: MouseEvent): void {
     event.stopPropagation();
-    this.language.set(lang);
+    this.notifService.markAllRead();
   }
 
-  goToChangePassword(): void {
-    this.profileOpen.set(false);
-    this.router.navigate(['/change-password']);
+  navigateNotif(link: string | null): void {
+    this.notifOpen.set(false);
+    if (link) this.router.navigateByUrl(link);
   }
+
+  setLanguage(lang: 'FR' | 'EN', event: MouseEvent): void { event.stopPropagation(); this.language.set(lang); }
+
+  goToChangePassword(): void { this.profileOpen.set(false); this.router.navigate(['/change-password']); }
 
   @HostListener('document:click')
-  closeDropdowns(): void {
-    this.profileOpen.set(false);
-    this.notifOpen.set(false);
-  }
+  closeDropdowns(): void { this.profileOpen.set(false); this.notifOpen.set(false); }
 
-  logout(): void {
-    this.authService.logout();
-  }
+  logout(): void { this.authService.logout(); }
 }

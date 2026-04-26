@@ -1,88 +1,87 @@
-<div class="register-page">
-  <div class="bg-overlay"></div>
-
-  <div class="register-card">
-
-    @if (success()) {
-      <div class="success-state">
-        <h2 class="success-title">Request Sent!</h2>
-        <p class="success-sub">Your request has been received. The administrator will send an activation link shortly.</p>
-        <a routerLink="/login" class="back-login-link">Back to login</a>
-      </div>
-    } @else {
-      <div class="card-logo">
-        <img src="logo.png" alt="STAR Assurances" class="logo-img" />
-      </div>
-
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-
-        <!-- Full Name -->
-        <div class="field">
-          <label class="field-label" for="fullName">FULL NAME</label>
-          <div class="input-wrap">
-            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-            </svg>
-            <input id="fullName" type="text" formControlName="fullName" class="input"
-                   placeholder="Enter your full name" autocomplete="name"
-                   [class.input--error]="form.get('fullName')?.invalid && form.get('fullName')?.touched" />
+<div class="auth-shell">
+  <div class="auth-page">
+    <section class="auth-left">
+      <img src="logo.png" alt="STAR Assurances" class="auth-logo" />
+      <div class="auth-card">
+        @if (success()) {
+          <div class="success-state">
+            <h2 class="success-title">Request Sent!</h2>
+            <p class="success-sub">Your request has been received. The administrator will send an activation link shortly.</p>
+            <a routerLink="/login" class="back-login-link">Back to login</a>
           </div>
-        </div>
+        } @else {
+          <h1 class="card-title">Create account</h1>
+          <p class="card-subtitle">Submit your details to request access.</p>
 
-        <!-- Email -->
-        <div class="field">
-          <label class="field-label" for="email">EMAIL</label>
-          <div class="input-wrap">
-            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-            </svg>
-            <input id="email" type="email" formControlName="email" class="input"
-                   placeholder="name@company.com" autocomplete="email"
-                   [class.input--error]="form.get('email')?.invalid && form.get('email')?.touched" />
-          </div>
-        </div>
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+            <div class="field">
+              <label class="field-label" for="fullName">FULL NAME</label>
+              <div class="input-wrap">
+                <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                <input id="fullName" type="text" formControlName="fullName" class="input"
+                       placeholder="Enter your full name" autocomplete="name"
+                       [class.input--error]="form.get('fullName')?.invalid && form.get('fullName')?.touched" />
+              </div>
+            </div>
 
-        <!-- Phone -->
-        <div class="field">
-          <label class="field-label" for="telephone">PHONE NUMBER</label>
-          <div class="input-wrap">
-            <input id="telephone" type="tel" formControlName="telephone" class="input input--no-icon"
-                   placeholder="+216" autocomplete="tel" />
-          </div>
-        </div>
+            <div class="field">
+              <label class="field-label" for="email">EMAIL</label>
+              <div class="input-wrap">
+                <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                <input id="email" type="email" formControlName="email" class="input"
+                       placeholder="name@company.com" autocomplete="email"
+                       [class.input--error]="form.get('email')?.invalid && form.get('email')?.touched" />
+              </div>
+            </div>
 
-        <!-- Amicale STAR -->
-        <div class="field">
-          <label class="field-label" for="matriculeStar">MATRICULE STAR</label>
-          <div class="input-wrap">
-            <input id="matriculeStar" type="text" formControlName="matriculeStar" class="input input--no-icon" />
-          </div>
-        </div>
+            <div class="field">
+              <label class="field-label" for="telephone">PHONE NUMBER</label>
+              <div class="input-wrap">
+                <input id="telephone" type="tel" formControlName="telephone" class="input input--no-icon"
+                       placeholder="+216" autocomplete="tel" />
+              </div>
+            </div>
 
-        <!-- CIN -->
-        <div class="field">
-          <label class="field-label" for="cin">CIN</label>
-          <div class="input-wrap">
-            <input id="cin" type="text" formControlName="cin" class="input input--no-icon" />
-          </div>
-        </div>
+            <div class="field">
+              <label class="field-label" for="matriculeStar">MATRICULE STAR</label>
+              <div class="input-wrap">
+                <input id="matriculeStar" type="text" formControlName="matriculeStar" class="input input--no-icon" />
+              </div>
+            </div>
 
-        @if (error()) {
-          <p class="error-msg">{{ error() }}</p>
+            <div class="field">
+              <label class="field-label" for="cin">CIN</label>
+              <div class="input-wrap">
+                <input id="cin" type="text" formControlName="cin" class="input input--no-icon" />
+              </div>
+            </div>
+
+            @if (error()) {
+              <p class="error-msg">{{ error() }}</p>
+            }
+
+            <button type="submit" class="submit-btn" [disabled]="loading()">
+              {{ loading() ? 'Sending…' : 'SEND REQUEST' }}
+            </button>
+          </form>
+
+          <p class="login-row">
+            Already have an account?&nbsp;<a routerLink="/login" class="login-link">Log in</a>
+          </p>
         }
+      </div>
+    </section>
 
-        <button type="submit" class="submit-btn" [disabled]="loading()">
-          {{ loading() ? 'Sending…' : 'SEND REQUEST' }}
-        </button>
-      </form>
-
-      <p class="login-row">
-        Already have an account?&nbsp;<a routerLink="/login" class="login-link">Log in</a>
-      </p>
-    }
+    <section class="auth-right">
+      <img src="amicale.jpg" alt="Amicale STAR" class="auth-img" />
+    </section>
   </div>
 
-  <footer class="page-footer">
+  <footer class="auth-footer">
     <span>© 2026 AMICALE STAR</span>
     <div class="footer-links">
       <a href="#">PRIVACY POLICY</a>
