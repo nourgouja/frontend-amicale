@@ -33,7 +33,7 @@
   } @else {
     <div class="offres-grid">
       @for (offre of filtered(); track offre.id) {
-        <app-offer-card [offre]="offre" mode="adherent" (inscrire)="inscrire(offre)" />
+        <app-offer-card [offre]="offre" mode="adherent" />
       }
     </div>
   }

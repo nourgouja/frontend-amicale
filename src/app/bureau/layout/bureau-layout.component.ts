@@ -1,8 +1,10 @@
-import { Component, computed, inject, signal, HostListener } from '@angular/core';
+import { Component, computed, inject, signal, HostListener, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { DatePipe, LowerCasePipe } from '@angular/common';
 import { filter, map, startWith } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
 import { getDisplayName, getInitials } from '../../shared/utils/format.utils';
 import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays, BarChart2 } from 'lucide-angular';
@@ -10,15 +12,16 @@ import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard,
 @Component({
   selector: 'app-bureau-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, ProfileCardComponent, LucideAngularModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LowerCasePipe, ProfileCardComponent, LucideAngularModule],
   providers: [
     { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays, BarChart2 }) },
   ],
   templateUrl: './bureau-layout.component.html',
   styleUrl: './bureau-layout.component.scss',
 })
-export class BureauLayoutComponent {
+export class BureauLayoutComponent implements OnInit {
   authService  = inject(AuthService);
+  notifService = inject(NotificationService);
   private router = inject(Router);
 
   private url = toSignal(
@@ -30,7 +33,7 @@ export class BureauLayoutComponent {
     { initialValue: this.router.url }
   );
 
-  initials = computed(() => getInitials(this.authService.currentUser()?.email ?? ''));
+  initials    = computed(() => getInitials(this.authService.currentUser()?.email ?? ''));
   displayName = computed(() => getDisplayName(this.authService.currentUser()?.email ?? ''));
 
   profileOpen = signal(false);
@@ -46,6 +49,8 @@ export class BureauLayoutComponent {
   ];
 
   readonly icons = { LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays, BarChart2 };
+
+  ngOnInit(): void { this.notifService.init(); }
 
   toggleProfile(e: MouseEvent): void { e.stopPropagation(); this.notifOpen.set(false); this.profileOpen.update(v => !v); }
   toggleNotif(e: MouseEvent): void   { e.stopPropagation(); this.profileOpen.set(false); this.notifOpen.update(v => !v); }

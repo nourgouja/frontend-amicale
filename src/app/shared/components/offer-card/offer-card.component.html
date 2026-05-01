@@ -1,4 +1,4 @@
-<article class="offer-card">
+<article class="offer-card" [class.offer-card--clickable]="mode === 'adherent'" (click)="onCardClick()">
 
   <!-- Image -->
   <div class="card-img">
@@ -17,7 +17,19 @@
     <!-- Type badge -->
     <span class="type-badge" [style.background]="typeColor">{{ typeLabel }}</span>
 
-    <!-- Admin/bureau three-dot menu -->
+    <!-- Adherent: star (favourite) -->
+    @if (mode === 'adherent') {
+      <button class="card-star-btn" [class.card-star-btn--active]="favoured()"
+              (click)="toggleFavour($event)" aria-label="Favori">
+        <svg width="15" height="15" viewBox="0 0 24 24"
+             [attr.fill]="favoured() ? '#f59e0b' : 'none'"
+             stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </button>
+    }
+
+    <!-- Admin / bureau three-dot menu -->
     @if (mode === 'admin' || mode === 'bureau') {
       <div class="card-menu-wrapper">
         <button class="card-menu-btn" (click)="toggleMenu($event)" aria-label="Options">
@@ -99,18 +111,5 @@
       </div>
     }
   </div>
-
-  <!-- Footer -->
-  @if (mode === 'adherent') {
-    <div class="card-footer">
-      @if (canRegister) {
-        <button class="btn-register" (click)="inscrire.emit(offre.id)">S'inscrire</button>
-      } @else if (isComplet) {
-        <button class="btn-register btn-register--full" disabled>Complet</button>
-      } @else {
-        <button class="btn-register btn-register--closed" disabled>Fermée</button>
-      }
-    </div>
-  }
 
 </article>

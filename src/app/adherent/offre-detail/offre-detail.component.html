@@ -4,96 +4,101 @@
     <div class="loading-state"><div class="spinner"></div></div>
   } @else if (offre(); as o) {
 
-    <a class="back-link" routerLink="/adherent/offres">← Retour aux offres</a>
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <a class="back-link" routerLink="/adherent/offres">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Retour
+      </a>
+    </div>
 
-    <div class="detail-layout">
-
-      <!-- Left: image + inscription -->
-      <aside class="detail-aside">
+    <!-- Hero: single image (thumbs only when multiple cover images exist) -->
+    <div class="hero-gallery" [class.hero-gallery--single]="!hasMultipleImages">
+      <div class="hero-main">
         @if (imageUrl) {
-          <img [src]="imageUrl" [alt]="o.titre" class="detail-img" />
+          <img [src]="imageUrl" [alt]="o.titre" class="hero-img" />
         } @else {
-          <div class="detail-img-placeholder">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
-              <polyline points="21 15 16 10 5 21"/>
+          <div class="hero-placeholder">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
             </svg>
           </div>
         }
-
-        <div class="aside-card">
-          @if (o.montantAdhesion) {
-            <div class="price-row">
-              <span class="price">{{ o.montantAdhesion | number }} DT</span>
-              <span class="price-label">par personne</span>
-            </div>
-          }
-          @if (o.capaciteMax) {
-            <div class="capacity-row">
-              <span>Places</span>
-              <span class="capacity-val">{{ o.nbInscrits }} / {{ o.capaciteMax }}</span>
-            </div>
-            <div class="capacity-bar">
-              <div class="capacity-fill" [style.width.%]="(o.nbInscrits / o.capaciteMax) * 100"></div>
-            </div>
-          }
-
-          @if (inscribed()) {
-            <div class="inscribed-msg">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Inscription envoyée ! En attente de validation.
-            </div>
-          } @else if (o.statutOffre !== 'OUVERTE') {
-            <button class="btn-inscr btn-inscr--disabled" disabled>Offre fermée</button>
-          } @else if (isFull) {
-            <button class="btn-inscr btn-inscr--disabled" disabled>Complet</button>
-          } @else {
-            <button class="btn-inscr" (click)="inscrire()" [disabled]="inscribing()">
-              {{ inscribing() ? 'En cours…' : 'S\'inscrire' }}
-            </button>
-          }
-        </div>
-      </aside>
-
-      <!-- Right: details -->
-      <div class="detail-main">
-        <div class="detail-badges">
-          <span class="type-badge">{{ o.typeOffre }}</span>
+        <div class="hero-badge-row">
+          <span class="hero-type-badge">{{ o.typeOffre }}</span>
           <app-status-badge [statut]="o.statutOffre" type="offre" />
         </div>
+      </div>
 
-        <h1 class="detail-title">{{ o.titre }}</h1>
-
-        <div class="detail-meta">
-          @if (o.lieu) {
-            <span class="meta-item">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              {{ o.lieu }}
-            </span>
-          }
-          @if (o.dateDebut) {
-            <span class="meta-item">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              {{ formatDate(o.dateDebut) }}
-              @if (o.dateFin) { – {{ formatDate(o.dateFin) }} }
-            </span>
-          }
+      @if (hasMultipleImages) {
+        <div class="hero-thumbs">
+          <div class="thumb thumb--1"></div>
+          <div class="thumb thumb--2"></div>
+          <div class="thumb thumb--3"></div>
         </div>
+      }
+    </div>
 
+    <!-- Offer Header: title + location + star -->
+    <div class="offer-header">
+      <div class="offer-header-text">
+        <h1 class="offer-title">{{ o.titre }}</h1>
+        @if (o.lieu) {
+          <p class="offer-location">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ o.lieu }}
+          </p>
+        }
+        @if (o.dateDebut) {
+          <p class="offer-dates">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            {{ formatDate(o.dateDebut) }}
+            @if (o.dateFin) { – {{ formatDate(o.dateFin) }} }
+          </p>
+        }
+      </div>
+      <button class="star-btn" [class.star-btn--active]="favorited()" (click)="toggleFavorite()" aria-label="Ajouter aux favoris">
+        <svg width="22" height="22" viewBox="0 0 24 24"
+             [attr.fill]="favorited() ? '#f59e0b' : 'none'"
+             stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Content: description left / map + booking right -->
+    <div class="apercu-grid">
+
+      <!-- Left: description + pole + avantages -->
+      <div class="apercu-left">
         @if (o.description) {
-          <div class="detail-section">
-            <h2 class="section-title">Description</h2>
-            <p class="detail-desc">{{ o.description }}</p>
+          <p class="desc-text">{{ o.description }}</p>
+        } @else {
+          <p class="desc-text desc-text--muted">Aucune description disponible.</p>
+        }
+
+        @if (o.poleNom) {
+          <div class="section-block">
+            <h3 class="section-title">Pôle organisateur</h3>
+            <div class="pole-card">
+              <div class="pole-avatar">{{ o.poleNom[0].toUpperCase() }}</div>
+              <div>
+                <div class="pole-name">{{ o.poleNom }}</div>
+                <div class="pole-sub">Bureau Amicale STAR</div>
+              </div>
+            </div>
           </div>
         }
 
         @if (o.avantages && o.avantages.length > 0) {
-          <div class="detail-section">
-            <h2 class="section-title">Avantages inclus</h2>
+          <div class="section-block">
+            <h3 class="section-title">Inclus</h3>
             <ul class="avantages-list">
               @for (a of o.avantages; track a) {
                 <li class="avantage-item">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span class="avantage-icon">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#026654" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
                   {{ a }}
                 </li>
               }
@@ -101,7 +106,118 @@
           </div>
         }
       </div>
+
+      <!-- Right: map card, then booking card -->
+      <div class="apercu-right">
+
+        <!-- Map -->
+        @if (o.lieu) {
+          <div class="right-card">
+            <h3 class="section-title">Lieu</h3>
+            <div class="map-address">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#026654" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ o.lieu }}
+            </div>
+            <a [href]="getMapUrl(o.lieu)" target="_blank" rel="noopener noreferrer" class="map-preview" aria-label="Voir sur Google Maps">
+              <div class="map-visual">
+                <div class="map-grid"></div>
+                <div class="map-road map-road--h"></div>
+                <div class="map-road map-road--v"></div>
+                <div class="map-pin-wrap">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="#026654" stroke="#ffffff" stroke-width="1.2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3" fill="#ffffff"/>
+                  </svg>
+                </div>
+              </div>
+              <span class="map-open-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Ouvrir dans Google Maps
+              </span>
+            </a>
+          </div>
+        }
+
+        <!-- Booking card -->
+        <div class="booking-card">
+
+          @if (o.prixParPersonne) {
+            <div class="booking-price-row">
+              <span class="booking-amount">{{ o.prixParPersonne | number:'1.0-2' }}</span>
+              <span class="booking-currency">DT</span>
+              <span class="booking-per">/ personne</span>
+            </div>
+          } @else {
+            <div class="booking-price-row">
+              <span class="booking-amount">Gratuit</span>
+            </div>
+          }
+
+          <div class="booking-fields">
+            @if (o.dateDebut) {
+              <div class="booking-field">
+                <span class="booking-field-label">Début</span>
+                <span class="booking-field-val">{{ formatDate(o.dateDebut) }}</span>
+              </div>
+            }
+            @if (o.dateFin) {
+              <div class="booking-field">
+                <span class="booking-field-label">Fin</span>
+                <span class="booking-field-val">{{ formatDate(o.dateFin) }}</span>
+              </div>
+            }
+            @if (o.placesRestantes !== undefined && o.placesRestantes !== null) {
+              <div class="booking-field">
+                <span class="booking-field-label">Places restantes</span>
+                <span class="booking-field-val"
+                      [class.booking-field-val--low]="o.placesRestantes <= 3 && o.placesRestantes > 0"
+                      [class.booking-field-val--full]="o.placesRestantes === 0">
+                  @if (o.placesRestantes === 0) { Complet }
+                  @else { {{ o.placesRestantes }}@if (o.capaciteMax) { / {{ o.capaciteMax }} } }
+                </span>
+              </div>
+            }
+          </div>
+
+          <div class="booking-total">
+            <span class="booking-total-label">Total</span>
+            <span class="booking-total-val">
+              @if (o.prixParPersonne) { {{ o.prixParPersonne | number:'1.0-2' }} DT }
+              @else { Gratuit }
+            </span>
+          </div>
+
+          @if (inscribed()) {
+            <div class="inscribed-msg">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Inscription envoyée – en attente de validation
+            </div>
+          } @else if (o.statutOffre !== 'OUVERTE') {
+            <button class="btn-book btn-book--disabled" disabled>Offre fermée</button>
+          } @else if (isFull) {
+            <button class="btn-book btn-book--disabled" disabled>Complet</button>
+          } @else {
+            <button class="btn-book" (click)="inscrire()" [disabled]="inscribing()">
+              @if (inscribing()) {
+                <span class="btn-spinner"></span> En cours…
+              } @else {
+                S'inscrire maintenant
+              }
+            </button>
+          }
+
+          @if (inscribeErr()) {
+            <div class="inscribe-error">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              {{ inscribeErr() }}
+            </div>
+          }
+
+        </div>
+
+      </div>
     </div>
+
   }
 
 </div>

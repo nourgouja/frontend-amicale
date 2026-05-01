@@ -58,7 +58,9 @@
       "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\pole",
       "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\pole",
       "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\auth",
-      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\email"
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\email",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\event",
+      "c:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\notification"
     ]
   }
 }
