@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { AdminUserService, UserResponse } from '../services/admin-user.service';
 import { AdminAdhesionService, DemandeAdhesionResponse } from '../services/admin-adhesion.service';
 
-interface PoleOption { id: number; nom: string; typeOffre: string; }
+interface PoleOption { id: number; nom: string; }
 
 @Component({
   selector: 'app-admin-users',
@@ -26,8 +26,6 @@ export class AdminUsersComponent implements OnInit {
   searchTerm = '';
   selectedRole = '';
 
-  tabCounts = signal<Record<string, number>>({ '': 0 });
-
   /* ── Poles ── */
   poles = signal<PoleOption[]>([]);
 
@@ -40,6 +38,8 @@ export class AdminUsersComponent implements OnInit {
   approveLoading     = signal(false);
   showRejectConfirm  = signal(false);
   rejectingId        = signal<number | null>(null);
+  rejectLoading      = signal(false);
+  rejectError        = signal('');
 
   /* ── Three-dots menu ── */
   openMenuId = signal<number | null>(null);
@@ -57,11 +57,21 @@ export class AdminUsersComponent implements OnInit {
   editingUser    = signal<UserResponse | null>(null);
   editForm: FormGroup;
 
-  /* ── Delete / Archive confirm ── */
-  showDeleteConfirm  = signal(false);
-  deletingUserId     = signal<number | null>(null);
+  /* ── Archive / Reactivate confirm ── */
   showArchiveConfirm = signal(false);
   archivingUserId    = signal<number | null>(null);
+  showReactivateConfirm = signal(false);
+  reactivatingUserId = signal<number | null>(null);
+  reactivateLoading  = signal(false);
+
+  /* ── Delete confirm ── */
+  showDeleteConfirm  = signal(false);
+  deletingUserId     = signal<number | null>(null);
+
+  /* ── Reset Password ── */
+  showResetPasswordConfirm = signal(false);
+  resetPasswordUserId = signal<number | null>(null);
+  resetPasswordLoading = signal(false);
 
   readonly roles = [
     { value: 'ADMIN',         label: 'Admin' },
@@ -72,18 +82,18 @@ export class AdminUsersComponent implements OnInit {
   readonly postes = [
     { value: 'PRESIDENT',       label: 'Président' },
     { value: 'TRESORIER',       label: 'Trésorier' },
-    { value: 'SECRETAIRE',      label: 'Secrétaire' },
     { value: 'RESPONSABLE_POLE', label: 'Responsable de Pôle' },
   ];
 
   readonly tabs = [
-    { label: 'Tout',          value: '' },
-    { label: 'Admin',         value: 'ADMIN' },
-    { label: 'Membre Bureau', value: 'MEMBRE_BUREAU' },
-    { label: 'Adhérent',      value: 'ADHERENT' },
+    { label: 'Tout',          value: '',         isArchived: false },
+    { label: 'Admin',         value: 'ADMIN',    isArchived: false },
+    { label: 'Membre Bureau', value: 'MEMBRE_BUREAU', isArchived: false },
+    { label: 'Adhérent',      value: 'ADHERENT', isArchived: false },
+    { label: 'Archivés',      value: 'ARCHIVED', isArchived: true },
   ];
 
-  /* ── Mirror form values into signals so computed() can track them ── */
+  /* ── Mirror form values into signals ── */
   createRole  = signal('ADHERENT');
   createPoste = signal('');
   editRole    = signal('');
@@ -101,23 +111,25 @@ export class AdminUsersComponent implements OnInit {
     private fb: FormBuilder,
   ) {
     this.createForm = this.fb.group({
-      prenom:    ['', Validators.required],
-      nom:       ['', Validators.required],
-      email:     ['', [Validators.required, Validators.email]],
-      telephone: [''],
-      role:      ['ADHERENT', Validators.required],
-      poste:     [''],
-      poleId:    [''],
+      prenom:        ['', Validators.required],
+      nom:           ['', Validators.required],
+      email:         ['', [Validators.required, Validators.email]],
+      telephone:     [''],
+      matriculeStar: [''],
+      role:          ['ADHERENT', Validators.required],
+      poste:         [''],
+      poleId:        [''],
     });
 
     this.editForm = this.fb.group({
-      prenom:    ['', Validators.required],
-      nom:       ['', Validators.required],
-      email:     ['', [Validators.required, Validators.email]],
-      telephone: [''],
-      role:      ['', Validators.required],
-      poste:     [''],
-      poleId:    [''],
+      prenom:        ['', Validators.required],
+      nom:           ['', Validators.required],
+      email:         ['', [Validators.required, Validators.email]],
+      telephone:     [''],
+      matriculeStar: [''],
+      role:          ['', Validators.required],
+      poste:         [''],
+      poleId:        [''],
     });
   }
 
@@ -128,48 +140,19 @@ export class AdminUsersComponent implements OnInit {
   }
 
   /* ════════════════ PÔLES ════════════════ */
-
   loadPoles(): void {
     this.http.get<PoleOption[]>('/api/poles').subscribe({
       next: list => this.poles.set(list),
-      error: ()  => {},
+      error: () => {},
     });
   }
 
-  /* Reactive: reset poste/poleId when role changes */
-  onCreateRoleChange(): void {
-    const role = this.createForm.get('role')?.value ?? '';
-    this.createRole.set(role);
-    this.createPoste.set('');
-    this.createForm.patchValue({ poste: '', poleId: '' });
-  }
-
-  onCreatePosteChange(): void {
-    const poste = this.createForm.get('poste')?.value ?? '';
-    this.createPoste.set(poste);
-    this.createForm.patchValue({ poleId: '' });
-  }
-
-  onEditRoleChange(): void {
-    const role = this.editForm.get('role')?.value ?? '';
-    this.editRole.set(role);
-    this.editPoste.set('');
-    this.editForm.patchValue({ poste: '', poleId: '' });
-  }
-
-  onEditPosteChange(): void {
-    const poste = this.editForm.get('poste')?.value ?? '';
-    this.editPoste.set(poste);
-    this.editForm.patchValue({ poleId: '' });
-  }
-
   /* ════════════════ DEMANDES D'ADHÉSION ════════════════ */
-
   loadDemandes(): void {
     this.demandesLoading.set(true);
     this.adhesionService.getDemandesEnAttente().subscribe({
       next: (list) => { this.demandes.set(list); this.demandesLoading.set(false); },
-      error: ()     => this.demandesLoading.set(false),
+      error: () => this.demandesLoading.set(false),
     });
   }
 
@@ -181,33 +164,62 @@ export class AdminUsersComponent implements OnInit {
     if (id == null) return;
     this.approveLoading.set(true);
     this.adhesionService.approuver(id).subscribe({
-      next: () => { this.approveLoading.set(false); this.showApproveConfirm.set(false); this.approvingId.set(null); this.loadDemandes(); this.loadUsers(); },
+      next: () => {
+        this.approveLoading.set(false);
+        this.showApproveConfirm.set(false);
+        this.approvingId.set(null);
+        this.loadDemandes();
+        this.loadUsers();
+      },
       error: () => this.approveLoading.set(false),
     });
   }
 
-  openRejectConfirm(id: number): void { this.rejectingId.set(id); this.showRejectConfirm.set(true); }
-  cancelReject(): void { this.showRejectConfirm.set(false); this.rejectingId.set(null); }
+  openRejectConfirm(id: number): void { this.rejectingId.set(id); this.rejectError.set(''); this.showRejectConfirm.set(true); }
+  cancelReject(): void { this.showRejectConfirm.set(false); this.rejectingId.set(null); this.rejectError.set(''); }
 
   executeReject(): void {
     const id = this.rejectingId();
     if (id == null) return;
+    this.rejectLoading.set(true);
+    this.rejectError.set('');
     this.adhesionService.rejeter(id).subscribe({
-      next: () => { this.showRejectConfirm.set(false); this.rejectingId.set(null); this.loadDemandes(); },
+      next: () => {
+        this.rejectLoading.set(false);
+        this.showRejectConfirm.set(false);
+        this.rejectingId.set(null);
+        this.loadDemandes();
+      },
+      error: (err) => {
+        this.rejectLoading.set(false);
+        this.rejectError.set(err?.error?.message ?? 'Une erreur est survenue.');
+      },
     });
   }
 
   /* ════════════════ USERS ════════════════ */
-
   loadUsers(): void {
     this.loading.set(true);
-    this.userService.getUsers(this.selectedRole || undefined, this.searchTerm || undefined, this.currentPage(), this.pageSize).subscribe({
-      next: (page) => { this.users.set(page.content); this.totalElements.set(page.totalElements); this.totalPages.set(page.totalPages); this.loading.set(false); },
+    const isArchived = this.selectedRole === 'ARCHIVED';
+    const role = isArchived ? undefined : (this.selectedRole || undefined);
+    
+    this.userService.getUsers(role, this.searchTerm || undefined, this.currentPage(), this.pageSize, isArchived).subscribe({
+      next: (page) => {
+        this.users.set(page.content);
+        this.totalElements.set(page.totalElements);
+        this.totalPages.set(page.totalPages);
+        this.loading.set(false);
+      },
       error: () => this.loading.set(false),
     });
   }
 
-  selectTab(role: string): void { this.selectedRole = role; this.currentPage.set(0); this.loadUsers(); }
+  selectTab(role: string): void {
+    this.selectedRole = role;
+    this.currentPage.set(0);
+    this.loadUsers();
+  }
+
   onSearch(): void { this.currentPage.set(0); this.loadUsers(); }
   prevPage(): void { if (this.currentPage() > 0) { this.currentPage.update(p => p - 1); this.loadUsers(); } }
   nextPage(): void { if (this.currentPage() + 1 < this.totalPages()) { this.currentPage.update(p => p + 1); this.loadUsers(); } }
@@ -235,13 +247,14 @@ export class AdminUsersComponent implements OnInit {
     this.createError.set('');
     const val = this.createForm.value;
     this.userService.createUser({
-      email:           val.email,
-      nom:             val.nom,
-      prenom:          val.prenom,
-      role:            val.role,
-      telephone:       val.telephone || undefined,
-      posteMembre:     val.role === 'MEMBRE_BUREAU' ? val.poste || undefined : undefined,
-      poleId:          (val.role === 'MEMBRE_BUREAU' && val.poste === 'RESPONSABLE_POLE' && val.poleId) ? Number(val.poleId) : undefined,
+      email: val.email,
+      nom: val.nom,
+      prenom: val.prenom,
+      role: val.role,
+      telephone: val.telephone || undefined,
+      matriculeStar: val.matriculeStar || undefined,
+      posteMembre: val.role === 'MEMBRE_BUREAU' ? val.poste || undefined : undefined,
+      poleId: (val.role === 'MEMBRE_BUREAU' && val.poste === 'RESPONSABLE_POLE' && val.poleId) ? Number(val.poleId) : undefined,
     }).subscribe({
       next: () => { this.createLoading.set(false); this.closeCreateModal(); this.currentPage.set(0); this.loadUsers(); },
       error: (err) => { this.createLoading.set(false); this.createError.set(err?.error?.message ?? 'Un utilisateur avec cet email existe déjà.'); },
@@ -255,13 +268,14 @@ export class AdminUsersComponent implements OnInit {
     this.editRole.set(user.role);
     this.editPoste.set(user.posteMembre ?? '');
     this.editForm.patchValue({
-      prenom:    user.prenom,
-      nom:       user.nom,
-      email:     user.email,
+      prenom: user.prenom,
+      nom: user.nom,
+      email: user.email,
       telephone: user.telephone ?? '',
-      role:      user.role,
-      poste:     user.posteMembre ?? '',
-      poleId:    user.poleId ?? '',
+      matriculeStar: user.matriculeStar ?? '',
+      role: user.role,
+      poste: user.posteMembre ?? '',
+      poleId: user.poleId ?? '',
     });
     this.editError.set('');
     this.showEditModal.set(true);
@@ -277,40 +291,146 @@ export class AdminUsersComponent implements OnInit {
     this.editError.set('');
     const val = this.editForm.value;
     this.userService.updateUser(user.id, {
-      nom:             val.nom,
-      prenom:          val.prenom,
-      email:           val.email,
-      telephone:       val.telephone || undefined,
-      role:            val.role,
-      posteMembre:     val.role === 'MEMBRE_BUREAU' ? val.poste || undefined : undefined,
-      poleId:          (val.role === 'MEMBRE_BUREAU' && val.poste === 'RESPONSABLE_POLE' && val.poleId) ? Number(val.poleId) : undefined,
+      nom: val.nom,
+      prenom: val.prenom,
+      email: val.email,
+      telephone: val.telephone || undefined,
+      matriculeStar: val.matriculeStar || undefined,
+      role: val.role,
+      posteMembre: val.role === 'MEMBRE_BUREAU' ? val.poste || undefined : undefined,
+      poleId: (val.role === 'MEMBRE_BUREAU' && val.poste === 'RESPONSABLE_POLE' && val.poleId) ? Number(val.poleId) : undefined,
     }).subscribe({
       next: () => { this.editLoading.set(false); this.closeEditModal(); this.loadUsers(); },
       error: (err) => { this.editLoading.set(false); this.editError.set(err?.error?.message ?? 'Une erreur est survenue.'); },
     });
   }
 
+  /* ── Role changes ── */
+  onCreateRoleChange(): void {
+    const role = this.createForm.get('role')?.value ?? '';
+    this.createRole.set(role);
+    this.createPoste.set('');
+    this.createForm.patchValue({ poste: '', poleId: '' });
+  }
+
+  onCreatePosteChange(): void {
+    const poste = this.createForm.get('poste')?.value ?? '';
+    this.createPoste.set(poste);
+    this.createForm.patchValue({ poleId: '' });
+  }
+
+  onEditRoleChange(): void {
+    const role = this.editForm.get('role')?.value ?? '';
+    this.editRole.set(role);
+    this.editPoste.set('');
+    this.editForm.patchValue({ poste: '', poleId: '' });
+  }
+
+  onEditPosteChange(): void {
+    const poste = this.editForm.get('poste')?.value ?? '';
+    this.editPoste.set(poste);
+    this.editForm.patchValue({ poleId: '' });
+  }
+
   /* ── Archive ── */
-  confirmArchive(id: number): void { this.closeMenu(); this.archivingUserId.set(id); this.showArchiveConfirm.set(true); }
-  cancelArchive(): void { this.showArchiveConfirm.set(false); this.archivingUserId.set(null); }
+  confirmArchive(id: number): void {
+    this.closeMenu();
+    this.archivingUserId.set(id);
+    this.showArchiveConfirm.set(true);
+  }
+
+  cancelArchive(): void {
+    this.showArchiveConfirm.set(false);
+    this.archivingUserId.set(null);
+  }
 
   executeArchive(): void {
     const id = this.archivingUserId();
     if (id == null) return;
     this.userService.archiveUser(id).subscribe({
-      next: () => { this.showArchiveConfirm.set(false); this.archivingUserId.set(null); this.loadUsers(); },
+      next: () => {
+        this.showArchiveConfirm.set(false);
+        this.archivingUserId.set(null);
+        this.loadUsers();
+      },
+      error: () => {},
+    });
+  }
+
+  /* ── Reactivate ── */
+  confirmReactivate(id: number): void {
+    this.closeMenu();
+    this.reactivatingUserId.set(id);
+    this.showReactivateConfirm.set(true);
+  }
+
+  cancelReactivate(): void {
+    this.showReactivateConfirm.set(false);
+    this.reactivatingUserId.set(null);
+  }
+
+  executeReactivate(): void {
+    const id = this.reactivatingUserId();
+    if (id == null) return;
+    this.reactivateLoading.set(true);
+    this.userService.activateUser(id).subscribe({
+      next: () => {
+        this.reactivateLoading.set(false);
+        this.showReactivateConfirm.set(false);
+        this.reactivatingUserId.set(null);
+        this.loadUsers();
+      },
+      error: () => this.reactivateLoading.set(false),
+    });
+  }
+
+  /* ── Reset Password ── */
+  confirmResetPassword(id: number): void {
+    this.resetPasswordUserId.set(id);
+    this.showResetPasswordConfirm.set(true);
+  }
+
+  cancelResetPassword(): void {
+    this.showResetPasswordConfirm.set(false);
+    this.resetPasswordUserId.set(null);
+  }
+
+  executeResetPassword(): void {
+    const id = this.resetPasswordUserId();
+    if (id == null) return;
+    this.resetPasswordLoading.set(true);
+    this.userService.resetPassword(id).subscribe({
+      next: () => {
+        this.resetPasswordLoading.set(false);
+        this.showResetPasswordConfirm.set(false);
+        this.resetPasswordUserId.set(null);
+        this.loadUsers();
+      },
+      error: () => this.resetPasswordLoading.set(false),
     });
   }
 
   /* ── Delete ── */
-  confirmDelete(id: number): void { this.closeMenu(); this.deletingUserId.set(id); this.showDeleteConfirm.set(true); }
-  cancelDelete(): void { this.showDeleteConfirm.set(false); this.deletingUserId.set(null); }
+  confirmDelete(id: number): void {
+    this.closeMenu();
+    this.deletingUserId.set(id);
+    this.showDeleteConfirm.set(true);
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirm.set(false);
+    this.deletingUserId.set(null);
+  }
 
   executeDelete(): void {
     const id = this.deletingUserId();
     if (id == null) return;
     this.userService.deleteUser(id).subscribe({
-      next: () => { this.showDeleteConfirm.set(false); this.deletingUserId.set(null); this.loadUsers(); },
+      next: () => {
+        this.showDeleteConfirm.set(false);
+        this.deletingUserId.set(null);
+        this.loadUsers();
+      },
     });
   }
 
@@ -340,5 +460,5 @@ export class AdminUsersComponent implements OnInit {
   }
 
   hasCreateError(field: string, error: string): boolean { const ctrl = this.createForm.get(field); return !!(ctrl?.touched && ctrl?.hasError(error)); }
-  hasEditError(field: string, error: string): boolean   { const ctrl = this.editForm.get(field);   return !!(ctrl?.touched && ctrl?.hasError(error)); }
+  hasEditError(field: string, error: string): boolean { const ctrl = this.editForm.get(field); return !!(ctrl?.touched && ctrl?.hasError(error)); }
 }

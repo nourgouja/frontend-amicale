@@ -3,9 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../core/services/auth.service';
 
-interface Pole { id: number; nom: string; typeOffre: string; }
+interface Pole { id: number; nom: string; }
 
 @Component({
   selector: 'app-creer-offre',
@@ -15,11 +14,10 @@ interface Pole { id: number; nom: string; typeOffre: string; }
   styleUrl: './creer-offre.component.scss',
 })
 export class CreerOffreComponent implements OnInit {
-  private fb          = inject(FormBuilder);
-  private router      = inject(Router);
-  private route       = inject(ActivatedRoute);
-  private http        = inject(HttpClient);
-  private authService = inject(AuthService);
+  private fb     = inject(FormBuilder);
+  private router = inject(Router);
+  private route  = inject(ActivatedRoute);
+  private http   = inject(HttpClient);
 
   readonly isBureauMode = this.router.url.startsWith('/bureau');
 
@@ -43,6 +41,7 @@ export class CreerOffreComponent implements OnInit {
     { value: 'SEJOUR',     label: 'Séjour',     color: '#10b981' },
     { value: 'ACTIVITE',   label: 'Activité',   color: '#f59e0b' },
     { value: 'CONVENTION', label: 'Convention', color: '#8b5cf6' },
+    { value: 'ANNONCE',    label: 'Annonce',    color: '#ec4899' },
   ] as const;
 
   userPoleTypesOffre = signal<string[]>([]);
@@ -70,7 +69,7 @@ export class CreerOffreComponent implements OnInit {
   get typeCtrl(): AbstractControl { return this.form.get('typeOffre')!; }
   get showDateFin(): boolean { const t = this.typeCtrl.value; return t === 'VOYAGE' || t === 'SEJOUR'; }
   get showModePaiement(): boolean { return this.typeCtrl.value === 'VOYAGE'; }
-  get isConvention(): boolean { return this.typeCtrl.value === 'CONVENTION'; }
+  get isConvention(): boolean { const t = this.typeCtrl.value; return t === 'CONVENTION' || t === 'ANNONCE'; }
   get canAddExtra(): boolean { return this.extraFiles().length < 5; }
 
   ngOnInit(): void {
@@ -97,6 +96,9 @@ export class CreerOffreComponent implements OnInit {
         next: p => {
           const types: string[] = p.poleTypesOffre ?? [];
           this.userPoleTypesOffre.set(types);
+          if (p.poleId) {
+            this.form.patchValue({ poleId: p.poleId });
+          }
           if (types.length > 0 && !this.typeCtrl.value) {
             this.form.patchValue({ typeOffre: types[0] });
           }
@@ -107,7 +109,7 @@ export class CreerOffreComponent implements OnInit {
     this.form.get('typeOffre')!.valueChanges.subscribe(type => {
       this.autoSetPole(type);
       const dateCtrl = this.form.get('dateDebut')!;
-      if (type === 'CONVENTION') {
+      if (type === 'CONVENTION' || type === 'ANNONCE') {
         dateCtrl.removeValidators(Validators.required);
       } else {
         dateCtrl.addValidators(Validators.required);
@@ -140,10 +142,9 @@ export class CreerOffreComponent implements OnInit {
     });
   }
 
-  private autoSetPole(type: string): void {
-    if (!type || !this.poles().length) return;
-    const match = this.poles().find(p => p.typeOffre === type);
-    this.form.patchValue({ poleId: match?.id ?? null });
+  private autoSetPole(_type: string): void {
+    // Bureau members use their own pole (set from profile).
+    // Admins: backend resolves pole by typeOffre when poleId is null.
   }
 
   selectedTypeName(): string {

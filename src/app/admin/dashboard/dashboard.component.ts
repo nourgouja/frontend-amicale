@@ -55,6 +55,54 @@ export class AdminDashboardComponent implements OnInit {
   offresBrouillon = computed(() => this.data()?.offres?.filter(o => o.statut === 'BROUILLON').length ?? 0);
   recentOffres    = computed(() => (this.data()?.offres ?? []).slice(0, 5));
 
+  inscriptionStats = computed(() => {
+    const d = this.data();
+    if (!d || !d.totalInscriptions) return { score: 0, breakdown: [] as { label: string; color: string; count: number; pct: number }[] };
+    const total = d.totalInscriptions;
+    return {
+      score: +(d.confirmees / total * 10).toFixed(1),
+      breakdown: [
+        { label: 'En attente', color: '#f59e0b', count: d.enAttente,  pct: Math.round(d.enAttente  / total * 100) },
+        { label: 'Confirmées', color: '#10b981', count: d.confirmees, pct: Math.round(d.confirmees / total * 100) },
+        { label: 'Annulées',   color: '#6366f1', count: d.annulees,   pct: Math.round(d.annulees   / total * 100) },
+      ],
+    };
+  });
+
+  offresStats = computed(() => {
+    const d = this.data();
+    if (!d || !d.offres.length) return { score: 0, breakdown: [] as { label: string; color: string; count: number; pct: number }[] };
+    const total     = d.offres.length;
+    const ouvertes  = d.offres.filter(o => o.statut === 'OUVERTE').length;
+    const brouillon = d.offres.filter(o => o.statut === 'BROUILLON').length;
+    const fermees   = d.offres.filter(o => o.statut === 'FERMEE').length;
+    const archivees = d.offres.filter(o => o.statut === 'ARCHIVEE').length;
+    return {
+      score: +(ouvertes / total * 10).toFixed(1),
+      breakdown: [
+        { label: 'Ouvertes',   color: '#026654', count: ouvertes,  pct: Math.round(ouvertes  / total * 100) },
+        { label: 'Brouillons', color: '#9ca3af', count: brouillon, pct: Math.round(brouillon / total * 100) },
+        { label: 'Fermées',    color: '#dc2626', count: fermees,   pct: Math.round(fermees   / total * 100) },
+        { label: 'Archivées',  color: '#d1d5db', count: archivees, pct: Math.round(archivees / total * 100) },
+      ].filter(i => i.count > 0),
+    };
+  });
+
+  cotisationStats = computed(() => {
+    const d = this.data();
+    if (!d) return { score: 0, breakdown: [] as { label: string; color: string; count: number; pct: number }[] };
+    const total = (d.echeancesPayees ?? 0) + (d.echeancesEnRetard ?? 0) + (d.echeancesEnAttente ?? 0);
+    if (!total) return { score: 0, breakdown: [] };
+    return {
+      score: +(d.echeancesPayees / total * 10).toFixed(1),
+      breakdown: [
+        { label: 'Payées',     color: '#10b981', count: d.echeancesPayees   ?? 0, pct: Math.round((d.echeancesPayees   ?? 0) / total * 100) },
+        { label: 'En attente', color: '#f59e0b', count: d.echeancesEnAttente ?? 0, pct: Math.round((d.echeancesEnAttente ?? 0) / total * 100) },
+        { label: 'En retard',  color: '#dc2626', count: d.echeancesEnRetard  ?? 0, pct: Math.round((d.echeancesEnRetard  ?? 0) / total * 100) },
+      ],
+    };
+  });
+
   calendarOffres = computed<CalendarOffre[]>(() =>
     (this.data()?.offres ?? []).map(o => ({
       id:        o.id,

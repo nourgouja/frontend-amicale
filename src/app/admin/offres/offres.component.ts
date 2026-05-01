@@ -103,6 +103,8 @@ export class OffresComponent implements OnInit {
     });
   }
 
+
+
   onFermer(id: number): void {
     this.http.patch(`/api/offres/fermer/${id}`, {}).subscribe({
       next: () => {

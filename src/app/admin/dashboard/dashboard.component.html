@@ -13,7 +13,7 @@
 
     <div class="greeting">
       <p class="greeting-date">{{ today }}</p>
-      <h1 class="greeting-title">Bonjour, {{ adminDisplayName() }} 👋</h1>
+      <h1 class="greeting-title">Bonjour, {{ adminDisplayName() }} </h1>
     </div>
 
     <!-- KPI Cards -->
@@ -26,6 +26,59 @@
         [subtitle]="offresBrouillon() + ' brouillons · ' + totalOffres() + ' total'" />
       <app-kpi-card label="Collecté" [value]="d.totalCollecte" icon="dollar-sign" color="green" unit="DT"
         [subtitle]="d.echeancesEnRetard + ' échéances en retard'" />
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+
+      <div class="stat-card">
+        <h4 class="stat-title">Taux de Confirmation</h4>
+        <div class="stat-score">{{ inscriptionStats().score }}<span class="stat-unit">/10</span></div>
+        <div class="stat-rows">
+          @for (row of inscriptionStats().breakdown; track row.label) {
+            <div class="stat-row">
+              <span class="stat-dot" [style.background]="row.color"></span>
+              <span class="stat-label">{{ row.label }}</span>
+              <span class="stat-pct">{{ row.pct }}%</span>
+              <span class="stat-count">({{ row.count }})</span>
+            </div>
+          }
+          @if (inscriptionStats().breakdown.length === 0) { <p class="stat-empty">Aucune inscription</p> }
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h4 class="stat-title">État des Offres</h4>
+        <div class="stat-score">{{ offresStats().score }}<span class="stat-unit">/10</span></div>
+        <div class="stat-rows">
+          @for (row of offresStats().breakdown; track row.label) {
+            <div class="stat-row">
+              <span class="stat-dot" [style.background]="row.color"></span>
+              <span class="stat-label">{{ row.label }}</span>
+              <span class="stat-pct">{{ row.pct }}%</span>
+              <span class="stat-count">({{ row.count }})</span>
+            </div>
+          }
+          @if (offresStats().breakdown.length === 0) { <p class="stat-empty">Aucune offre</p> }
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <h4 class="stat-title">État des Cotisations</h4>
+        <div class="stat-score">{{ cotisationStats().score }}<span class="stat-unit">/10</span></div>
+        <div class="stat-rows">
+          @for (row of cotisationStats().breakdown; track row.label) {
+            <div class="stat-row">
+              <span class="stat-dot" [style.background]="row.color"></span>
+              <span class="stat-label">{{ row.label }}</span>
+              <span class="stat-pct">{{ row.pct }}%</span>
+              <span class="stat-count">({{ row.count }})</span>
+            </div>
+          }
+          @if (cotisationStats().breakdown.length === 0) { <p class="stat-empty">Aucune donnée</p> }
+        </div>
+      </div>
+
     </div>
 
     <!-- Mid row -->

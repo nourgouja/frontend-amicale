@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AdminAdhesionService } from '../../admin/services/admin-adhesion.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-register',

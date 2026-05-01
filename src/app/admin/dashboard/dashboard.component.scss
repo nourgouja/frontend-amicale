@@ -47,6 +47,40 @@
   @include mobile { grid-template-columns: 1fr; }
 }
 
+/* ── Statistics grid ── */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: $space-4;
+  @include tablet { grid-template-columns: 1fr 1fr; }
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.stat-card { @include card; padding: $space-5; }
+
+.stat-title {
+  font-size: $font-size-xs; font-weight: 700; color: $color-text-muted;
+  text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 $space-3;
+}
+
+.stat-score {
+  font-size: 2.2rem; font-weight: 800; color: $color-text; line-height: 1; margin-bottom: $space-4;
+}
+
+.stat-unit { font-size: $font-size-base; font-weight: 500; color: $color-text-muted; }
+
+.stat-rows { display: flex; flex-direction: column; gap: 10px; }
+
+.stat-row { display: flex; align-items: center; gap: 8px; }
+
+.stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.stat-label { font-size: $font-size-sm; color: $color-text; flex: 1; }
+
+.stat-pct { font-size: $font-size-sm; font-weight: 600; color: $color-text; min-width: 38px; text-align: right; }
+
+.stat-count { font-size: $font-size-xs; color: $color-text-muted; min-width: 36px; text-align: right; }
+
+.stat-empty { font-size: $font-size-sm; color: $color-text-muted; margin: 0; text-align: center; padding: $space-2 0; }
+
 /* ── Mid row ── */
 .mid-row {
   display: grid;

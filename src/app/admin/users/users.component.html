@@ -83,8 +83,12 @@
           <button
             class="tab-btn"
             [class.active]="selectedRole === tab.value"
+            [class.tab-archived]="tab.value === 'ARCHIVED'"
             (click)="selectTab(tab.value)"
-          >{{ tab.label }}{{ tab.value === '' ? ' (' + totalElements() + ')' : '' }}</button>
+          >
+            {{ tab.label }}
+            @if (tab.value === '' && selectedRole !== 'ARCHIVED') { ({{ totalElements() }}) }
+          </button>
         }
       </div>
       <button class="add-btn" (click)="openCreateModal()">
@@ -147,6 +151,7 @@
                   </button>
                   @if (openMenuId() === user.id) {
                     <div class="dropdown-menu">
+                      <!-- Edit button (always shown) -->
                       <button class="dropdown-item" (click)="openEditModal(user)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                           fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -155,15 +160,43 @@
                         </svg>
                         Modifier
                       </button>
-                      <button class="dropdown-item" (click)="confirmArchive(user.id)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="21 8 21 21 3 21 3 8"/>
-                          <rect x="1" y="3" width="22" height="5"/>
-                          <line x1="10" y1="12" x2="14" y2="12"/>
-                        </svg>
-                        Archiver
-                      </button>
+
+                      <!-- Archive/Reactivate button (conditionally shown) -->
+                      @if (selectedRole === 'ARCHIVED') {
+                        <button class="dropdown-item" (click)="confirmReactivate(user.id)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21.5 2v6h-6M2.5 22v-6h6"/>
+                            <path d="M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                          </svg>
+                          Réactiver
+                        </button>
+                      } @else {
+                        <button class="dropdown-item" (click)="confirmArchive(user.id)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="21 8 21 21 3 21 3 8"/>
+                            <rect x="1" y="3" width="22" height="5"/>
+                            <line x1="10" y1="12" x2="14" y2="12"/>
+                          </svg>
+                          Archiver
+                        </button>
+                      }
+
+                      <!-- Reset Password button (only for active users) -->
+                      @if (selectedRole !== 'ARCHIVED') {
+                        <button class="dropdown-item" (click)="confirmResetPassword(user.id)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="1"/><path d="M12 1v6m0 6v6"/>
+                            <path d="M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6m6 0h6"/>
+                            <path d="M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
+                          </svg>
+                          Réinitialiser Mot de Passe
+                        </button>
+                      }
+
+                      <!-- Delete button (always shown) -->
                       <button class="dropdown-item item-danger" (click)="confirmDelete(user.id)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                           fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -257,6 +290,13 @@
             <span class="phone-flag">🇹🇳</span>
             <span class="phone-prefix">+216</span>
             <input formControlName="telephone" type="tel" placeholder="XX XXX XXX" class="phone-input" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Matricule Star <span class="req">*</span></label>
+          <div class="phone-wrap">
+            <input formControlName="matriculeStar" type="tel" placeholder="XXX" class="phone-input" />
           </div>
         </div>
 
@@ -376,6 +416,13 @@
         </div>
 
         <div class="form-group">
+          <label>Matricule Star <span class="req">*</span></label>
+          <div class="phone-wrap">
+            <input formControlName="matriculeStar" type="tel" placeholder="XXX" class="phone-input" />
+          </div>
+        </div>
+
+        <div class="form-group">
           <label>Rôle <span class="req">*</span></label>
           <select formControlName="role" (change)="onEditRoleChange()">
             @for (r of roles; track r.value) {
@@ -471,10 +518,13 @@
           </svg>
         </button>
       </div>
-      <p class="confirm-text">Voulez-vous rejeter cette demande d'adhésion ?</p>
+      <p class="confirm-text">Voulez-vous rejeter cette demande d'adhésion ? Un email de notification sera envoyé au demandeur.</p>
+      @if (rejectError()) { <p class="form-error">{{ rejectError() }}</p> }
       <div class="modal-actions">
-        <button class="btn-cancel" (click)="cancelReject()">Annuler</button>
-        <button class="btn-danger" (click)="executeReject()">Rejeter</button>
+        <button class="btn-cancel" (click)="cancelReject()" [disabled]="rejectLoading()">Annuler</button>
+        <button class="btn-danger" (click)="executeReject()" [disabled]="rejectLoading()">
+          {{ rejectLoading() ? 'Traitement…' : 'Rejeter' }}
+        </button>
       </div>
     </div>
   </div>
@@ -497,6 +547,52 @@
       <div class="modal-actions">
         <button class="btn-cancel" (click)="cancelArchive()">Annuler</button>
         <button class="btn-confirm" (click)="executeArchive()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showReactivateConfirm()) {
+  <div class="modal-overlay" (click)="cancelReactivate()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Réactiver l'utilisateur</h2>
+        <button class="modal-close" (click)="cancelReactivate()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <p class="confirm-text">Voulez-vous réactiver cet utilisateur ? Il pourra à nouveau se connecter.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelReactivate()">Annuler</button>
+        <button class="btn-confirm" (click)="executeReactivate()" [disabled]="reactivateLoading()">
+          {{ reactivateLoading() ? 'Traitement…' : 'Réactiver' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showResetPasswordConfirm()) {
+  <div class="modal-overlay" (click)="cancelResetPassword()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Réinitialiser le mot de passe</h2>
+        <button class="modal-close" (click)="cancelResetPassword()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <p class="confirm-text">Un nouveau mot de passe temporaire sera généré et envoyé par email à l'utilisateur.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelResetPassword()">Annuler</button>
+        <button class="btn-confirm" (click)="executeResetPassword()" [disabled]="resetPasswordLoading()">
+          {{ resetPasswordLoading() ? 'Traitement…' : 'Réinitialiser' }}
+        </button>
       </div>
     </div>
   </div>
