@@ -87,9 +87,7 @@
 }
 
 .offers-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: $space-5;
-  @include tablet { grid-template-columns: repeat(2, 1fr); }
-  @include mobile { grid-template-columns: 1fr; }
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: $space-5;
 }
 .offer-card-wrapper {
   cursor: pointer; border-radius: $radius-lg;

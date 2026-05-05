@@ -1,25 +1,28 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { formatDate } from '../../shared/utils/format.utils';
 
-interface Cotisation {
+interface Echeance {
   id: number;
+  inscriptionId: number;
+  numero: number;
   montant: number;
   dateEcheance: string;
   datePaiement?: string;
   statut: string;
-  anneeCotisation: number;
+  daysUntilDue: number;
+  overdue: boolean;
 }
 
-interface CotisationHistorique {
+interface InscriptionSummary {
   id: number;
-  montant: number;
-  dateEcheance: string;
-  datePaiement?: string;
+  offreTitre: string;
   statut: string;
-  anneeCotisation: number;
+  montant: number;
+  periodePaiement?: string;
+  echeances: Echeance[];
 }
 
 @Component({
@@ -32,19 +35,35 @@ interface CotisationHistorique {
 export class AdherentCotisationComponent implements OnInit {
   private http = inject(HttpClient);
 
-  cotisation  = signal<Cotisation | null>(null);
-  historique  = signal<CotisationHistorique[]>([]);
-  loading     = signal(true);
+  inscriptions = signal<InscriptionSummary[]>([]);
+  loading      = signal(true);
+
+  // Only CONFIRMEE inscriptions with echeances
+  confirmed = computed(() =>
+    this.inscriptions().filter(i => i.statut === 'CONFIRMEE' && i.echeances?.length > 0)
+  );
+
+  allEcheances = computed(() => this.confirmed().flatMap(i => i.echeances));
+
+  prochaines = computed(() =>
+    this.allEcheances()
+      .filter(e => e.statut !== 'PAYEE')
+      .sort((a, b) => a.dateEcheance.localeCompare(b.dateEcheance))
+      .slice(0, 5)
+  );
+
+  totalPaye = computed(() =>
+    this.allEcheances().filter(e => e.statut === 'PAYEE').reduce((s, e) => s + e.montant, 0)
+  );
+
+  totalImpaye = computed(() =>
+    this.allEcheances().filter(e => e.statut !== 'PAYEE').reduce((s, e) => s + e.montant, 0)
+  );
 
   ngOnInit(): void {
-    this.http.get<Cotisation>('/api/cotisations/ma-cotisation').subscribe({
-      next:  cot => { this.cotisation.set(cot); this.loading.set(false); },
-      error: ()  => this.loading.set(false),
-    });
-
-    this.http.get<CotisationHistorique[]>('/api/cotisations/mon-historique').subscribe({
-      next:  list => this.historique.set(list),
-      error: ()   => {},
+    this.http.get<InscriptionSummary[]>('/api/inscriptions/mesinscriptions').subscribe({
+      next:  list => { this.inscriptions.set(list); this.loading.set(false); },
+      error: ()   => this.loading.set(false),
     });
   }
 

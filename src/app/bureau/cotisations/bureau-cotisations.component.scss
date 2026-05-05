@@ -16,6 +16,7 @@
   .sb-value { font-size: $font-size-base; font-weight: 700; line-height: 1; }
   .sb-label { font-size: $font-size-xs; margin-top: 2px; }
 
+  &--green  { background: rgba(16,185,129,0.12); color: #047857; }
   &--red    { background: rgba(220,38,38,0.10); color: $color-error; }
   &--orange { background: rgba(245,158,11,0.12); color: #92400e; }
 }
@@ -44,6 +45,7 @@
 
 .table-card { @include card; overflow: hidden; }
 
+// ── Main table ──────────────────────────────────────────────────────────────
 .data-table {
   width: 100%; border-collapse: collapse;
 
@@ -58,10 +60,20 @@
     font-size: $font-size-sm; color: $color-text; vertical-align: middle;
   }
   tr:last-child td { border-bottom: none; }
-  tbody tr { transition: background $transition-fast; &:hover { background: rgba(2,102,84,0.025); } }
-  tbody tr.row--retard { background: rgba(220,38,38,0.03); }
-  @include reduced-motion { tbody tr { transition: none; } }
 }
+
+.th-chevron, .td-chevron { width: 32px; padding-right: $space-3 !important; }
+
+.main-row {
+  cursor: pointer;
+  transition: background $transition-fast;
+  &:hover { background: rgba(2,102,84,0.03); }
+  &.row--retard { background: rgba(220,38,38,0.03); &:hover { background: rgba(220,38,38,0.06); } }
+  &.row--expanded { background: rgba(2,102,84,0.05); }
+  @include reduced-motion { transition: none; }
+}
+
+.chevron-icon { color: $color-text-muted; display: block; }
 
 .member-cell  { display: flex; align-items: center; gap: $space-3; }
 .member-avatar {
@@ -72,25 +84,90 @@
 }
 .member-info  { display: flex; flex-direction: column; min-width: 0; }
 .member-name  { font-weight: 600; @include truncate; }
-.member-email { font-size: $font-size-xs; color: $color-text-muted; @include truncate; }
 
 .year-cell    { font-weight: 500; color: $color-text-muted; }
+.num-cell     { color: $color-text-muted; }
 .amount-cell  { font-weight: 600; }
 .date-cell    { color: $color-text-muted; white-space: nowrap; &--red { color: $color-error; font-weight: 600; } }
 
-.btn-pay {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 5px 12px; border-radius: $radius-sm; border: none;
+// ── Expanded detail row ──────────────────────────────────────────────────────
+.detail-row td {
+  padding: 0;
+  border-bottom: 1px solid $color-border;
+  background: $color-bg;
+}
+
+.detail-panel {
+  display: flex; gap: $space-6; padding: $space-5 $space-6;
+  border-top: 2px solid rgba(2,102,84,0.15);
+}
+
+// Left: adherent card
+.detail-info {
+  display: flex; align-items: flex-start; gap: $space-3;
+  min-width: 220px; flex-shrink: 0;
+}
+
+.detail-avatar {
+  width: 46px; height: 46px; border-radius: 50%;
   background: $color-primary-light; color: $color-primary;
+  font-size: $font-size-sm; font-weight: 700;
+  @include flex-center; flex-shrink: 0;
+}
+
+.detail-meta {
+  display: flex; flex-direction: column; gap: 3px; min-width: 0;
+}
+
+.detail-name   { font-size: $font-size-base; font-weight: 700; color: $color-text; }
+.detail-email  { font-size: $font-size-xs; color: $color-text-muted; }
+.detail-offre  { font-size: $font-size-xs; color: $color-primary; font-weight: 500; margin-top: 2px; }
+.detail-periode {
+  display: inline-block; margin-top: 4px;
+  font-size: $font-size-xs; font-weight: 600;
+  padding: 2px 8px; border-radius: $radius-sm;
+  background: rgba(2,102,84,0.08); color: $color-primary;
+}
+
+// Right: inner echeances table
+.detail-echeances { flex: 1; overflow-x: auto; }
+
+.inner-table {
+  width: 100%; border-collapse: collapse;
+  font-size: $font-size-xs;
+
+  thead tr { background: transparent; }
+  th {
+    padding: $space-2 $space-3; text-align: left;
+    font-size: 10px; font-weight: 700; color: $color-text-muted;
+    text-transform: uppercase; letter-spacing: 0.4px;
+    border-bottom: 1px solid $color-border;
+  }
+  td {
+    padding: $space-2 $space-3; border-bottom: 1px solid rgba(0,0,0,0.05);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  &--payee  { opacity: 0.6; }
+}
+
+.inner-row--payee  td:first-child { opacity: 0.55; }
+.inner-row--retard td { color: $color-error; }
+
+// ── Green "Marquer paiement" button ─────────────────────────────────────────
+.btn-marquer {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: $radius-sm; border: none;
+  background: $color-primary; color: #fff;
   font-family: $font-base; font-size: $font-size-xs; font-weight: 600;
   cursor: pointer; white-space: nowrap; transition: background $transition-fast;
-  &:hover { background: rgba(2,102,84,0.2); }
+  &:hover { background: $color-primary-dark; }
   &:focus-visible { @include focus-ring; }
   @include reduced-motion { transition: none; }
 }
 
-.no-action { color: $color-text-muted; }
-
+// ── Empty / loading states ───────────────────────────────────────────────────
 .loading-state, .empty-state {
   display: flex; flex-direction: column; align-items: center; gap: $space-3;
   padding: $space-8 $space-4; color: $color-text-muted; font-size: $font-size-sm; text-align: center;

@@ -7,7 +7,7 @@
         @if (pendingCount() > 0) {
           <span class="pending-badge">{{ pendingCount() }}</span>
         }
-        Gérez les demandes d'inscription aux offres
+        Gérez les demandes d'inscription aux offres de votre pôle
       </p>
     </div>
   </div>
@@ -16,23 +16,22 @@
   <div class="filters-bar">
     <div class="search-wrap">
       <lucide-icon name="search" [size]="15" class="search-icon"></lucide-icon>
-      <input type="search" class="search-input" placeholder="Rechercher par nom ou offre…"
-             [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
+      <input type="search" class="search-input" placeholder="Rechercher par nom d'adhérent…"
+             [value]="searchQuery()"
+             (input)="onSearchInput($any($event.target).value)" />
     </div>
-    <select class="statut-select" [ngModel]="statutFilter()" (ngModelChange)="statutFilter.set($event)">
-      @for (s of statuts; track s.key) {
-        <option [value]="s.key">{{ s.label }}</option>
-      }
+    <select class="filter-select" [ngModel]="statutFilter()" (ngModelChange)="onStatutChange($event)">
+      @for (s of statuts; track s.key) { <option [value]="s.key">{{ s.label }}</option> }
+    </select>
+    <select class="filter-select" [ngModel]="typeFilter()" (ngModelChange)="onTypeChange($event)">
+      @for (t of types; track t.key) { <option [value]="t.key">{{ t.label }}</option> }
     </select>
   </div>
 
   <!-- Table -->
   @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Chargement…</p>
-    </div>
-  } @else if (filtered().length === 0) {
+    <div class="loading-state"><div class="spinner"></div><p>Chargement…</p></div>
+  } @else if (inscriptions().length === 0) {
     <div class="empty-state">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
@@ -44,46 +43,45 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>Membre</th>
+            <th>Adhérent</th>
             <th>Offre</th>
             <th>Date d'inscription</th>
-            <th>Statut</th>
-            <th>Actions</th>
+            <th>Statut inscription</th>
+            <th>Paiement</th>
           </tr>
         </thead>
         <tbody>
-          @for (ins of filtered(); track ins.id) {
-            <tr>
+          @for (ins of inscriptions(); track ins.id) {
+            <tr class="data-row" (click)="openDetail(ins)">
               <td>
                 <div class="member-cell">
-                  <div class="member-avatar">{{ initials(ins.membreNom, ins.membrePrenom) }}</div>
+                  <div class="member-avatar">{{ initials(ins.adherentNom, ins.adherentPrenom) }}</div>
                   <div class="member-info">
-                    <span class="member-name">{{ ins.membrePrenom }} {{ ins.membreNom }}</span>
-                    <span class="member-email">{{ ins.membreEmail }}</span>
+                    <span class="member-name">{{ ins.adherentPrenom }} {{ ins.adherentNom }}</span>
+                    <span class="member-email">{{ ins.adherentEmail ?? ins.mailAdherent }}</span>
                   </div>
                 </div>
               </td>
               <td>
-                <span class="offre-name">{{ ins.offreTitre }}</span>
+                <div class="offre-cell">
+                  <span class="offre-name">{{ ins.offreTitre }}</span>
+                  <span class="offre-type">{{ ins.typeOffre | lowercase }}</span>
+                </div>
               </td>
               <td class="date-cell">{{ formatDate(ins.dateInscription) }}</td>
+              <td><app-status-badge [statut]="ins.statut" type="inscription" /></td>
               <td>
-                <app-status-badge [statut]="ins.statut" type="inscription" />
-              </td>
-              <td>
-                @if (ins.statut === 'EN_ATTENTE') {
-                  <div class="action-btns">
-                    <button class="btn-validate" (click)="openAction(ins, 'valider')" aria-label="Valider l'inscription">
-                      <lucide-icon name="check-circle" [size]="15"></lucide-icon>
-                      Valider
-                    </button>
-                    <button class="btn-refuse" (click)="openAction(ins, 'refuser')" aria-label="Refuser l'inscription">
-                      <lucide-icon name="x-circle" [size]="15"></lucide-icon>
-                      Refuser
-                    </button>
+                @if (ins.echeances && ins.echeances.length > 0) {
+                  <div class="echeances-summary">
+                    @if (ins.periodePaiement) {
+                      <span class="mode-label">{{ ins.periodePaiement | lowercase }}</span>
+                    }
+                    <span class="echeances-count">{{ paidCount(ins) }}/{{ ins.echeances.length }} payées</span>
                   </div>
+                } @else if (ins.statutPaiement) {
+                  <app-status-badge [statut]="ins.statutPaiement" type="cotisation" />
                 } @else {
-                  <span class="no-action">—</span>
+                  <span class="no-value">—</span>
                 }
               </td>
             </tr>
@@ -95,15 +93,178 @@
 
 </div>
 
-@if (confirmTarget(); as t) {
-  <app-confirm-modal
-    [title]="t.action === 'valider' ? 'Valider l\'inscription' : 'Refuser l\'inscription'"
-    [message]="t.action === 'valider'
-      ? 'Confirmer l\'inscription de ' + t.ins.membrePrenom + ' ' + t.ins.membreNom + ' à « ' + t.ins.offreTitre + ' » ?'
-      : 'Refuser la demande de ' + t.ins.membrePrenom + ' ' + t.ins.membreNom + ' pour « ' + t.ins.offreTitre + ' » ?'"
-    [confirmLabel]="t.action === 'valider' ? 'Valider' : 'Refuser'"
-    [confirmColor]="t.action === 'valider' ? 'primary' : 'danger'"
-    [loading]="actionLoading()"
-    (confirmed)="confirmAction()"
-    (cancelled)="cancelAction()" />
+<!-- Toast -->
+@if (toast(); as t) {
+  <div class="toast" [class.toast-error]="t.type === 'error'">{{ t.msg }}</div>
+}
+
+<!-- ── Detail panel (right side) ── -->
+@if (selectedIns(); as ins) {
+  <div class="panel-backdrop" (click)="closeDetail()">
+    <div class="panel-side" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+
+      <!-- Header -->
+      <div class="panel-hd">
+        <div class="panel-hd-left">
+          <div class="panel-avatar">{{ initials(ins.adherentNom, ins.adherentPrenom) }}</div>
+          <div>
+            <h2 class="panel-title">{{ ins.adherentPrenom }} {{ ins.adherentNom }}</h2>
+            <p class="panel-sub">{{ ins.adherentEmail ?? ins.mailAdherent }}</p>
+          </div>
+        </div>
+        <button class="panel-close" (click)="closeDetail()" aria-label="Fermer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      @if (detailLoading()) {
+        <div class="panel-loading"><div class="spinner"></div></div>
+      } @else {
+
+        <div class="panel-body">
+
+          <!-- Status row -->
+          <div class="detail-status-row">
+            <div class="detail-kv">
+              <span class="kv-label">Statut inscription</span>
+              <app-status-badge [statut]="ins.statut" type="inscription" />
+            </div>
+            <div class="detail-kv">
+              <span class="kv-label">Date d'inscription</span>
+              <span class="kv-val">{{ formatDate(ins.dateInscription) }}</span>
+            </div>
+            @if (ins.montant != null) {
+              <div class="detail-kv">
+                <span class="kv-label">Montant total</span>
+                <span class="kv-val kv-val--price">{{ ins.montant | number:'1.0-2' }} TND</span>
+              </div>
+            }
+          </div>
+
+          <!-- Participants -->
+          <div class="panel-section">
+            <h3 class="section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              Participants : {{ ins.totalPeople ?? (1 + (ins.nombreAccompagnants ?? 0)) }} personne(s)
+            </h3>
+            @if (ins.guests && ins.guests.length > 0) {
+              <table class="guests-table">
+                <thead><tr><th>Nom</th><th>Prénom</th><th>Âge</th><th>Sexe</th></tr></thead>
+                <tbody>
+                  @for (g of ins.guests; track $index) {
+                    <tr>
+                      <td>{{ g.nom }}</td>
+                      <td>{{ g.prenom ?? '—' }}</td>
+                      <td class="muted">{{ g.age ?? '—' }}</td>
+                      <td class="muted">{{ sexeLabel(g.sexe) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            } @else {
+              <p class="no-guests">Inscription individuelle — aucun accompagnant.</p>
+            }
+          </div>
+
+          <!-- Payment schedule -->
+          @if (ins.echeances && ins.echeances.length > 0) {
+            <div class="panel-section">
+              <h3 class="section-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                Échéancier de paiement
+              </h3>
+              <table class="echeances-table">
+                <thead>
+                  <tr><th>Date d'échéance</th><th>Montant</th><th>Statut</th><th></th></tr>
+                </thead>
+                <tbody>
+                  @for (e of ins.echeances; track e.id) {
+                    <tr>
+                      <td>{{ formatDate(e.dateEcheance) }}</td>
+                      <td class="echeance-montant">{{ e.montant | number:'1.0-2' }} TND</td>
+                      <td>
+                        <span class="pay-badge"
+                              [class.pay--ok]="e.statut === 'PAYEE'"
+                              [class.pay--late]="e.statut === 'EN_RETARD'"
+                              [class.pay--attente]="e.statut === 'EN_ATTENTE'">
+                          @switch (e.statut) {
+                            @case ('PAYEE')      { Payée }
+                            @case ('EN_RETARD')  { En retard }
+                            @case ('EN_ATTENTE') { En attente }
+                          }
+                        </span>
+                      </td>
+                      <td>
+                        @if (e.statut !== 'PAYEE') {
+                          <button class="btn-pay-row" [disabled]="payLoading() === e.id"
+                                  (click)="payer(e.id, ins.id)">
+                            @if (payLoading() === e.id) { … } @else { Marquer payée }
+                          </button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          <!-- Notes -->
+          <div class="panel-section">
+            <h3 class="section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              Notes
+            </h3>
+            <textarea class="notes-input" rows="3" placeholder="Ajouter une note interne…"
+                      [ngModel]="notesInput()" (ngModelChange)="notesInput.set($event)"></textarea>
+            <button class="btn-save-notes" [disabled]="notesSaving()" (click)="saveNotes()">
+              @if (notesSaving()) { Enregistrement… } @else { Enregistrer les notes }
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Footer actions -->
+        <div class="panel-footer">
+          @if (ins.statut === 'EN_ATTENTE') {
+            <button class="btn-confirm-main" [disabled]="actionLoading() === ins.id"
+                    (click)="confirmer(ins.id)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              @if (actionLoading() === ins.id) { Traitement… } @else { Confirmer l'inscription }
+            </button>
+            <button class="btn-reject-main" [disabled]="actionLoading() === ins.id"
+                    (click)="refuser(ins.id)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              @if (actionLoading() === ins.id) { Traitement… } @else { Rejeter }
+            </button>
+          } @else {
+            <span class="status-final">
+              @switch (ins.statut) {
+                @case ('CONFIRMEE') {
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  Inscription confirmée
+                }
+                @case ('REJETEE') {
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  Inscription rejetée
+                }
+                @case ('ANNULEE') { Inscription annulée }
+              }
+            </span>
+          }
+        </div>
+
+      }
+    </div>
+  </div>
 }

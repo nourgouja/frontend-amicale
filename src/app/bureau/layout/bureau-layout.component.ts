@@ -7,14 +7,14 @@ import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
 import { getDisplayName, getInitials } from '../../shared/utils/format.utils';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays, BarChart2 } from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays } from 'lucide-angular';
 
 @Component({
   selector: 'app-bureau-layout',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LowerCasePipe, ProfileCardComponent, LucideAngularModule],
   providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays, BarChart2 }) },
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays }) },
   ],
   templateUrl: './bureau-layout.component.html',
   styleUrl: './bureau-layout.component.scss',
@@ -45,10 +45,10 @@ export class BureauLayoutComponent implements OnInit {
     { label: 'Inscriptions',    route: '/bureau/inscriptions', icon: 'ClipboardList'   },
     { label: 'Cotisations',     route: '/bureau/cotisations',  icon: 'DollarSign'      },
     { label: 'Calendrier',      route: '/bureau/calendrier',   icon: 'CalendarDays'    },
-    { label: 'Statistiques',    route: '/bureau/statistiques', icon: 'BarChart2'       },
+    //{ label: 'Statistiques',    route: '/bureau/statistiques', icon: 'BarChart2'       },
   ];
 
-  readonly icons = { LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays, BarChart2 };
+  readonly icons = { LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays };
 
   ngOnInit(): void { this.notifService.init(); }
 

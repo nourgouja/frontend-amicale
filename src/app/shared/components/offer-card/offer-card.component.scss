@@ -135,7 +135,10 @@
   svg { flex-shrink: 0; color: $color-text-muted; }
   &:hover { background: #f5f5f5; }
   &:focus-visible { @include focus-ring; }
-  &--danger { color: $color-error; svg { color: $color-error; } }
+  &--danger  { color: $color-error;   svg { color: $color-error; } }
+  &--publish { color: $color-primary; svg { color: $color-primary; } font-weight: 600;
+    &:hover { background: rgba(2,102,84,0.06); }
+  }
 }
 
 /* ── Body ── */

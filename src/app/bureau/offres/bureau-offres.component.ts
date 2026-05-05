@@ -5,7 +5,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { OfferCardComponent, Offre } from '../../shared/components/offer-card/offer-card.component';
 import { getOffreTypeColor } from '../../shared/utils/format.utils';
 
-type CategoryFilter = 'mes-offres' | 'tout' | 'VOYAGE' | 'SEJOUR' | 'ACTIVITE' | 'CONVENTION' | 'archivees';
+type CategoryFilter = 'mes-offres' | 'tout' | 'VOYAGE' | 'SEJOUR' | 'ACTIVITE' | 'CONVENTION' | 'fermees';
 type StatusFilter   = 'tous' | 'OUVERTE' | 'FERMEE' | 'BROUILLON';
 
 const ALL_CAT_FILTERS: { key: CategoryFilter; label: string }[] = [
@@ -14,7 +14,7 @@ const ALL_CAT_FILTERS: { key: CategoryFilter; label: string }[] = [
   { key: 'SEJOUR',     label: 'Séjours' },
   { key: 'ACTIVITE',   label: 'Activités' },
   { key: 'CONVENTION', label: 'Conventions' },
-  { key: 'archivees',  label: 'Archivées' },
+  { key: 'fermees',    label: 'Fermées' },
 ];
 
 @Component({
@@ -50,7 +50,7 @@ export class BureauOffresComponent implements OnInit {
       { key: 'ACTIVITE',   label: 'Activités' },
       { key: 'CONVENTION', label: 'Conventions' },
       { key: 'tout',       label: 'Toutes les offres' },
-      { key: 'archivees',  label: 'Archivées' },
+      { key: 'fermees',    label: 'Fermées' },
     ];
   });
 
@@ -69,13 +69,13 @@ export class BureauOffresComponent implements OnInit {
     const q     = this.searchTerm().toLowerCase().trim();
 
     if (cat === 'mes-offres') {
-      data = data.filter(o => types.includes(o.typeOffre) && o.statutOffre !== 'ARCHIVEE');
-    } else if (cat === 'archivees') {
-      data = data.filter(o => o.statutOffre === 'ARCHIVEE');
+      data = data.filter(o => types.includes(o.typeOffre) && o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'FERMEE');
+    } else if (cat === 'fermees') {
+      data = data.filter(o => o.statutOffre === 'FERMEE');
     } else if (cat === 'tout') {
-      data = data.filter(o => o.statutOffre !== 'ARCHIVEE');
+      data = data.filter(o => o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'FERMEE');
     } else {
-      data = data.filter(o => o.typeOffre === cat && o.statutOffre !== 'ARCHIVEE');
+      data = data.filter(o => o.typeOffre === cat && o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'FERMEE');
     }
 
     if (st !== 'tous') data = data.filter(o => o.statutOffre === st);
@@ -124,11 +124,18 @@ export class BureauOffresComponent implements OnInit {
   onModifier(id: number): void     { this.closeDetail(); this.router.navigate(['/bureau/offres', id, 'edit']); }
   goToParticipants(id: number): void { this.closeDetail(); this.router.navigate(['/bureau/offres', id, 'inscriptions']); }
 
+  onPublier(id: number): void {
+    this.http.patch(`/api/offres/publier/${id}`, {}).subscribe({
+      next: () => { this.showToast('Offre publiée avec succès.', 'success'); this.loadOffres(); },
+      error: (err) => this.showToast(err?.error?.message ?? 'Impossible de publier cette offre.', 'error'),
+    });
+  }
+
   onArchive(id: number): void {
     this.http.patch(`/api/offres/archiver/${id}`, {}).subscribe({
       next: () => {
         this.showToast('Offre archivée avec succès.', 'success');
-        this.activeFilter.set('archivees');
+        this.activeFilter.set('tout');
         this.loadOffres();
       },
       error: (err) => this.showToast(

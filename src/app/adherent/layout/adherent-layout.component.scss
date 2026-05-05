@@ -3,61 +3,101 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 .adherent-shell {
-  display: flex; flex-direction: column; min-height: 100vh;
+  display: flex; height: 100vh; overflow: hidden;
   font-family: $font-base; background: $color-bg;
 }
 
-.top-nav {
-  height: 64px; background: $color-surface; border-bottom: 1px solid $color-border;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 $space-7; position: sticky; top: 0; z-index: 200; flex-shrink: 0;
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+.sidebar {
+  width: $sidebar-width; min-width: $sidebar-width;
+  background: $color-surface; border-right: 1px solid $color-border;
+  display: flex; flex-direction: column; overflow-y: auto;
 }
 
-.nav-brand { flex-shrink: 0; }
-.nav-logo  { height: 50px; object-fit: contain; }
+.sidebar-brand { padding: 18px 20px; border-bottom: 1px solid $color-border; }
+.sidebar-logo  { width: 100px; object-fit: contain; margin-left: 30px; }
 
-.nav-actions { display: flex; align-items: center; gap: $space-4; }
-.icon-wrap   { position: relative; }
+.sidebar-nav { display: flex; flex-direction: column; gap: 3px; padding: $space-3 $space-3 $space-3; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px $space-4;
+  border-radius: $radius-md; color: $color-text-muted; text-decoration: none;
+  font-size: 13.5px; font-weight: 500;
+  transition: background $transition-fast, color $transition-fast;
+
+  .nav-icon { opacity: 0.7; flex-shrink: 0; }
+  &:hover   { background: $color-primary-light; color: $color-primary; .nav-icon { opacity: 1; } }
+  &.active  { background: $color-primary; color: #fff; font-weight: 600; .nav-icon { opacity: 1; } }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.sidebar-spacer { flex: 1; }
+
+.sidebar-footer {
+  padding: $space-4; border-top: 1px solid $color-border;
+  display: flex; align-items: center; gap: $space-3;
+}
+
+.sidebar-avatar {
+  width: 36px; height: 36px; border-radius: $radius-md;
+  background: $color-primary; color: #fff;
+  font-size: $font-size-sm; font-weight: 700; @include flex-center; flex-shrink: 0;
+  &--img { object-fit: cover; display: block; }
+}
+
+.sidebar-info { display: flex; flex-direction: column; min-width: 0; }
+.sidebar-name { font-size: 12.5px; font-weight: 600; color: $color-text; @include truncate; }
+.sidebar-role { font-size: $font-size-xs; color: $color-text-muted; }
+
+// ── Main area ─────────────────────────────────────────────────────────────────
+.main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+// ── Top bar ───────────────────────────────────────────────────────────────────
+.top-bar {
+  height: $topbar-height; background: $color-surface; border-bottom: 1px solid $color-border;
+  display: flex; align-items: center; padding: 0 $space-7; gap: $space-4; flex-shrink: 0;
+}
+
+.top-bar-left  { flex: 1; display: flex; justify-content: center; }
+.top-bar-right { display: flex; align-items: center; gap: $space-4; }
+
+.search-bar {
+  display: flex; align-items: center; gap: $space-2;
+  background: $color-bg; border: 1px solid $color-border; border-radius: $radius-full;
+  padding: 0 $space-4; height: 40px; width: 100%; max-width: 420px; color: $color-text-muted;
+}
+
+.search-input {
+  flex: 1; border: none; background: none; outline: none;
+  font-family: $font-base; font-size: $font-size-sm; color: $color-text;
+  &::placeholder { color: #b5b5b5; }
+}
+
+.icon-wrap { position: relative; }
 
 .icon-btn {
-  width: 36px; height: 36px; border-radius: 50%; border: none;
-  background: transparent; color: $color-text-muted;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: color $transition-fast;
+  position: relative; width: 36px; height: 36px; border-radius: 50%;
+  border: none; background: transparent; color: #666;
+  @include flex-center; cursor: pointer; transition: color $transition-fast;
   &:hover { color: $color-primary; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
 }
 
-.nav-divider { width: 1px; height: 28px; background: $color-border; flex-shrink: 0; }
-
-.user-btn {
-  display: flex; align-items: center; gap: $space-3;
-  background: none; border: none; cursor: pointer; padding: 4px 6px;
-  border-radius: $radius-md;
-  &:hover { background: $color-primary-light; }
-}
-
-.user-info {
-  display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
-  @media (max-width: 480px) { display: none; }
-}
-
-.user-name { font-size: 13px; font-weight: 600; color: $color-text; white-space: nowrap; }
-.user-role { font-size: 10.5px; font-weight: 500; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.5px; }
+.avatar-btn { background: none; border: none; cursor: pointer; padding: 0; &:focus-visible { @include focus-ring; border-radius: 50%; } }
 
 .top-avatar {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: $color-primary; color: #fff;
-  font-size: 12px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  font-family: $font-base; flex-shrink: 0;
+  width: 34px; height: 34px; border-radius: 50%; background: $color-primary; color: #fff;
+  font-size: $font-size-sm; font-weight: 700; @include flex-center; font-family: $font-base;
 }
 
+// ── Notification dropdown ─────────────────────────────────────────────────────
 .notif-badge {
   position: absolute; top: 2px; right: 2px;
   min-width: 16px; height: 16px; padding: 0 3px;
   border-radius: $radius-full; background: $color-error; color: #fff;
-  font-size: 9px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; @include flex-center;
   border: 2px solid $color-surface; pointer-events: none;
 }
 
@@ -81,6 +121,7 @@
   text-decoration: none; color: inherit;
   transition: background $transition-fast;
   &:hover { background: $color-bg; }
+  @include reduced-motion { transition: none; }
 }
 
 .notif-sev-dot {
@@ -98,22 +139,22 @@
 
 .dropdown {
   position: absolute; top: calc(100% + 10px); right: 0;
-  background: $color-surface; border-radius: $radius-xl;
-  box-shadow: $shadow-dropdown; padding: $space-2 0; z-index: 500;
+  background: $color-surface; border-radius: $radius-xl; box-shadow: $shadow-dropdown;
+  padding: $space-2 0; z-index: 500; animation: dropIn 0.15s ease;
+  @include reduced-motion { animation: none; }
 }
 .notif-dropdown { width: 280px; }
-.dropdown-header { padding: $space-3 $space-4 $space-2; font-size: $font-size-base; font-weight: 700; color: $color-text; }
-.dropdown-empty  { padding: $space-6 $space-4; text-align: center; font-size: $font-size-sm; color: $color-text-muted; }
 
-.content { flex: 1; padding: $content-padding; overflow-y: auto; overflow-x: hidden; }
-
-.site-footer {
-  background: $color-primary; color: rgba(255,255,255,.85);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 $space-7; height: 52px; flex-shrink: 0;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.5px;
-  .footer-links {
-    display: flex; gap: 28px;
-    a { color: rgba(255,255,255,.85); text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: 0.5px; &:hover { color: #fff; } }
-  }
+.dropdown-empty {
+  padding: $space-6 $space-4; text-align: center;
+  font-size: $font-size-sm; color: $color-text-muted;
+  display: flex; flex-direction: column; align-items: center; gap: $space-3;
 }
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+.content { flex: 1; overflow-y: auto; padding: $content-padding; }

@@ -1,76 +1,126 @@
-<!-- ── Hero row ── -->
-<div class="hero-row">
-  <section class="hero-card">
-    <img src="home.jpg" alt="Amicale STAR" class="hero-img" />
-    <div class="hero-search">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round" class="search-icon">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
-      <input type="text" placeholder="Search resources, events..."
-             [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)" />
-    </div>
-  </section>
-
-  <div class="quote-cadre">
-    <svg class="quote-icon" width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
-      <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/>
-    </svg>
-    <p class="quote-text">L'union fait la force. Ensemble, nous construisons une amicale au service de chacun.</p>
-    <span class="quote-author">— Amicale STAR</span>
+<!-- ══════════════════════════════════════════════
+     SECTION 1 — OFFERS
+══════════════════════════════════════════════ -->
+<div class="dashboard-header">
+  <h2 class="section-title">Explorer les offres</h2>
+  <div class="filters">
+    @for (f of filters; track f.value) {
+      <button class="filter-btn" [class.active]="activeFilter() === f.value" (click)="setFilter(f.value)">
+        {{ f.label }}
+      </button>
+    }
   </div>
 </div>
 
-<!-- ── Activities ── -->
-<section class="section">
-  <div class="filters">
-    @for (f of filters; track f.value) {
-      <button class="filter-btn" [class.active]="activeFilter() === f.value" (click)="setFilter(f.value)">{{ f.label }}</button>
+@if (loading()) {
+  <div class="offers-grid">
+    @for (i of [1,2,3,4,5,6]; track i) { <div class="offer-card--skeleton"></div> }
+  </div>
+} @else if (filteredOffres().length === 0) {
+  <div class="empty-state"><p>Aucune offre disponible pour le moment.</p></div>
+} @else {
+  <div class="offers-grid">
+    @for (o of filteredOffres(); track o.id) {
+      <div class="prop-card" [class.prop-card--fermee]="o.statutOffre !== 'OUVERTE'" [routerLink]="['/adherent/offres', o.id]">
+
+        <div class="prop-img-wrap">
+          @if (coverUrl(o)) {
+            <img [src]="coverUrl(o)!" [alt]="o.titre" class="prop-img" />
+          } @else {
+            <div class="prop-img-placeholder">
+              <span class="type-chip">{{ typeLabel(o.typeOffre) }}</span>
+            </div>
+          }
+          @if (o.statutOffre !== 'OUVERTE') {
+            <div class="fermee-overlay"><span class="fermee-badge">Fermée</span></div>
+          }
+          <a class="prop-arrow" [routerLink]="['/adherent/offres', o.id]" (click)="$event.stopPropagation()" aria-label="Voir l'offre">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="prop-info">
+          <div class="prop-location">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#26d07c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>{{ o.lieu || 'Tunisie' }}</span>
+          </div>
+          <h3 class="prop-title">{{ o.titre }}</h3>
+          <div class="prop-footer">
+            <div class="prop-host">
+              <div class="host-avatar">A</div>
+              <span class="host-name">Amicale STAR</span>
+            </div>
+            <span class="prop-price">
+              @if (o.prixParPersonne) { {{ o.prixParPersonne | number:'1.0-0' }} DT }
+              @else { Gratuit }
+            </span>
+          </div>
+        </div>
+
+      </div>
     }
   </div>
+}
 
-  @if (loading()) {
-    <div class="offers-grid">
-      @for (i of [1,2,3]; track i) { <div class="offer-card--skeleton"></div> }
+<!-- ══════════════════════════════════════════════
+     SECTION 2 — CONVENTIONS / PARTENAIRES
+══════════════════════════════════════════════ -->
+@if (!loading() && conventions().length > 0) {
+  <section class="section--conventions">
+    <div class="section-head">
+      <h2 class="section-title">Nos Partenaires</h2>
+      <p class="section-sub">Conventions accessibles à tous les adhérents STAR</p>
     </div>
-  } @else if (filteredOffres().length === 0) {
-    <div class="empty-state"><p>Aucune activité disponible pour le moment.</p></div>
-  } @else {
-    <div class="offers-grid">
-      @for (o of filteredOffres(); track o.id) {
-        @if (!coverUrl(o)) {
-          <div class="offer-text-card">
-            <div class="otc-body">
-              <h3 class="otc-title">{{ o.titre }}</h3>
-              <p class="otc-desc">{{ o.description }}</p>
-            </div>
-            <div class="otc-footer">
-              <div>
-                <p class="otc-price-label">Prix par personne</p>
-                <p class="otc-price">@if (o.prixParPersonne) { {{ o.prixParPersonne | number:'1.2-2' }} DT } @else { Gratuit }</p>
+    <div class="conventions-grid">
+      @for (c of conventions(); track c.id) {
+        <a class="convention-card" [routerLink]="['/adherent/offres', c.id]">
+
+          <div class="convention-img">
+            @if (coverUrl(c)) {
+              <img [src]="coverUrl(c)!" [alt]="c.titre" class="convention-cover" />
+            } @else {
+              <div class="convention-img-placeholder">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
               </div>
-              <a class="btn-view" [routerLink]="['/adherent/offres', o.id]">View</a>
+            }
+            <span class="convention-pill">Convention</span>
+          </div>
+
+          <div class="convention-info">
+            <h3 class="convention-name">{{ c.titre }}</h3>
+            @if (c.description) {
+              <p class="convention-desc">{{ c.description }}</p>
+            }
+            <div class="convention-footer">
+              @if (c.lieu) {
+                <span class="convention-lieu">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  {{ c.lieu }}
+                </span>
+              }
+              <span class="convention-cta">En savoir plus →</span>
             </div>
           </div>
-        } @else {
-          <div class="offer-img-card">
-            <img [src]="coverUrl(o)!" [alt]="o.titre" class="oic-img" />
-            <div class="oic-overlay"></div>
-            <span class="oic-title">{{ o.titre }}</span>
-            <div class="oic-actions">
-              <a class="oic-btn" [routerLink]="['/adherent/offres', o.id]">+</a>
-              <button class="oic-btn oic-btn--heart">♡</button>
-            </div>
-          </div>
-        }
+
+        </a>
       }
     </div>
-  }
-</section>
+  </section>
+}
 
-<!-- ── Bureau members ── -->
-<section class="section section--members">
+<!-- ══════════════════════════════════════════════
+     SECTION 3 — BUREAU AMICALE
+══════════════════════════════════════════════ -->
+<section class="section--members">
   <div class="section-head"><h2 class="section-title">Notre Bureau Amicale</h2></div>
   @if (membres().length === 0) {
     <div class="empty-state"><p>Aucun membre du bureau enregistré.</p></div>

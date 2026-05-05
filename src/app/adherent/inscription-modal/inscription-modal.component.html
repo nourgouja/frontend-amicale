@@ -1,0 +1,152 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-panel" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+
+    <!-- Header -->
+    <div class="modal-hd">
+      <div class="modal-hd-text">
+        <h2 class="modal-title">Inscription</h2>
+        <p class="modal-sub">{{ offreTitre }}</p>
+      </div>
+      <button class="modal-close" (click)="close()" [disabled]="submitting()" aria-label="Fermer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <form [formGroup]="form">
+
+        <!-- Guests section -->
+        <div class="section-hd">
+          <h3 class="section-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Accompagnants ({{ guests.length }})
+          </h3>
+          <button type="button" class="btn-add"
+                  (click)="addGuest()"
+                  [disabled]="guests.length >= maxGuests">
+            + Ajouter
+          </button>
+        </div>
+
+        <div formArrayName="guests" class="guests-list">
+          @for (g of guests.controls; track $index; let i = $index) {
+            <div [formGroupName]="i" class="guest-row">
+              <div class="guest-fields">
+                <input class="f-input"
+                       formControlName="nom"
+                       placeholder="Nom *"
+                       [class.f-input--err]="guestGroup(i).get('nom')?.invalid && guestGroup(i).get('nom')?.dirty" />
+                <input class="f-input"
+                       formControlName="prenom"
+                       placeholder="Prénom" />
+                <input class="f-input f-input--narrow"
+                       type="number"
+                       formControlName="age"
+                       placeholder="Âge *"
+                       min="0" max="120"
+                       [class.f-input--err]="guestGroup(i).get('age')?.invalid && guestGroup(i).get('age')?.dirty" />
+                <select class="f-input f-input--narrow" formControlName="sexe">
+                  <option value="M">Homme</option>
+                  <option value="F">Femme</option>
+                  <option value="AUTRE">Autre</option>
+                </select>
+              </div>
+              <button type="button" class="btn-remove" (click)="removeGuest(i)" aria-label="Supprimer l'accompagnant">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+
+        @if (guests.length === 0) {
+          <p class="empty-hint">Aucun accompagnant — vous vous inscrivez seul(e).</p>
+        }
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+
+      @if (supportsPaymentChoice) {
+        <div class="payment-choice">
+          <p class="payment-choice-label">Période de paiement</p>
+          <div class="payment-options">
+            @for (opt of periodOptions; track opt.key) {
+              <button type="button"
+                      class="payment-option"
+                      [class.payment-option--active]="selectedPeriod() === opt.key"
+                      (click)="selectPeriod(opt.key)">
+                <span class="po-title">{{ opt.label }}</span>
+                @if (totalPrice != null) {
+                  <span class="po-amount">
+                    {{ (totalPrice / opt.tranches) | number:'1.0-2' }} DT
+                    @if (opt.tranches > 1) { <span class="po-x">× {{ opt.tranches }}</span> }
+                  </span>
+                }
+                <span class="po-desc">{{ opt.desc }}</span>
+              </button>
+            }
+          </div>
+
+          @if (trancheAmount != null) {
+            <div class="payment-schedule">
+              @for (n of trancheRange(); track n) {
+                <div class="ps-row">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                  </svg>
+                  <span class="ps-label">Tranche {{ n }}/{{ nbTranches }}</span>
+                  <span class="ps-amount"><strong>{{ trancheAmount | number:'1.0-2' }} DT</strong></span>
+                  <span class="ps-note">{{ trancheDueDate(n - 1) | date:'dd MMM' }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <div class="total-row">
+        <span class="total-label">Total</span>
+        <div class="total-right">
+          <span class="total-people">{{ totalPeople }} personne(s)</span>
+          @if (totalPrice != null) {
+            <span class="total-price">{{ totalPrice | number:'1.0-2' }} DT</span>
+          }
+        </div>
+      </div>
+
+      @if (error()) {
+        <div class="modal-error">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {{ error() }}
+        </div>
+      }
+
+      <div class="footer-actions">
+        <button class="btn-cancel" (click)="close()" [disabled]="submitting()">Annuler</button>
+        <button class="btn-confirm" (click)="submit()" [disabled]="submitting() || form.invalid">
+          @if (submitting()) { <span class="btn-spinner"></span> En cours… }
+          @else { Confirmer l'inscription }
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

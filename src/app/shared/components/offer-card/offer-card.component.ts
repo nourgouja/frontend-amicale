@@ -40,6 +40,7 @@ export class OfferCardComponent {
   @Output() fermer     = new EventEmitter<number>();
   @Output() modifier   = new EventEmitter<number>();
   @Output() inscrire   = new EventEmitter<number>();
+  @Output() publier    = new EventEmitter<number>();
 
   menuOpen  = signal(false);
   favoured  = signal(false);
@@ -92,6 +93,12 @@ export class OfferCardComponent {
 
   @HostListener('document:click')
   closeMenu(): void { this.menuOpen.set(false); }
+
+  onPublier(e: MouseEvent): void {
+    e.stopPropagation();
+    this.menuOpen.set(false);
+    this.publier.emit(this.offre.id);
+  }
 
   onArchive(e: MouseEvent): void {
     e.stopPropagation();

@@ -56,7 +56,7 @@
         <line x1="7" y1="7" x2="7.01" y2="7"/>
       </svg>
       <p class="empty-title">Aucune offre dans cette catégorie</p>
-      @if (activeFilter() !== 'archivees') {
+      @if (activeFilter() !== 'fermees') {
         <p class="empty-sub">Modifiez vos filtres ou créez la première offre.</p>
         <button class="btn-add-sm" (click)="goToCreate()">+ Créer une offre</button>
       }
@@ -68,7 +68,8 @@
              (keydown.enter)="openDetail(offre)" (keydown.space)="openDetail(offre)">
           <app-offer-card
             [offre]="offre"
-            mode="admin"
+            mode="bureau"
+            (publier)="onPublier($event)"
             (archive)="onArchive($event)"
             (fermer)="onFermer($event)"
             (modifier)="onModifier($event)"
@@ -143,7 +144,7 @@
       }
     </div>
 
-    @if (o.statutOffre === 'OUVERTE' || o.statutOffre === 'FERMEE') {
+    @if ((o.statutOffre === 'OUVERTE' || o.statutOffre === 'FERMEE') && o.typeOffre !== 'CONVENTION') {
       <div class="dp-participants">
         <button class="dp-participants-btn" (click)="goToParticipants(o.id)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

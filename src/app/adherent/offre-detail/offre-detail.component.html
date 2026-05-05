@@ -6,7 +6,7 @@
 
     <!-- Top Bar -->
     <div class="top-bar">
-      <a class="back-link" routerLink="/adherent/offres">
+      <a class="back-link" routerLink="/adherent/dashboard">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         Retour
       </a>
@@ -69,12 +69,45 @@
     <!-- Content: description left / map + booking right -->
     <div class="apercu-grid">
 
-      <!-- Left: description + pole + avantages -->
+      <!-- Left: description + avantages + lienExterne + pole -->
       <div class="apercu-left">
-        @if (o.description) {
-          <p class="desc-text">{{ o.description }}</p>
-        } @else {
-          <p class="desc-text desc-text--muted">Aucune description disponible.</p>
+
+        <div class="section-block">
+          <h3 class="section-title">Description</h3>
+          @if (o.description) {
+            <p class="desc-text">{{ o.description }}</p>
+          } @else {
+            <p class="desc-text desc-text--muted">Aucune description disponible.</p>
+          }
+        </div>
+
+        @if (parseAvantages(o.avantages).length > 0) {
+          <div class="section-block">
+            <h3 class="section-title">Inclus</h3>
+            <ul class="avantages-list">
+              @for (a of parseAvantages(o.avantages); track a) {
+                <li class="avantage-item">
+                  <span class="avantage-icon">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#026654" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                  {{ a }}
+                </li>
+              }
+            </ul>
+          </div>
+        }
+
+        @if (o.lienExterne) {
+          <div class="section-block">
+            <h3 class="section-title">En savoir plus</h3>
+            <a [href]="o.lienExterne" target="_blank" rel="noopener noreferrer" class="lien-externe">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+              {{ o.lienExterne }}
+            </a>
+          </div>
         }
 
         @if (o.poleNom) {
@@ -90,21 +123,6 @@
           </div>
         }
 
-        @if (o.avantages && o.avantages.length > 0) {
-          <div class="section-block">
-            <h3 class="section-title">Inclus</h3>
-            <ul class="avantages-list">
-              @for (a of o.avantages; track a) {
-                <li class="avantage-item">
-                  <span class="avantage-icon">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#026654" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  </span>
-                  {{ a }}
-                </li>
-              }
-            </ul>
-          </div>
-        }
       </div>
 
       <!-- Right: map card, then booking card -->
@@ -138,7 +156,33 @@
           </div>
         }
 
-        <!-- Booking card -->
+        <!-- Convention info card (replaces booking card entirely) -->
+        @if (isConvention) {
+          <div class="convention-card">
+            <div class="convention-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <h3 class="convention-title">Convention partenaire</h3>
+            <p class="convention-desc">
+              Cette convention est accessible à tous les adhérents. Aucune inscription n'est requise — contactez le bureau pour en bénéficier.
+            </p>
+            @if (o.lienExterne) {
+              <a [href]="o.lienExterne" target="_blank" rel="noopener noreferrer" class="convention-link">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                En savoir plus
+              </a>
+            }
+          </div>
+        }
+
+        <!-- Booking card (hidden for conventions) -->
+        @if (!isConvention) {
         <div class="booking-card">
 
           @if (o.prixParPersonne) {
@@ -179,41 +223,53 @@
             }
           </div>
 
-          <div class="booking-total">
-            <span class="booking-total-label">Total</span>
-            <span class="booking-total-val">
-              @if (o.prixParPersonne) { {{ o.prixParPersonne | number:'1.0-2' }} DT }
-              @else { Gratuit }
-            </span>
-          </div>
-
           @if (inscribed()) {
+            <!-- Post-inscription state -->
             <div class="inscribed-msg">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
               Inscription envoyée – en attente de validation
             </div>
+
+            @if (inscribedGuests() && inscribedGuests()!.length > 0) {
+              <div class="guests-panel">
+                <span class="guests-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  {{ inscribedGuests()!.length }} accompagnant(s)
+                </span>
+                @for (g of inscribedGuests()!; track $index) {
+                  <div class="guest-row-ro">
+                    <span class="guest-name">{{ g.prenom }} {{ g.nom }}</span>
+                    <span class="guest-meta">
+                      @if (g.age) { {{ g.age }} ans }
+                      @if (g.age && g.sexe) { · }
+                      {{ sexeLabel(g.sexe) }}
+                    </span>
+                  </div>
+                }
+              </div>
+            }
+
+            <button class="btn-cancel-insc" (click)="annuler()" [disabled]="cancelling()">
+              @if (cancelling()) { <span class="btn-spinner"></span> }
+              Annuler la demande
+            </button>
+            @if (cancelErr()) {
+              <div class="inscribe-error">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                {{ cancelErr() }}
+              </div>
+            }
+
           } @else if (o.statutOffre !== 'OUVERTE') {
             <button class="btn-book btn-book--disabled" disabled>Offre fermée</button>
           } @else if (isFull) {
             <button class="btn-book btn-book--disabled" disabled>Complet</button>
           } @else {
-            <button class="btn-book" (click)="inscrire()" [disabled]="inscribing()">
-              @if (inscribing()) {
-                <span class="btn-spinner"></span> En cours…
-              } @else {
-                S'inscrire maintenant
-              }
-            </button>
-          }
-
-          @if (inscribeErr()) {
-            <div class="inscribe-error">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              {{ inscribeErr() }}
-            </div>
+            <button class="btn-book" (click)="openModal()">S'inscrire maintenant</button>
           }
 
         </div>
+        } <!-- end @if (!isConvention) -->
 
       </div>
     </div>
@@ -221,3 +277,14 @@
   }
 
 </div>
+
+@if (modalOpen()) {
+  <app-inscription-modal
+    [offreId]="offre()!.id"
+    [offreTitre]="offre()!.titre"
+    [prixParPersonne]="offre()!.prixParPersonne ?? null"
+    [placesRestantes]="offre()!.placesRestantes ?? null"
+    [typeOffre]="offre()!.typeOffre"
+    (submitted)="onInscribed($event)"
+    (closed)="closeModal()" />
+}

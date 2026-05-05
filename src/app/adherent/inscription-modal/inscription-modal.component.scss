@@ -1,0 +1,201 @@
+@use '../../../styles/variables' as *;
+
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.46); z-index: 300;
+  display: flex; align-items: center; justify-content: center; padding: $space-4;
+  animation: fade-in 0.15s ease;
+  @include reduced-motion { animation: none; }
+}
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-panel {
+  width: 100%; max-width: 520px;
+  background: $color-surface; border-radius: $radius-lg;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+  display: flex; flex-direction: column; max-height: 90vh;
+  animation: scale-in 0.18s ease;
+  @include reduced-motion { animation: none; }
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.97); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.modal-hd {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: $space-3; padding: $space-5 $space-6; border-bottom: 1px solid $color-border; flex-shrink: 0;
+}
+
+.modal-hd-text { min-width: 0; }
+.modal-title   { font-size: $font-size-lg; font-weight: 700; color: $color-text; }
+.modal-sub     { font-size: $font-size-sm; color: $color-text-muted; margin-top: 2px; @include truncate; }
+
+.modal-close {
+  width: 30px; height: 30px; border-radius: $radius-md; border: 1px solid $color-border;
+  background: transparent; color: $color-text-muted; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background $transition-fast;
+  &:hover:not(:disabled) { background: $color-bg; color: $color-text; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────────
+.modal-body {
+  flex: 1; overflow-y: auto; padding: $space-5 $space-6;
+  display: flex; flex-direction: column; gap: $space-4;
+}
+
+.section-hd {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.section-label {
+  display: flex; align-items: center; gap: $space-2;
+  font-size: $font-size-sm; font-weight: 700; color: $color-text;
+  svg { color: $color-text-muted; }
+}
+
+.btn-add {
+  display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 $space-3;
+  border-radius: $radius-sm; border: 1px solid $color-primary;
+  background: $color-primary-light; color: $color-primary;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 600; cursor: pointer;
+  transition: background $transition-fast;
+  &:hover:not(:disabled) { background: rgba(2,102,84,0.18); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+// ── Guest rows ────────────────────────────────────────────────────────────────
+.guests-list { display: flex; flex-direction: column; gap: $space-2; }
+
+.guest-row {
+  display: flex; align-items: center; gap: $space-2;
+  padding: $space-3; border: 1px solid $color-border; border-radius: $radius-md; background: $color-bg;
+}
+
+.guest-fields { display: flex; gap: $space-2; flex: 1; flex-wrap: wrap; }
+
+.f-input {
+  flex: 1; min-width: 80px; height: 34px; padding: 0 $space-2;
+  border: 1px solid $color-border; border-radius: $radius-sm;
+  background: $color-surface; font-family: $font-base; font-size: $font-size-sm; color: $color-text;
+  outline: none; transition: border-color $transition-fast;
+  &:focus { border-color: $color-primary; }
+  &::placeholder { color: $color-text-muted; }
+  &--narrow { flex: 0 0 80px; min-width: 0; }
+  &--err { border-color: $color-error; }
+}
+
+.btn-remove {
+  width: 26px; height: 26px; flex-shrink: 0; border-radius: $radius-sm;
+  border: 1px solid $color-border; background: transparent; color: $color-text-muted; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background $transition-fast;
+  &:hover { background: rgba(239,68,68,0.08); color: $color-error; border-color: rgba(239,68,68,0.25); }
+}
+
+.empty-hint {
+  font-size: $font-size-sm; color: $color-text-muted; font-style: italic;
+  text-align: center; padding: $space-4 0;
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+.modal-footer {
+  padding: $space-4 $space-6 $space-5; border-top: 1px solid $color-border;
+  display: flex; flex-direction: column; gap: $space-3; flex-shrink: 0;
+}
+
+// ── Payment choice ────────────────────────────────────────────────────────────
+.payment-choice { display: flex; flex-direction: column; gap: $space-2; }
+
+.payment-choice-label {
+  font-size: $font-size-xs; font-weight: 700; color: $color-text-muted;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: $space-2; }
+
+.po-x { font-size: $font-size-xs; font-weight: 400; color: $color-text-muted; margin-left: 2px; }
+
+.payment-option {
+  flex: 1; padding: $space-3; border-radius: $radius-md;
+  border: 1.5px solid $color-border; background: $color-bg;
+  cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 2px;
+  transition: border-color $transition-fast, background $transition-fast;
+
+  &:hover:not(:disabled) { border-color: $color-primary; background: rgba(2,102,84,0.04); }
+  &--active { border-color: $color-primary; background: rgba(2,102,84,0.07); }
+}
+
+.po-title  { font-size: $font-size-sm; font-weight: 600; color: $color-text; }
+.po-amount { font-size: $font-size-md; font-weight: 700; color: $color-primary; }
+.po-desc   { font-size: $font-size-xs; color: $color-text-muted; }
+
+.payment-schedule {
+  padding: $space-3 $space-4; border-radius: $radius-md;
+  background: rgba(2,102,84,0.04); border: 1px solid rgba(2,102,84,0.15);
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 180px; overflow-y: auto;
+}
+
+.ps-row {
+  display: flex; align-items: center; gap: $space-2;
+  font-size: $font-size-xs; color: $color-text;
+  svg { flex-shrink: 0; color: $color-primary; }
+}
+
+.ps-label  { flex: 1; font-weight: 500; }
+.ps-amount { font-weight: 700; color: $color-primary; }
+.ps-note   { color: $color-text-muted; margin-left: 4px; }
+
+.total-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: $space-3 $space-4; border-radius: $radius-md; background: $color-bg;
+  border: 1px solid $color-border;
+}
+
+.total-label  { font-size: $font-size-sm; font-weight: 600; color: $color-text-muted; }
+.total-right  { display: flex; align-items: center; gap: $space-3; }
+.total-people { font-size: $font-size-sm; color: $color-text; }
+.total-price  { font-size: $font-size-md; font-weight: 700; color: $color-primary; }
+
+.modal-error {
+  display: flex; align-items: center; gap: $space-2;
+  padding: $space-2 $space-3; border-radius: $radius-sm;
+  background: rgba(220,38,38,0.07); color: $color-error; border: 1px solid rgba(220,38,38,0.2);
+  font-size: $font-size-xs;
+  svg { flex-shrink: 0; }
+}
+
+.footer-actions { display: flex; gap: $space-3; justify-content: flex-end; }
+
+.btn-cancel {
+  height: 38px; padding: 0 $space-5; border: 1px solid $color-border; border-radius: $radius-md;
+  background: transparent; color: $color-text-muted;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 500; cursor: pointer;
+  transition: background $transition-fast;
+  &:hover:not(:disabled) { background: $color-bg; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btn-confirm {
+  height: 38px; padding: 0 $space-5; border: none; border-radius: $radius-md;
+  background: $color-primary; color: #fff;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: $space-2;
+  transition: background $transition-fast;
+  &:hover:not(:disabled) { background: $color-primary-dark; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-spinner {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+  animation: spin 0.7s linear infinite;
+  @include reduced-motion { animation: none; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

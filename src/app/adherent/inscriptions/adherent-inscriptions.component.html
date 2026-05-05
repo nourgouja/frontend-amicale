@@ -1,7 +1,7 @@
 <div class="adherent-inscriptions">
 
   <div class="page-head">
-    <h1 class="page-title">Mes inscriptions</h1>
+    <h1 class="page-title">My activities</h1>
     <p class="page-sub">Historique de vos inscriptions aux offres</p>
   </div>
 
@@ -34,7 +34,7 @@
   } @else {
     <div class="cards-list">
       @for (ins of filtered(); track ins.id) {
-        <div class="ins-card">
+        <div class="ins-card" (click)="openDrawer(ins)">
           <div class="ins-type-bar" [style.background]="typeColor(ins.typeOffre)"></div>
           <div class="ins-body">
             <div class="ins-main">
@@ -44,13 +44,14 @@
                   Inscrit le {{ formatDate(ins.dateInscription) }}
                   @if (ins.lieuOffre) { · {{ ins.lieuOffre }} }
                   @if (ins.dateDebutOffre) { · Début: {{ formatDate(ins.dateDebutOffre) }} }
+                  @if (ins.totalPeople && ins.totalPeople > 1) { · {{ ins.totalPeople }} personnes }
                 </p>
               </div>
               <div class="ins-right">
                 <app-status-badge [statut]="ins.statut" type="inscription" />
                 @if (ins.statut === 'EN_ATTENTE' || ins.statut === 'CONFIRMEE') {
-                  <button class="btn-cancel" (click)="openCancel(ins)" aria-label="Annuler l'inscription">
-                    <lucide-icon name="x-circle" [size]="14"></lucide-icon>
+                  <button class="btn-cancel" (click)="openCancel(ins); $event.stopPropagation()" aria-label="Annuler">
+                    <lucide-icon name="circle-x" [size]="14"></lucide-icon>
                     Annuler
                   </button>
                 }
@@ -64,6 +65,7 @@
 
 </div>
 
+<!-- ── Cancel modal ── -->
 @if (cancelTarget(); as ins) {
   <app-confirm-modal
     title="Annuler l'inscription"
@@ -73,4 +75,104 @@
     [loading]="cancelling()"
     (confirmed)="confirmCancel()"
     (cancelled)="closeCancel()" />
+}
+
+<!-- ── Detail drawer ── -->
+@if (drawerIns(); as ins) {
+  <div class="drawer-backdrop" (click)="closeDrawer()">
+    <div class="drawer-panel" (click)="$event.stopPropagation()" role="dialog">
+
+      <!-- Header -->
+      <div class="drawer-hd">
+        <div class="drawer-hd-left">
+          <div class="drawer-type-dot" [style.background]="typeColor(ins.typeOffre)"></div>
+          <div>
+            <h2 class="drawer-title">{{ ins.offreTitre }}</h2>
+            <p class="drawer-sub">Inscrit le {{ formatDate(ins.dateInscription) }}</p>
+          </div>
+        </div>
+        <button class="drawer-close" (click)="closeDrawer()" aria-label="Fermer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="drawer-body">
+
+        <!-- Status row -->
+        <div class="drawer-status-row">
+          <div class="dkv">
+            <span class="dkv-label">Statut</span>
+            <app-status-badge [statut]="ins.statut" type="inscription" />
+          </div>
+          @if (ins.statutPaiement) {
+            <div class="dkv">
+              <span class="dkv-label">Paiement</span>
+              <app-status-badge [statut]="ins.statutPaiement" type="cotisation" />
+            </div>
+          }
+          @if (ins.montant != null) {
+            <div class="dkv">
+              <span class="dkv-label">Montant</span>
+              <span class="dkv-val dkv-val--price">{{ ins.montant | number:'1.0-2' }} TND</span>
+            </div>
+          }
+        </div>
+
+        <!-- Guests section (read-only) -->
+        <div class="drawer-section">
+          <h3 class="section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Participants : {{ ins.totalPeople ?? 1 }} personne(s)
+          </h3>
+
+          <table class="guest-table">
+            <thead>
+              <tr><th>Nom</th><th>Prénom</th><th>Âge</th><th>Sexe</th></tr>
+            </thead>
+            <tbody>
+              <tr class="row-adherent">
+                <td>{{ ins.adherentNom ?? '—' }}</td>
+                <td>{{ ins.adherentPrenom ?? '—' }} <span class="you-badge">vous</span></td>
+                <td class="muted">—</td>
+                <td class="muted">—</td>
+              </tr>
+              @for (g of ins.guests; track $index) {
+                <tr>
+                  <td>{{ g.nom }}</td>
+                  <td>{{ g.prenom ?? '—' }}</td>
+                  <td class="muted">{{ g.age ?? '—' }}</td>
+                  <td class="muted">{{ sexeLabel(g.sexe) || '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Payment schedule -->
+        @if (ins.echeances && ins.echeances.length > 0) {
+          <div class="drawer-section">
+            <h3 class="section-title">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              Échéancier de paiement
+            </h3>
+            <table class="guest-table">
+              <thead><tr><th>Nº</th><th>Échéance</th><th>Montant</th><th>Statut</th></tr></thead>
+              <tbody>
+                @for (e of ins.echeances; track e.id) {
+                  <tr>
+                    <td class="muted">{{ e.numero }}</td>
+                    <td>{{ formatDate(e.dateEcheance) }}</td>
+                    <td>{{ e.montant | number:'1.0-2' }} TND</td>
+                    <td><app-status-badge [statut]="e.statut" type="cotisation" /></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
 }

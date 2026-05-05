@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../../core/services/auth.service';
 import { getDisplayName } from '../../shared/utils/format.utils';
 
@@ -18,7 +19,7 @@ interface MembreBureau {
 
 const TYPE_LABELS: Record<string, string> = {
   VOYAGE: 'Voyage', SEJOUR: 'Séjour', ACTIVITE: 'Activité',
-  CONVENTION: 'Convention', EVENEMENT: 'Événement', LOISIRS: 'Loisirs',
+  CONVENTION: 'Convention', EVENEMENT: 'Événement',
 };
 
 @Component({
@@ -46,26 +47,33 @@ export class AdherentDashboardComponent implements OnInit {
 
   readonly filters = [
     { value: '', label: 'Tout' },
-    { value: 'VOYAGE',     label: 'Voyage' },
-    { value: 'SEJOUR',     label: 'Séjour' },
-    { value: 'ACTIVITE',   label: 'Activité' },
-    { value: 'CONVENTION', label: 'Convention' },
-    { value: 'EVENEMENT',  label: 'Événement' },
-    { value: 'LOISIRS',    label: 'Loisirs' },
+    { value: 'VOYAGE',   label: 'Voyage' },
+    { value: 'SEJOUR',   label: 'Séjour' },
+    { value: 'ACTIVITE', label: 'Activité' },
+    { value: 'EVENEMENT', label: 'Événement' },
   ];
 
+  /** Regular offers — conventions excluded */
   filteredOffres = computed(() => {
     const type = this.activeFilter();
     const q    = this.searchQuery().toLowerCase().trim();
     return this.offres().filter(o => {
+      if (o.typeOffre === 'CONVENTION') return false;
       const matchType  = !type || o.typeOffre === type;
       const matchQuery = !q || o.titre.toLowerCase().includes(q) || (o.description ?? '').toLowerCase().includes(q);
       return matchType && matchQuery;
     });
   });
 
+  /** Convention/partner offers — separate section */
+  conventions = computed(() =>
+    this.offres().filter(o => o.typeOffre === 'CONVENTION')
+  );
+
   ngOnInit(): void {
-    this.http.get<Offre[]>('/api/offres').subscribe({
+    this.http.get<Offre[]>('/api/offres/publiques').pipe(
+      catchError(() => this.http.get<Offre[]>('/api/offres'))
+    ).subscribe({
       next: list => { this.offres.set(list); this.loading.set(false); },
       error: ()  => this.loading.set(false),
     });
