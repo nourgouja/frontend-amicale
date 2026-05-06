@@ -76,13 +76,20 @@
 
       <div class="field">
         <label class="label">Description</label>
-        <textarea class="input" formControlName="description" rows="4"
+        <textarea class="input" formControlName="description" rows="8"
           placeholder="Description de l'offre"></textarea>
       </div>
 
       <div class="field">
         <label class="label">Lieu</label>
         <input class="input" formControlName="lieu" placeholder="Lieu de l'offre" />
+        <input class="input" type="url" formControlName="lienExterne" placeholder="Destination" />
+
+      </div>
+
+      <div class="field">
+        <label class="label">Lien externe <span class="opt" style="font-weight:400;color:#9ca3af">— facultatif</span></label>
+        <input class="input" type="url" formControlName="lienExterne" placeholder="https://..." />
       </div>
 
       <div class="field-row">
@@ -112,22 +119,11 @@
         </div>
       </div>
 
-      @if (showModePaiement) {
-        <div class="field">
-          <label class="label">Mode de paiement</label>
-          <select class="input" formControlName="modePaiement">
-            <option value="">-- Choisir --</option>
-            @for (m of paymentModes; track m.value) {
-              <option [value]="m.value">{{ m.label }}</option>
-            }
-          </select>
-        </div>
-      }
 
       <div class="field">
-        <label class="label">Avantages</label>
-        <textarea class="input" formControlName="avantages" rows="3"
-          placeholder="Avantages inclus..."></textarea>
+        <label class="label">Avantages inclus</label>
+        <textarea class="input" formControlName="avantages" rows="6"
+          placeholder="Un avantage par ligne&#10;Ex: Transport inclus&#10;Hébergement 5 étoiles&#10;Repas du soir"></textarea>
       </div>
 
     </form>

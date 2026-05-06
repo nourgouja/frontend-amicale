@@ -3,9 +3,15 @@
   <div class="page-head">
     <div>
       <h1 class="page-title">Cotisations</h1>
-      <p class="page-sub">Suivez les paiements des membres</p>
+      <p class="page-sub">Suivez les paiements des membres confirmés</p>
     </div>
     <div class="summary-badges">
+      @if (totalCollecte() > 0) {
+        <div class="summary-badge summary-badge--green">
+          <span class="sb-value">{{ totalCollecte() | number }} DT</span>
+          <span class="sb-label">collecté</span>
+        </div>
+      }
       @if (retardCount() > 0) {
         <div class="summary-badge summary-badge--red">
           <span class="sb-value">{{ retardCount() }}</span>
@@ -21,32 +27,24 @@
     </div>
   </div>
 
-  <!-- Filters -->
+  <!-- Search -->
   <div class="filters-bar">
     <div class="search-wrap">
       <lucide-icon name="search" [size]="15" class="search-icon"></lucide-icon>
-      <input type="search" class="search-input" placeholder="Rechercher un membre…"
+      <input type="search" class="search-input" placeholder="Rechercher un membre ou une offre…"
              [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
     </div>
-    <select class="statut-select" [ngModel]="statutFilter()" (ngModelChange)="statutFilter.set($event)">
-      @for (s of statuts; track s.key) {
-        <option [value]="s.key">{{ s.label }}</option>
-      }
-    </select>
   </div>
 
   <!-- Table -->
   @if (loading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Chargement…</p>
-    </div>
+    <div class="loading-state"><div class="spinner"></div><p>Chargement…</p></div>
   } @else if (filtered().length === 0) {
     <div class="empty-state">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
       </svg>
-      <p>Aucune cotisation trouvée</p>
+      <p>Aucune inscription confirmée avec paiements</p>
     </div>
   } @else {
     <div class="table-card">
@@ -54,48 +52,101 @@
         <thead>
           <tr>
             <th>Membre</th>
-            <th>Année</th>
-            <th>Montant</th>
-            <th>Échéance</th>
-            <th>Paiement</th>
-            <th>Statut</th>
-            <th>Actions</th>
+            <th>Offre</th>
+            <th>Tranches</th>
+            <th>Total</th>
+            <th>Statut paiement</th>
+            <th class="th-chevron"></th>
           </tr>
         </thead>
         <tbody>
-          @for (cot of filtered(); track cot.id) {
-            <tr [class.row--retard]="cot.statut === 'EN_RETARD'">
+          @for (g of filtered(); track g.inscriptionId) {
+
+            <!-- Inscription row -->
+            <tr class="main-row"
+                [class.row--retard]="groupStatut(g) === 'EN_RETARD'"
+                [class.row--expanded]="isExpanded(g.inscriptionId)"
+                (click)="toggleExpand(g.inscriptionId)">
               <td>
                 <div class="member-cell">
-                  <div class="member-avatar" [class.member-avatar--red]="cot.statut === 'EN_RETARD'">
-                    {{ initials(cot.membreNom, cot.membrePrenom) }}
+                  <div class="member-avatar" [class.member-avatar--red]="groupStatut(g) === 'EN_RETARD'">
+                    {{ initials(g.adherentNom, g.adherentPrenom) }}
                   </div>
                   <div class="member-info">
-                    <span class="member-name">{{ cot.membrePrenom }} {{ cot.membreNom }}</span>
-                    <span class="member-email">{{ cot.membreEmail }}</span>
+                    <span class="member-name">{{ g.adherentPrenom }} {{ g.adherentNom }}</span>
                   </div>
                 </div>
               </td>
-              <td class="year-cell">{{ cot.anneeCotisation }}</td>
-              <td class="amount-cell">{{ cot.montant | number }} DT</td>
-              <td class="date-cell" [class.date-cell--red]="cot.statut === 'EN_RETARD'">
-                {{ formatDate(cot.dateEcheance) }}
-              </td>
-              <td class="date-cell">{{ formatDate(cot.datePaiement ?? '') }}</td>
-              <td>
-                <app-status-badge [statut]="cot.statut" type="cotisation" />
-              </td>
-              <td>
-                @if (cot.statut !== 'PAYEE') {
-                  <button class="btn-pay" (click)="openPay(cot)">
-                    <lucide-icon name="credit-card" [size]="14"></lucide-icon>
-                    Marquer payé
-                  </button>
-                } @else {
-                  <span class="no-action">—</span>
-                }
+              <td class="year-cell">{{ g.offreTitre }}</td>
+              <td class="num-cell">{{ trancheLabel(g) }}</td>
+              <td class="amount-cell">{{ totalGroup(g) | number }} DT</td>
+              <td><app-status-badge [statut]="groupStatut(g)" type="cotisation" /></td>
+              <td class="td-chevron">
+                <lucide-icon [name]="isExpanded(g.inscriptionId) ? 'chevron-up' : 'chevron-down'" [size]="15" class="chevron-icon"></lucide-icon>
               </td>
             </tr>
+
+            <!-- Expanded detail row -->
+            @if (isExpanded(g.inscriptionId)) {
+              <tr class="detail-row">
+                <td colspan="6">
+                  <div class="detail-panel">
+
+                    <!-- Left: adherent info -->
+                    <div class="detail-info">
+                      <div class="detail-avatar">{{ initials(g.adherentNom, g.adherentPrenom) }}</div>
+                      <div class="detail-meta">
+                        <span class="detail-name">{{ g.adherentPrenom }} {{ g.adherentNom }}</span>
+                        @if (g.adherentEmail) {
+                          <span class="detail-email">{{ g.adherentEmail }}</span>
+                        }
+                        <span class="detail-offre">{{ g.offreTitre }}</span>
+                        @if (g.periodePaiement) {
+                          <span class="detail-periode">{{ periodLabel(g.periodePaiement) }}</span>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Right: echeances table -->
+                    <div class="detail-echeances">
+                      <table class="inner-table">
+                        <thead>
+                          <tr>
+                            <th>Tranche</th>
+                            <th>Montant</th>
+                            <th>Échéance</th>
+                            <th>Payé le</th>
+                            <th>Statut</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (ec of g.echeances; track ec.id) {
+                            <tr [class.inner-row--retard]="ec.statut === 'EN_RETARD'">
+                              <td>{{ ec.numero }}/{{ g.echeances.length }}</td>
+                              <td><strong>{{ ec.montant | number }} DT</strong></td>
+                              <td>{{ formatDate(ec.dateEcheance) }}</td>
+                              <td>{{ formatDate(ec.datePaiement ?? '') }}</td>
+                              <td><app-status-badge [statut]="ec.statut" type="cotisation" /></td>
+                              <td>
+                                @if (ec.statut !== 'PAYEE') {
+                                  <button class="btn-marquer" (click)="openPay(ec, $event)">
+                                    <lucide-icon name="credit-card" [size]="13"></lucide-icon>
+                                    Marquer paiement
+                                  </button>
+                                }
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+                </td>
+              </tr>
+            }
+
           }
         </tbody>
       </table>
@@ -107,7 +158,7 @@
 @if (payTarget(); as cot) {
   <app-confirm-modal
     title="Enregistrer le paiement"
-    [message]="'Marquer la cotisation de ' + cot.membrePrenom + ' ' + cot.membreNom + ' (' + cot.montant + ' DT) comme payée à la date d\'aujourd\'hui ?'"
+    [message]="'Marquer la tranche nº' + cot.numero + ' de ' + (cot.adherentPrenom ?? '') + ' ' + (cot.adherentNom ?? '') + ' (' + (cot.montant | number) + ' DT) comme payée ?'"
     confirmLabel="Confirmer le paiement"
     confirmColor="primary"
     [loading]="payLoading()"

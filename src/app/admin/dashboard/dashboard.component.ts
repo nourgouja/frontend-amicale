@@ -14,6 +14,17 @@ import {
   Users, ClipboardList, Tag, DollarSign, CheckCircle, Calendar
 } from 'lucide-angular';
 
+interface RecentInscription {
+  id: number;
+  offreTitre: string;
+  dateDebutOffre?: string;
+  dateFinOffre?: string;
+  statut: string;
+  dateInscription: string;
+  adherentNom?: string;
+  adherentPrenom?: string;
+}
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -40,6 +51,25 @@ export class AdminDashboardComponent implements OnInit {
   detailLoading = signal(false);
   selectedOffre = signal<Offre | null>(null);
 
+  /* ── Recent inscriptions ── */
+  recentInscriptions = signal<RecentInscription[]>([]);
+
+  /* ── Monthly chart ── */
+  monthlyChart = computed(() => {
+    const inscriptions = this.recentInscriptions();
+    const now = new Date();
+    const months: { label: string; count: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const label = d.toLocaleDateString('fr-FR', { month: 'short' });
+      const count = inscriptions.filter(ins => ins.dateInscription?.startsWith(key)).length;
+      months.push({ label, count });
+    }
+    const max = Math.max(...months.map(m => m.count), 1);
+    return months.map(m => ({ ...m, pct: Math.round(m.count / max * 100) }));
+  });
+
   readonly today = new Intl.DateTimeFormat('fr-FR', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   }).format(new Date()).replace(/^\w/, c => c.toUpperCase());
@@ -53,6 +83,10 @@ export class AdminDashboardComponent implements OnInit {
   totalOffres     = computed(() => this.data()?.offres?.length ?? 0);
   offresOuvertes  = computed(() => this.data()?.offres?.filter(o => o.statut === 'OUVERTE').length ?? 0);
   offresBrouillon = computed(() => this.data()?.offres?.filter(o => o.statut === 'BROUILLON').length ?? 0);
+  cotisationTotal = computed(() => {
+    const d = this.data();
+    return (d?.echeancesPayees ?? 0) + (d?.echeancesEnRetard ?? 0) + (d?.echeancesEnAttente ?? 0);
+  });
   recentOffres    = computed(() => (this.data()?.offres ?? []).slice(0, 5));
 
   inscriptionStats = computed(() => {
@@ -104,12 +138,14 @@ export class AdminDashboardComponent implements OnInit {
   });
 
   calendarOffres = computed<CalendarOffre[]>(() =>
-    (this.data()?.offres ?? []).map(o => ({
-      id:        o.id,
-      titre:     o.titre,
-      typeOffre: 'ACTIVITE',
-      dateDebut: new Date().toISOString(),
-    }))
+    this.fullOffres()
+      .filter(o => o.statutOffre === 'OUVERTE' && o.dateDebut)
+      .map(o => ({
+        id:        o.id,
+        titre:     o.titre,
+        typeOffre: o.typeOffre,
+        dateDebut: o.dateDebut,
+      }))
   );
 
   constructor(private dashboardService: AdminDashboardService) {}
@@ -118,6 +154,10 @@ export class AdminDashboardComponent implements OnInit {
     this.loadDashboard();
     this.http.get<Offre[]>('/api/offres/all').subscribe({
       next: res => this.fullOffres.set(res),
+      error: () => {},
+    });
+    this.http.get<RecentInscription[]>('/api/inscriptions').subscribe({
+      next: res => this.recentInscriptions.set(res),
       error: () => {},
     });
   }
@@ -173,8 +213,9 @@ export class AdminDashboardComponent implements OnInit {
     return getOffreTypeColor(o?.typeOffre ?? 'ACTIVITE');
   }
 
-  fmtDate(d: string): string { return formatDate(d); }
+  fmtDate(d: string | undefined | null): string { return d ? formatDate(d) : '—'; }
   typeLabel(t: string): string { return getOffreTypeLabel(t); }
+  recentFive = computed(() => this.recentInscriptions().slice(0, 8));
 
   inscrits(offre: Offre): number {
     const cap  = offre.capaciteMax ?? 0;

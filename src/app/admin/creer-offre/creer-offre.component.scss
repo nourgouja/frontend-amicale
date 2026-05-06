@@ -64,6 +64,7 @@
 
 .label { font-size: $font-size-sm; font-weight: 600; color: $color-text; }
 .req   { color: $color-error; margin-left: 2px; }
+.opt   { font-weight: 400; color: $color-text-muted; font-size: $font-size-xs; margin-left: 4px; }
 
 .input {
   width: 100%; padding: 10px $space-3;

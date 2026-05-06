@@ -27,25 +27,22 @@
   cursor: pointer; outline: none; &:focus { border-color: $color-primary; }
 }
 
+// ── Cards ─────────────────────────────────────────────────────────────────────
 .cards-list { display: flex; flex-direction: column; gap: $space-3; }
 
 .ins-card {
-  display: flex; @include card; overflow: hidden;
-  transition: box-shadow $transition-fast;
-  &:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); }
-  @include reduced-motion { transition: none; }
+  display: flex; @include card; overflow: hidden; cursor: pointer;
+  transition: box-shadow $transition-fast, transform $transition-fast;
+  &:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.10); transform: translateY(-1px); }
+  @include reduced-motion { transition: none; &:hover { transform: none; } }
 }
 
 .ins-type-bar { width: 4px; flex-shrink: 0; }
-
 .ins-body { flex: 1; padding: $space-4 $space-5; }
-
 .ins-main { display: flex; align-items: center; gap: $space-4; }
-
 .ins-info { flex: 1; min-width: 0; }
 .ins-title { font-size: $font-size-base; font-weight: 600; color: $color-text; @include truncate; }
 .ins-meta  { font-size: $font-size-xs; color: $color-text-muted; margin-top: 3px; }
-
 .ins-right { display: flex; align-items: center; gap: $space-3; flex-shrink: 0; }
 
 .btn-cancel {
@@ -59,6 +56,7 @@
   @include reduced-motion { transition: none; }
 }
 
+// ── States ────────────────────────────────────────────────────────────────────
 .loading-state, .empty-state {
   display: flex; flex-direction: column; align-items: center; gap: $space-3;
   padding: $space-8 $space-4; color: $color-text-muted; font-size: $font-size-sm; text-align: center;
@@ -72,3 +70,158 @@
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Drawer ────────────────────────────────────────────────────────────────────
+.drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.42); z-index: 200;
+  display: flex; justify-content: flex-end;
+  animation: fade-in 0.15s ease;
+  @include reduced-motion { animation: none; }
+}
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.drawer-panel {
+  width: 500px; max-width: 96vw; height: 100vh;
+  background: $color-surface; display: flex; flex-direction: column;
+  box-shadow: -4px 0 32px rgba(0,0,0,0.15);
+  animation: slide-in 0.2s ease;
+  @include reduced-motion { animation: none; }
+}
+
+@keyframes slide-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+.drawer-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: $space-3; padding: $space-5 $space-6; border-bottom: 1px solid $color-border; flex-shrink: 0;
+}
+
+.drawer-hd-left { display: flex; align-items: center; gap: $space-3; min-width: 0; }
+
+.drawer-type-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+.drawer-title { font-size: $font-size-lg; font-weight: 700; color: $color-text; @include truncate; }
+.drawer-sub   { font-size: $font-size-xs; color: $color-text-muted; margin-top: 2px; }
+
+.drawer-close {
+  width: 32px; height: 32px; border-radius: $radius-md; border: 1px solid $color-border;
+  background: transparent; color: $color-text-muted; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background $transition-fast;
+  &:hover { background: $color-bg; color: $color-text; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.drawer-body { flex: 1; overflow-y: auto; padding: $space-5 $space-6; display: flex; flex-direction: column; gap: $space-5; }
+
+// ── Status row ────────────────────────────────────────────────────────────────
+.drawer-status-row {
+  display: flex; gap: $space-5; flex-wrap: wrap;
+  padding-bottom: $space-4; border-bottom: 1px solid $color-border;
+}
+
+.dkv { display: flex; flex-direction: column; gap: 4px; }
+.dkv-label { font-size: $font-size-xs; font-weight: 600; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.4px; }
+.dkv-val { font-size: $font-size-sm; color: $color-text; font-weight: 500; }
+.dkv-val--price { color: $color-primary; font-weight: 700; }
+
+// ── Sections ──────────────────────────────────────────────────────────────────
+.drawer-section { display: flex; flex-direction: column; gap: $space-3; }
+
+.section-hd { display: flex; align-items: center; justify-content: space-between; }
+
+.section-title {
+  display: flex; align-items: center; gap: $space-2;
+  font-size: $font-size-sm; font-weight: 700; color: $color-text;
+  svg { color: $color-text-muted; flex-shrink: 0; }
+}
+
+.btn-add-sm {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 26px; padding: 0 $space-2; border-radius: $radius-sm;
+  border: 1px solid $color-primary; background: $color-primary-light; color: $color-primary;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 600; cursor: pointer;
+  &:hover { background: rgba(2,102,84,0.15); }
+  &:focus-visible { @include focus-ring; }
+}
+
+// ── Guest table ───────────────────────────────────────────────────────────────
+.guest-table {
+  width: 100%; border-collapse: collapse; font-size: $font-size-sm;
+
+  th {
+    padding: $space-2 $space-3; text-align: left; border-bottom: 1px solid $color-border;
+    font-size: $font-size-xs; font-weight: 600; color: $color-text-muted; text-transform: uppercase;
+  }
+
+  td {
+    padding: $space-2 $space-3; border-bottom: 1px solid $color-border; color: $color-text;
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+.row-adherent td { background: rgba(2, 102, 84, 0.04); font-weight: 500; }
+
+.you-badge {
+  display: inline-flex; align-items: center; height: 16px; padding: 0 7px;
+  background: $color-primary; color: #fff;
+  border-radius: $radius-full; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.4px; text-transform: uppercase;
+  vertical-align: middle; margin-left: 5px;
+}
+
+.muted { color: $color-text-muted; }
+
+.guest-actions { display: flex; gap: $space-1; }
+
+.icon-btn {
+  width: 26px; height: 26px; border-radius: $radius-sm; border: 1px solid $color-border;
+  background: transparent; color: $color-text-muted; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background $transition-fast;
+  &:hover { background: $color-bg; color: $color-text; }
+  &--danger:hover { background: rgba(239,68,68,0.08); color: $color-error; border-color: rgba(239,68,68,0.2); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.empty-guests { font-size: $font-size-sm; color: $color-text-muted; font-style: italic; }
+
+// ── Guest form ────────────────────────────────────────────────────────────────
+.guest-form {
+  display: flex; flex-direction: column; gap: $space-2;
+  padding: $space-3; border: 1px solid $color-border; border-radius: $radius-md; background: $color-bg;
+}
+
+.form-label { font-size: $font-size-xs; font-weight: 600; color: $color-text-muted; text-transform: uppercase; }
+.form-row   { display: flex; gap: $space-2; }
+
+.form-input {
+  flex: 1; height: 34px; padding: 0 $space-2;
+  border: 1px solid $color-border; border-radius: $radius-sm;
+  background: $color-surface; font-family: $font-base; font-size: $font-size-sm; color: $color-text;
+  outline: none;
+  &:focus { border-color: $color-primary; }
+  &::placeholder { color: $color-text-muted; }
+}
+
+.form-actions { display: flex; gap: $space-2; }
+
+.btn-save {
+  height: 30px; padding: 0 $space-4; border: none; border-radius: $radius-sm;
+  background: $color-primary; color: #fff;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 600; cursor: pointer;
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+
+.btn-cancel-form {
+  height: 30px; padding: 0 $space-3; border: 1px solid $color-border; border-radius: $radius-sm;
+  background: transparent; color: $color-text-muted;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 500; cursor: pointer;
+  &:hover { background: $color-bg; }
+}

@@ -1,5 +1,7 @@
 import { Component, Input, Output, EventEmitter, signal, HostListener } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
+import { inject } from '@angular/core';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 import { getOffreTypeColor, getOffreTypeLabel } from '../../utils/format.utils';
 
@@ -29,15 +31,30 @@ export interface Offre {
   styleUrl: './offer-card.component.scss',
 })
 export class OfferCardComponent {
+  private router = inject(Router);
+
   @Input() offre!: Offre;
   @Input() mode: 'admin' | 'bureau' | 'adherent' = 'adherent';
 
-  @Output() archive   = new EventEmitter<number>();
-  @Output() fermer    = new EventEmitter<number>();
-  @Output() modifier  = new EventEmitter<number>();
-  @Output() inscrire  = new EventEmitter<number>();
+  @Output() archive    = new EventEmitter<number>();
+  @Output() fermer     = new EventEmitter<number>();
+  @Output() modifier   = new EventEmitter<number>();
+  @Output() inscrire   = new EventEmitter<number>();
+  @Output() publier    = new EventEmitter<number>();
 
-  menuOpen = signal(false);
+  menuOpen  = signal(false);
+  favoured  = signal(false);
+
+  toggleFavour(e: MouseEvent): void {
+    e.stopPropagation();
+    this.favoured.update(v => !v);
+  }
+
+  onCardClick(): void {
+    if (this.mode === 'adherent') {
+      this.router.navigate(['/adherent/offres', this.offre.id]);
+    }
+  }
 
   get imageUrl(): string | null {
     if (!this.offre?.imageBase64 || !this.offre?.imageType) return null;
@@ -76,6 +93,12 @@ export class OfferCardComponent {
 
   @HostListener('document:click')
   closeMenu(): void { this.menuOpen.set(false); }
+
+  onPublier(e: MouseEvent): void {
+    e.stopPropagation();
+    this.menuOpen.set(false);
+    this.publier.emit(this.offre.id);
+  }
 
   onArchive(e: MouseEvent): void {
     e.stopPropagation();

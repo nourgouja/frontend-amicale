@@ -161,6 +161,14 @@ export const routes: Routes = [
         loadComponent: () => import('./adherent/cotisation/adherent-cotisation.component').then(m => m.AdherentCotisationComponent),
       },
       {
+        path: 'annonces',
+        loadComponent: () => import('./adherent/annonces/adherent-annonces.component').then(m => m.AdherentAnnoncesComponent),
+      },
+      {
+        path: 'calendrier',
+        loadComponent: () => import('./admin/calendrier/calendrier.component').then(m => m.CalendrierComponent),
+      },
+      {
         path: 'profil',
         loadComponent: () => import('./adherent/profil/adherent-profil.component').then(m => m.AdherentProfilComponent),
       },

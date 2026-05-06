@@ -5,7 +5,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { OfferCardComponent, Offre } from '../../shared/components/offer-card/offer-card.component';
 import { getOffreTypeColor } from '../../shared/utils/format.utils';
 
-type CategoryFilter = 'tout' | 'VOYAGE' | 'SEJOUR' | 'ACTIVITE' | 'CONVENTION' | 'archivees';
+type CategoryFilter = 'tout' | 'VOYAGE' | 'SEJOUR' | 'ACTIVITE' | 'CONVENTION' | 'fermees';
 type StatusFilter   = 'tous' | 'OUVERTE' | 'FERMEE' | 'BROUILLON';
 
 @Component({
@@ -34,7 +34,7 @@ export class OffresComponent implements OnInit {
     { key: 'SEJOUR',     label: 'Séjours' },
     { key: 'ACTIVITE',   label: 'Activités' },
     { key: 'CONVENTION', label: 'Conventions' },
-    { key: 'archivees',  label: 'Archivées' },
+    { key: 'fermees',    label: 'Fermées' },
   ];
 
   readonly statusFilters: { key: StatusFilter; label: string }[] = [
@@ -50,12 +50,12 @@ export class OffresComponent implements OnInit {
     const st  = this.statusFilter();
     const q   = this.searchTerm().toLowerCase().trim();
 
-    if (cat === 'archivees') {
-      data = data.filter(o => o.statutOffre === 'ARCHIVEE');
+    if (cat === 'fermees') {
+      data = data.filter(o => o.statutOffre === 'FERMEE');
     } else if (cat !== 'tout') {
-      data = data.filter(o => o.typeOffre === cat && o.statutOffre !== 'ARCHIVEE');
+      data = data.filter(o => o.typeOffre === cat && o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'FERMEE');
     } else {
-      data = data.filter(o => o.statutOffre !== 'ARCHIVEE');
+      data = data.filter(o => o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'FERMEE');
     }
 
     if (st !== 'tous') data = data.filter(o => o.statutOffre === st);
@@ -89,11 +89,18 @@ export class OffresComponent implements OnInit {
   goToCreate(): void           { this.router.navigate(['/admin/offres/creer']); }
   onModifier(id: number): void { this.closeDetail(); this.router.navigate(['/admin/offres', id, 'edit']); }
 
+  onPublier(id: number): void {
+    this.http.patch(`/api/offres/publier/${id}`, {}).subscribe({
+      next: () => { this.showToast('Offre publiée avec succès.', 'success'); this.loadOffres(); },
+      error: (err) => this.showToast(err?.error?.message ?? 'Impossible de publier cette offre.', 'error'),
+    });
+  }
+
   onArchive(id: number): void {
     this.http.patch(`/api/offres/archiver/${id}`, {}).subscribe({
       next: () => {
         this.showToast('Offre archivée avec succès.', 'success');
-        this.activeFilter.set('archivees');
+        this.activeFilter.set('tout');
         this.loadOffres();
       },
       error: (err) => {

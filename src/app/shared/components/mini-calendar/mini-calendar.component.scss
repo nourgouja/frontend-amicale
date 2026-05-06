@@ -82,6 +82,7 @@
   }
 
   @include reduced-motion { transition: none; }
+  @include mobile { min-height: 44px; padding: 3px 2px; }
 }
 
 .day-num {
@@ -110,6 +111,7 @@
   text-align: left;
   line-height: 14px;
   flex-shrink: 0;
+  @include mobile { display: none; }
 }
 
 .event-more {

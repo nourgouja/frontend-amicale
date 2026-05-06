@@ -47,7 +47,7 @@ export class CreerOffreComponent implements OnInit {
   }
 
   get showModePaiement(): boolean {
-    return this.typeCtrl.value === 'VOYAGE';
+    return false;
   }
 
   ngOnInit(): void {
@@ -62,7 +62,8 @@ export class CreerOffreComponent implements OnInit {
     capaciteMax:     [null, [Validators.min(1)]],
     modePaiement:    [''],
     avantages:       [''],
-poleId: [null]
+    lienExterne:     [''],
+    poleId: [null]
   });
 
   this.http.get<Pole[]>('/api/poles').subscribe({

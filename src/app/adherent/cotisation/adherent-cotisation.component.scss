@@ -40,6 +40,23 @@
   font-size: $font-size-sm; border: 1px solid rgba(16,185,129,0.2);
 }
 
+// ── Summary cards ────────────────────────────────────────────────────────────
+.summary-cards {
+  display: flex; gap: $space-4; flex-wrap: wrap;
+}
+
+.sum-card {
+  @include card; flex: 1; min-width: 140px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: $space-5 $space-4; gap: $space-1; text-align: center;
+
+  &--green { border-top: 3px solid #10b981; }
+  &--orange { border-top: 3px solid #f59e0b; }
+}
+
+.sum-card-val   { font-size: $font-size-xl; font-weight: 700; color: $color-text; }
+.sum-card-label { font-size: $font-size-xs; color: $color-text-muted; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
+
 .panel { @include card; overflow: hidden; }
 .panel-head { padding: $space-4 $space-5; border-bottom: 1px solid $color-border; }
 .panel-title { font-size: $font-size-base; font-weight: 700; color: $color-text; }

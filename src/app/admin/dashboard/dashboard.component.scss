@@ -84,22 +84,79 @@
 /* ── Mid row ── */
 .mid-row {
   display: grid;
-  grid-template-columns: 1fr 420px;
+  grid-template-columns: 1fr minmax(0, 380px);
   gap: $space-4;
   align-items: start;
   @include tablet { grid-template-columns: 1fr; }
   @include mobile { grid-template-columns: 1fr; }
 }
 
+.mid-left { display: flex; flex-direction: column; gap: $space-4; min-width: 0; }
+
 .table-card { @include card; overflow: hidden; }
 
 .calendar-card {
   @include card;
   overflow: hidden;
+  @include tablet { order: -1; }
 }
 
 .calendar-body {
-  padding: $space-4 $space-4 $space-5;
+  padding: $space-3;
+  overflow-x: auto;
+}
+
+/* ── Chart ── */
+.chart-card { @include card; overflow: hidden; }
+
+.card-head-sub {
+  font-size: $font-size-xs; color: $color-text-muted;
+}
+
+.chart-body {
+  padding: $space-4 $space-5 $space-5;
+  min-height: 140px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.chart-empty {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  font-size: $font-size-sm; color: $color-text-muted;
+}
+
+.bar-chart {
+  display: flex; align-items: flex-end; gap: $space-3;
+  width: 100%; height: 120px;
+}
+
+.bar-col {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: $space-1;
+  min-width: 0;
+}
+
+.bar-wrap {
+  width: 100%; flex: 1; display: flex; align-items: flex-end;
+  background: $color-bg; border-radius: $radius-sm; overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  width: 100%; min-height: 4px;
+  background: linear-gradient(180deg, #04a07b 0%, $color-primary 100%);
+  border-radius: $radius-sm $radius-sm 0 0;
+  transition: height 0.4s ease;
+  position: relative; display: flex; align-items: flex-start; justify-content: center;
+  @include reduced-motion { transition: none; }
+}
+
+.bar-val {
+  font-size: 9px; font-weight: 700; color: #fff; padding-top: 3px; line-height: 1;
+}
+
+.bar-label {
+  font-size: $font-size-xs; color: $color-text-muted; text-transform: capitalize; text-align: center;
+  white-space: nowrap;
 }
 
 .card-head {
@@ -141,6 +198,10 @@
   gap: $space-3; padding: $space-8 $space-4; color: $color-text-muted; font-size: $font-size-sm;
   svg { opacity: 0.4; }
 }
+
+.td-name  { font-weight: 600; white-space: nowrap; }
+.td-offre { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-date  { white-space: nowrap; color: $color-text-muted; }
 
 /* ── Offers cards section ── */
 .cards-section {

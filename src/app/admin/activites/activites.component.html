@@ -1,81 +1,475 @@
-<div class="activites-page">
-
-  <!-- Header row -->
-  <div class="page-header">
-    <div class="filter-tabs">
-      @for (f of filters; track f.key) {
-        <button
-          class="tab-btn"
-          [class.active]="activeFilter() === f.key"
-          (click)="setFilter(f.key)"
-        >
-          {{ f.label }} (0)
-        </button>
-      }
-    </div>
+<!-- Toast -->
+@if (toast(); as t) {
+  <div class="toast" [class.toast--error]="t.type === 'error'" role="alert">
+    @if (t.type === 'success') {
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    } @else {
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    }
+    {{ t.msg }}
   </div>
+}
 
-  <!-- Main content: table + calendar -->
-  <div class="content-row">
+<!-- ════════════════════════════════════════════
+     PART A – OFFERS TABLE
+════════════════════════════════════════════ -->
+@if (view() === 'offres') {
+  <div class="act-shell">
 
-    <!-- Table card -->
-    <div class="table-card">
-      <table class="act-table">
-        <thead>
-          <tr>
-            <th>Activité</th>
-            <th>Du</th>
-            <th>Jusqu'à</th>
-            <th>État</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colspan="4">
-              <div class="empty-state">
-                <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24"
-                  fill="none" stroke="#cdd0d5" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2"/>
-                  <line x1="9" y1="3" x2="9" y2="21"/>
-                  <line x1="3" y1="9" x2="9" y2="9"/>
-                  <line x1="3" y1="15" x2="9" y2="15"/>
-                  <line x1="13" y1="9" x2="18" y2="9"/>
-                  <line x1="13" y1="13" x2="16" y2="13"/>
-                </svg>
-                <p class="empty-title">Aucune activité programmée pour le moment</p>
-                <p class="empty-sub">Ajoutez une activité pour qu'elle apparaisse ici.</p>
-          
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="page-hd">
+      <div>
+        <h1 class="page-title">Activités</h1>
+        <p class="page-sub">{{ offres().length }} offres enregistrées</p>
+      </div>
+      <button class="btn-icon" (click)="loadOffres()" title="Rafraîchir">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </button>
     </div>
 
-    <!-- Mini calendar -->
-    <div class="calendar-card">
-      <div class="cal-month-nav">
-        <button class="cal-nav-btn">&#8249;</button>
-        <span class="cal-month-title">Avril 2026</span>
-        <button class="cal-nav-btn">&#8250;</button>
-      </div>
-      <div class="cal-weekdays">
-        <span>Lu</span><span>Ma</span><span>Me</span>
-        <span>Je</span><span>Ve</span><span>Sa</span><span>Di</span>
-      </div>
-      <div class="cal-grid">
-        <!-- April 2026 starts on Wednesday → 2 offset cells -->
-        <span class="cal-day empty"></span>
-        <span class="cal-day empty"></span>
-        @for (day of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]; track day) {
-          <span class="cal-day" [class.today]="day === 19">{{ day }}</span>
+    <!-- Filters -->
+    <div class="filter-row">
+      <div class="tab-group">
+        @for (s of offreStatuts; track s.key) {
+          <button class="tab-btn" [class.active]="offreStatut() === s.key"
+                  (click)="offreStatut.set(s.key)">{{ s.label }}</button>
         }
       </div>
-      <div class="cal-legend">
-        <span class="legend-item"><span class="dot green"></span> Activité</span>
-        <span class="legend-item"><span class="dot yellow"></span> Échéance</span>
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="search" placeholder="Rechercher une offre…"
+               [value]="offreSearch()" (input)="onOffreSearch($any($event.target).value)" />
       </div>
     </div>
 
+    <!-- Table -->
+    <div class="table-card">
+      @if (offresLoading()) {
+        <div class="state-row">
+          <div class="spinner"></div>
+          <span>Chargement des offres…</span>
+        </div>
+      } @else if (filteredOffres().length === 0) {
+        <div class="empty-state">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <p class="empty-title">Aucune offre trouvée</p>
+        </div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Offre</th>
+              <th>Dates</th>
+              <th>Lieu</th>
+              <th>Prix</th>
+              <th>Capacité</th>
+              <th>Statut</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (o of filteredOffres(); track o.id) {
+              <tr class="data-row">
+                <td>
+                  <div class="offre-cell">
+                    <span class="type-pill" [style.background]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span>
+                    <span class="offre-title">{{ o.titre }}</span>
+                  </div>
+                </td>
+                <td class="muted-cell">
+                  {{ fmtDate(o.dateDebut) }}
+                  @if (o.dateFin) { → {{ fmtDate(o.dateFin) }} }
+                </td>
+                <td class="muted-cell">{{ o.lieu ?? '—' }}</td>
+                <td class="muted-cell">
+                  @if (o.prixParPersonne != null) { {{ o.prixParPersonne | number:'1.0-0' }} TND }
+                  @else { Gratuit }
+                </td>
+                <td>
+                  @if (o.capaciteMax) {
+                    <div class="cap-cell">
+                      <div class="cap-bar-track">
+                        <div class="cap-bar-fill" [style.width.%]="fillPercent(o)"></div>
+                      </div>
+                      <span class="cap-label">{{ inscritsCount(o) }}/{{ o.capaciteMax }}</span>
+                    </div>
+                  } @else {
+                    <span class="muted-cell">—</span>
+                  }
+                </td>
+                <td>
+                  <span class="statut-badge"
+                        [class.statut--open]="o.statutOffre === 'OUVERTE'"
+                        [class.statut--draft]="o.statutOffre === 'BROUILLON'"
+                        [class.statut--closed]="o.statutOffre === 'FERMEE'"
+                        [class.statut--archived]="o.statutOffre === 'ARCHIVEE'">
+                    @switch (o.statutOffre) {
+                      @case ('OUVERTE')   { Ouverte }
+                      @case ('BROUILLON') { Brouillon }
+                      @case ('FERMEE')    { Fermée }
+                      @case ('ARCHIVEE')  { Archivée }
+                      @default            { {{ o.statutOffre }} }
+                    }
+                  </span>
+                </td>
+                <td>
+                  @if (o.typeOffre === 'CONVENTION') {
+                    <span class="convention-label">Publication</span>
+                  } @else {
+                  <button class="btn-participants" (click)="openParticipants(o)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Participants
+                  </button>
+                  } <!-- end @else -->
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
   </div>
-</div>
+}
+
+<!-- ════════════════════════════════════════════
+     PART B – PARTICIPANTS TABLE
+════════════════════════════════════════════ -->
+@if (view() === 'participants' || view() === 'detail') {
+  <div class="act-shell">
+
+    <!-- Header -->
+    <div class="page-hd page-hd--back">
+      <button class="back-btn" (click)="backToOffres()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Offres
+      </button>
+      @if (selectedOffre(); as o) {
+        <div class="hd-title-wrap">
+          <h1 class="page-title">
+            <span class="type-pill type-pill--sm" [style.background]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span>
+            {{ o.titre }}
+          </h1>
+          <div class="stat-chips">
+            <span class="stat-chip">{{ insCounts().total }} inscrits</span>
+            @if (insCounts().attente > 0) {
+              <span class="stat-chip stat-chip--warn">{{ insCounts().attente }} en attente</span>
+            }
+            <span class="stat-chip stat-chip--ok">{{ insCounts().confirmee }} confirmés</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <div class="tab-group">
+        @for (s of insStatuts; track s.key) {
+          <button class="tab-btn" [class.active]="insStatut() === s.key"
+                  (click)="insStatut.set(s.key)">{{ s.label }}</button>
+        }
+      </div>
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="search" placeholder="Rechercher un participant…"
+               [value]="insSearch()" (input)="onInsSearch($any($event.target).value)" />
+      </div>
+    </div>
+
+    <!-- Convention notice -->
+    @if (selectedOffre()?.typeOffre === 'CONVENTION') {
+      <div class="convention-notice">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        </svg>
+        <p>Les conventions sont des publications partenaires — elles n'ont pas de liste de participants ni d'inscriptions.</p>
+      </div>
+    }
+
+    <!-- Table -->
+    @if (selectedOffre()?.typeOffre !== 'CONVENTION') {
+    <div class="table-card">
+      @if (insLoading()) {
+        <div class="state-row">
+          <div class="spinner"></div>
+          <span>Chargement des participants…</span>
+        </div>
+      } @else if (filteredIns().length === 0) {
+        <div class="empty-state">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          </svg>
+          <p class="empty-title">Aucun participant trouvé</p>
+        </div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Participant</th>
+              <th>Email</th>
+              <th>Date d'inscription</th>
+              <th>Statut</th>
+              <th>Paiement</th>
+              <th># Invités</th>
+              <th>Total</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ins of filteredIns(); track ins.id) {
+              <tr class="data-row data-row--clickable" (click)="openDetail(ins)">
+                <td>
+                  <div class="member-cell">
+                    <div class="avatar">{{ initials(ins.adherentNom, ins.adherentPrenom) }}</div>
+                    <span class="member-name">{{ ins.adherentPrenom }} {{ ins.adherentNom }}</span>
+                  </div>
+                </td>
+                <td class="muted-cell">{{ ins.mailAdherent }}</td>
+                <td class="muted-cell">{{ fmtDate(ins.dateInscription) }}</td>
+                <td>
+                  <span class="ins-badge"
+                        [class.ins--attente]="ins.statut === 'EN_ATTENTE'"
+                        [class.ins--ok]="ins.statut === 'CONFIRMEE'"
+                        [class.ins--rejet]="ins.statut === 'REJETEE'"
+                        [class.ins--annul]="ins.statut === 'ANNULEE'">
+                    @switch (ins.statut) {
+                      @case ('EN_ATTENTE') { En attente }
+                      @case ('CONFIRMEE')  { Confirmée }
+                      @case ('REJETEE')    { Rejetée }
+                      @case ('ANNULEE')    { Annulée }
+                    }
+                  </span>
+                </td>
+                <td>
+                  @if (ins.statutPaiement) {
+                    <span class="pay-badge"
+                          [class.pay--ok]="ins.statutPaiement === 'PAYEE'"
+                          [class.pay--late]="ins.statutPaiement === 'EN_RETARD'"
+                          [class.pay--attente]="ins.statutPaiement === 'EN_ATTENTE'">
+                      @switch (ins.statutPaiement) {
+                        @case ('PAYEE')      { Payée }
+                        @case ('EN_RETARD')  { En retard }
+                        @case ('EN_ATTENTE') { En attente }
+                      }
+                    </span>
+                  } @else {
+                    <span class="muted-cell">—</span>
+                  }
+                </td>
+                <td class="muted-cell center-cell">{{ ins.guests?.length ?? ins.nombreAccompagnants }}</td>
+                <td class="muted-cell center-cell">{{ ins.totalPeople ?? (1 + ins.nombreAccompagnants) }}</td>
+                <td (click)="$event.stopPropagation()">
+                  @if (ins.statut === 'EN_ATTENTE') {
+                    <div class="action-btns">
+                      <button class="btn-approve" [disabled]="actionLoading() === ins.id"
+                              (click)="confirmer(ins.id)">
+                        @if (actionLoading() === ins.id) { … } @else { Valider }
+                      </button>
+                      <button class="btn-reject" [disabled]="actionLoading() === ins.id"
+                              (click)="refuser(ins.id)">
+                        @if (actionLoading() === ins.id) { … } @else { Rejeter }
+                      </button>
+                    </div>
+                  } @else {
+                    <span class="muted-cell">—</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+    } <!-- end @if not CONVENTION -->
+
+  </div>
+}
+
+<!-- ════════════════════════════════════════════
+     PART C – DETAIL MODAL
+════════════════════════════════════════════ -->
+@if (view() === 'detail') {
+  <div class="modal-backdrop" (click)="backToParticipants()">
+    <div class="modal-panel" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+
+      <!-- Modal header -->
+      <div class="modal-hd">
+        <div class="modal-hd-left">
+          @if (selectedIns(); as ins) {
+            <div class="avatar avatar--lg">{{ initials(ins.adherentNom, ins.adherentPrenom) }}</div>
+            <div>
+              <h2 class="modal-title">{{ ins.adherentPrenom }} {{ ins.adherentNom }}</h2>
+              <p class="modal-sub">{{ ins.mailAdherent }}</p>
+            </div>
+          }
+        </div>
+        <button class="modal-close" (click)="backToParticipants()" aria-label="Fermer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal body -->
+      @if (detailLoading()) {
+        <div class="state-row state-row--modal">
+          <div class="spinner"></div>
+          <span>Chargement du dossier…</span>
+        </div>
+      } @else if (selectedIns(); as ins) {
+        <div class="modal-body">
+
+          <!-- Status row -->
+          <div class="detail-status-row">
+            <div class="detail-kv">
+              <span class="kv-label">Statut inscription</span>
+              <span class="ins-badge"
+                    [class.ins--attente]="ins.statut === 'EN_ATTENTE'"
+                    [class.ins--ok]="ins.statut === 'CONFIRMEE'"
+                    [class.ins--rejet]="ins.statut === 'REJETEE'"
+                    [class.ins--annul]="ins.statut === 'ANNULEE'">
+                @switch (ins.statut) {
+                  @case ('EN_ATTENTE') { En attente }
+                  @case ('CONFIRMEE')  { Confirmée }
+                  @case ('REJETEE')    { Rejetée }
+                  @case ('ANNULEE')    { Annulée }
+                }
+              </span>
+            </div>
+            <div class="detail-kv">
+              <span class="kv-label">Date d'inscription</span>
+              <span class="kv-val">{{ fmtDate(ins.dateInscription) }}</span>
+            </div>
+            @if (ins.montant != null) {
+              <div class="detail-kv">
+                <span class="kv-label">Montant total</span>
+                <span class="kv-val kv-val--price">{{ ins.montant | number:'1.0-2' }} TND</span>
+              </div>
+            }
+          </div>
+
+          <!-- Guests section (read-only) -->
+          <div class="modal-section">
+            <h3 class="section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Participants : {{ ins.totalPeople ?? (1 + ins.nombreAccompagnants) }} personne(s)
+            </h3>
+
+            @if (ins.guests && ins.guests.length > 0) {
+              <table class="guests-admin-table">
+                <thead><tr><th>Nom</th><th>Prénom</th><th>Âge</th><th>Sexe</th></tr></thead>
+                <tbody>
+                  @for (g of ins.guests; track $index) {
+                    <tr>
+                      <td>{{ g.nom }}</td>
+                      <td>{{ g.prenom ?? '—' }}</td>
+                      <td class="muted-cell">{{ g.age ?? '—' }}</td>
+                      <td class="muted-cell">{{ sexeLabel(g.sexe) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            } @else {
+              <p class="no-guests">Inscription individuelle — aucun accompagnant.</p>
+            }
+          </div>
+
+          <!-- Payment schedule section -->
+          @if (ins.echeances && ins.echeances.length > 0) {
+            <div class="modal-section">
+              <h3 class="section-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                Échéancier de paiement
+              </h3>
+              <table class="echeances-table">
+                <thead>
+                  <tr>
+                    <th>Date d'échéance</th>
+                    <th>Montant</th>
+                    <th>Statut</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (e of ins.echeances; track e.id) {
+                    <tr>
+                      <td>{{ fmtDate(e.dateEcheance) }}</td>
+                      <td class="echeance-montant">{{ e.montant | number:'1.0-2' }} TND</td>
+                      <td>
+                        <span class="pay-badge"
+                              [class.pay--ok]="e.statut === 'PAYEE'"
+                              [class.pay--late]="e.statut === 'EN_RETARD'"
+                              [class.pay--attente]="e.statut === 'EN_ATTENTE'">
+                          @switch (e.statut) {
+                            @case ('PAYEE')      { Payée }
+                            @case ('EN_RETARD')  { En retard }
+                            @case ('EN_ATTENTE') { En attente }
+                          }
+                        </span>
+                      </td>
+                      <td>
+                        @if (e.statut !== 'PAYEE') {
+                          <button class="btn-pay" [disabled]="payLoading() === e.id"
+                                  (click)="payer(e.id, ins.id)">
+                            @if (payLoading() === e.id) { … } @else { Marquer payée }
+                          </button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          <!-- Admin notes section -->
+          <div class="modal-section">
+            <h3 class="section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Notes administrateur
+            </h3>
+            <textarea class="notes-input" rows="3" placeholder="Ajouter une note interne…"
+                      [ngModel]="notesInput()" (ngModelChange)="notesInput.set($event)"></textarea>
+            <button class="btn-save-notes" [disabled]="notesSaving()" (click)="saveNotes()">
+              @if (notesSaving()) { Enregistrement… } @else { Enregistrer les notes }
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Modal footer – main actions -->
+        <div class="modal-footer">
+          @if (ins.statut === 'EN_ATTENTE') {
+            <button class="btn-confirm-main" [disabled]="actionLoading() === ins.id"
+                    (click)="confirmer(ins.id)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              @if (actionLoading() === ins.id) { Traitement… } @else { Confirmer l'inscription }
+            </button>
+            <button class="btn-reject-main" [disabled]="actionLoading() === ins.id"
+                    (click)="refuser(ins.id)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              @if (actionLoading() === ins.id) { Traitement… } @else { Rejeter }
+            </button>
+          } @else {
+            <span class="status-final">
+              @switch (ins.statut) {
+                @case ('CONFIRMEE') {
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Inscription confirmée
+                }
+                @case ('REJETEE') {
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  Inscription rejetée
+                }
+                @case ('ANNULEE') { Inscription annulée }
+              }
+            </span>
+          }
+        </div>
+      }
+
+    </div>
+  </div>
+}

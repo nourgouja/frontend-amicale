@@ -1,7 +1,8 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 export interface AuthResponse {
   accessToken: string;
@@ -47,12 +48,16 @@ export class AuthService {
       );
   }
 
-  logout() {
-    localStorage.removeItem(this.TOKEN_KEY);
-    this.currentUser.set(null);
-    this.firstLogin.set(false);
-    this.photoUrl.set(null);
-    this.router.navigate(['/login']);
+  logout(): void {
+    this.http.post(`${this.API}/logout`, {}).pipe(
+      catchError(() => of(null))
+    ).subscribe(() => {
+      localStorage.removeItem(this.TOKEN_KEY);
+      this.currentUser.set(null);
+      this.firstLogin.set(false);
+      this.photoUrl.set(null);
+      this.router.navigate(['/login']);
+    });
   }
 
   clearFirstLogin(): void {

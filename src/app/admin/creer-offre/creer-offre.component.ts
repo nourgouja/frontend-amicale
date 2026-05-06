@@ -35,6 +35,7 @@ export class CreerOffreComponent implements OnInit {
   successMsg      = signal('');
   errorMsg        = signal('');
   isEditMode      = signal(false);
+  originalStatut  = signal<string>('');
 
   private readonly allTypes = [
     { value: 'VOYAGE',     label: 'Voyage',     color: '#3b82f6' },
@@ -68,7 +69,7 @@ export class CreerOffreComponent implements OnInit {
 
   get typeCtrl(): AbstractControl { return this.form.get('typeOffre')!; }
   get showDateFin(): boolean { const t = this.typeCtrl.value; return t === 'VOYAGE' || t === 'SEJOUR'; }
-  get showModePaiement(): boolean { return this.typeCtrl.value === 'VOYAGE'; }
+  get showModePaiement(): boolean { const t = this.typeCtrl.value; return t === 'VOYAGE' || t === 'SEJOUR'; }
   get isConvention(): boolean { const t = this.typeCtrl.value; return t === 'CONVENTION' || t === 'ANNONCE'; }
   get canAddExtra(): boolean { return this.extraFiles().length < 5; }
 
@@ -84,6 +85,7 @@ export class CreerOffreComponent implements OnInit {
       capaciteMax:     [null, [Validators.min(1)]],
       modePaiement:    [''],
       avantages:       [''],
+      lienExterne:     [''],
       poleId:          [null],
     });
 
@@ -124,11 +126,13 @@ export class CreerOffreComponent implements OnInit {
   private loadOffre(id: number): void {
     this.http.get<any>(`/api/offres/${id}`).subscribe({
       next: offre => {
+        this.originalStatut.set(offre.statutOffre ?? '');
         this.form.patchValue({
           titre: offre.titre, typeOffre: offre.typeOffre, description: offre.description,
           lieu: offre.lieu, dateDebut: offre.dateDebut?.slice(0, 10), dateFin: offre.dateFin?.slice(0, 10),
           prixParPersonne: offre.prixParPersonne, capaciteMax: offre.capaciteMax,
-          modePaiement: offre.modePaiement, avantages: offre.avantages, poleId: offre.poleId,
+          modePaiement: offre.modePaiement, avantages: offre.avantages,
+          lienExterne: offre.lienExterne, poleId: offre.poleId,
         });
         if (offre.imageBase64 && offre.imageType) {
           this.previewUrl.set(`data:${offre.imageType};base64,${offre.imageBase64}`);
@@ -223,6 +227,10 @@ export class CreerOffreComponent implements OnInit {
     req$.subscribe({
       next: () => {
         this.submitting.set(false);
+        // When editing a non-published offer, explicitly publish it
+        if (id && statut === 'OUVERTE' && this.originalStatut() !== 'OUVERTE') {
+          this.http.patch(`/api/offres/publier/${id}`, {}).subscribe();
+        }
         this.successMsg.set(id ? 'Offre mise à jour avec succès.' : 'Offre créée avec succès.');
         setTimeout(() => this.cancel(), 1200);
       },
