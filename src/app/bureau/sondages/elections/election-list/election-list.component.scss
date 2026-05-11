@@ -1,0 +1,102 @@
+@use '../../../../../styles/variables' as *;
+
+.page-toast {
+  position: fixed; top: $space-5; right: $space-5; z-index: 2000;
+  display: flex; align-items: center; gap: $space-2;
+  padding: 12px $space-5; border-radius: $radius-md;
+  font-size: $font-size-sm; font-weight: 600; box-shadow: $shadow-dropdown;
+  background: $color-primary; color: #fff; animation: slideIn 0.2s ease;
+  @include reduced-motion { animation: none; }
+  &--error { background: $color-error; }
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+.elections-page { display: flex; flex-direction: column; gap: $space-5; }
+
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: $space-4; }
+.page-title  { font-size: $font-size-xl; font-weight: 700; color: $color-text; }
+.page-sub    { font-size: $font-size-sm; color: $color-text-muted; margin-top: 2px; }
+
+.section { display: flex; flex-direction: column; gap: $space-4; }
+
+.section-title {
+  display: flex; align-items: center; gap: $space-2;
+  font-size: $font-size-base; font-weight: 700; color: $color-text-muted; letter-spacing: 0.03em;
+}
+
+.section-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  &--active { background: #166534; }
+  &--closed { background: #1e40af; }
+}
+
+.loading-state { @include flex-center; padding: 60px $space-4; }
+.spinner {
+  width: 36px; height: 36px; border: 3px solid $color-border; border-top-color: $color-primary;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  @include reduced-motion { animation: none; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+  @include flex-center; flex-direction: column; gap: $space-4; padding: 80px $space-4; color: $color-text-muted;
+}
+.empty-title { font-size: $font-size-lg; font-weight: 700; color: $color-text; }
+
+.elections-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: $space-5;
+}
+
+.election-card {
+  @include card; padding: $space-5;
+  display: flex; flex-direction: column; gap: $space-3;
+}
+
+.card-top {
+  display: flex; align-items: center; justify-content: space-between; gap: $space-2;
+}
+.status-badge {
+  display: inline-flex; align-items: center; height: 22px; padding: 0 10px;
+  border-radius: $radius-full; font-size: $font-size-xs; font-weight: 700; letter-spacing: 0.04em;
+  &--active { background: #dcfce7; color: #166534; }
+  &--closed { background: #dbeafe; color: #1e40af; }
+}
+.candidate-count { font-size: $font-size-xs; color: $color-text-muted; font-weight: 600; }
+.election-title  { font-size: $font-size-md; font-weight: 700; color: $color-text; line-height: 1.35; }
+.election-desc   { font-size: $font-size-sm; color: $color-text-muted; line-height: 1.55; }
+
+.voted-indicator {
+  display: flex; align-items: center; gap: $space-2;
+  font-size: $font-size-xs; font-weight: 600; color: #166534;
+  background: #dcfce7; padding: 6px 10px; border-radius: $radius-md;
+}
+
+.card-meta {
+  display: flex; flex-direction: column; gap: 2px;
+  font-size: $font-size-xs; color: $color-text-muted;
+}
+
+.btn-vote-now {
+  width: 100%; padding: 10px; border-radius: $radius-md; border: none;
+  background: $color-primary; color: #fff;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600; cursor: pointer;
+  transition: background $transition-fast; margin-top: $space-1;
+  &:hover { background: $color-primary-dark; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.btn-results {
+  width: 100%; padding: 10px; border-radius: $radius-md; border: none;
+  background: #dbeafe; color: #1e40af;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600; cursor: pointer;
+  transition: background $transition-fast; margin-top: $space-1;
+  &:hover { background: #bfdbfe; }
+  @include reduced-motion { transition: none; }
+}
+
+.election-card--closed { opacity: 0.9; }
+
+.card-date { font-size: $font-size-xs; color: $color-text-muted; }
+
+.empty-sub { font-size: $font-size-sm; color: $color-text-muted; text-align: center; max-width: 300px; }

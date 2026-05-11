@@ -1,0 +1,266 @@
+@use '../../../../../styles/variables' as *;
+
+.create-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  max-width: 760px;
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────────
+.page-toast {
+  position: fixed; top: 20px; right: 20px; z-index: 9999;
+  padding: 12px $space-5; border-radius: $radius-md;
+  background: $color-success; color: #fff;
+  font-size: $font-size-sm; font-weight: 600; box-shadow: $shadow-dropdown;
+  animation: slideIn 0.2s ease;
+  &--error { background: $color-error; }
+}
+@keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+// ── Header ─────────────────────────────────────────────────────────────────────
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.btn-back {
+  display: inline-flex; align-items: center; gap: $space-2;
+  padding: 7px 14px; border: none; border-radius: $radius-md;
+  background: #f3f4f6; color: $color-text;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600; cursor: pointer;
+  align-self: flex-start;
+  &:hover { background: #e5e7eb; }
+}
+
+.header-text { display: flex; flex-direction: column; gap: $space-1; }
+.page-title  { font-size: $font-size-xl; font-weight: 700; color: $color-text; }
+.page-sub    { font-size: $font-size-sm; color: $color-text-muted; }
+
+// ── Step indicator ─────────────────────────────────────────────────────────────
+.step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.step-dot {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: $font-size-xs; font-weight: 700;
+  background: #f3f4f6; color: $color-text-muted; border: 2px solid $color-border;
+  transition: all $transition-base;
+
+  &--active {
+    background: $color-primary; color: #fff; border-color: $color-primary;
+  }
+  &--done {
+    background: $color-primary; color: #fff; border-color: $color-primary;
+  }
+}
+
+.step-line {
+  flex: 1; height: 2px; background: $color-border; max-width: 60px;
+  transition: background $transition-base;
+  &--done { background: $color-primary; }
+}
+
+// ── Step content ───────────────────────────────────────────────────────────────
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  animation: fadeIn 0.22s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+// ── Form fields ────────────────────────────────────────────────────────────────
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.field-label {
+  font-size: $font-size-sm; font-weight: 600; color: $color-text;
+  .required { color: $color-error; }
+}
+
+.field-input,
+.field-textarea,
+.field-select {
+  padding: 10px $space-3;
+  border: 1px solid $color-border; border-radius: $radius-md;
+  font-family: $font-base; font-size: $font-size-base; color: $color-text;
+  background: $color-surface;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+  }
+
+  &.is-invalid { border-color: $color-error; }
+  &::placeholder { color: $color-text-muted; }
+}
+
+.field-textarea { min-height: 80px; resize: vertical; }
+.field-select   { cursor: pointer; }
+
+.field-error {
+  font-size: $font-size-sm;
+  color: $color-error;
+}
+
+// ── Candidates list ────────────────────────────────────────────────────────────
+.candidates-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.candidate-card {
+  @include card;
+  display: flex; align-items: center; gap: $space-3; padding: $space-3;
+}
+
+.candidate-photo-wrap { flex-shrink: 0; }
+
+.candidate-img {
+  width: 52px; height: 52px; border-radius: $radius-md; object-fit: cover;
+}
+
+.candidate-avatar {
+  width: 52px; height: 52px; border-radius: $radius-md;
+  background: $color-primary-light; color: $color-primary;
+  @include flex-center; font-size: $font-size-lg; font-weight: 700;
+}
+
+.candidate-info {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+.candidate-name {
+  font-size: $font-size-base; font-weight: 700; color: $color-text;
+  @include truncate;
+}
+
+.candidate-desc {
+  font-size: $font-size-sm; color: $color-text-muted;
+  overflow: hidden; text-overflow: ellipsis;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+
+.btn-remove {
+  flex-shrink: 0; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: $radius-md;
+  background: #fee2e2; color: $color-error; cursor: pointer;
+  transition: background $transition-fast;
+  &:hover { background: #fecaca; }
+}
+
+// ── Add section ────────────────────────────────────────────────────────────────
+.add-section {
+  background: #f9fafb;
+  border: 1px dashed $color-border;
+  border-radius: $radius-lg;
+  padding: $space-5;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.add-title {
+  font-size: $font-size-base; font-weight: 700; color: $color-text;
+}
+
+.add-error {
+  padding: 10px $space-3; border-radius: $radius-md;
+  background: #fee2e2; color: $color-error;
+  font-size: $font-size-sm; font-weight: 600;
+}
+
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+// ── File upload ────────────────────────────────────────────────────────────────
+.file-input { display: none; }
+
+.file-upload-btn {
+  display: inline-flex; align-items: center; gap: $space-2;
+  padding: 10px $space-4; border: 2px dashed $color-border;
+  border-radius: $radius-md; background: $color-surface;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600;
+  color: $color-text-muted; cursor: pointer;
+  transition: all $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; background: rgba($color-primary, 0.04); }
+}
+
+.file-hint {
+  display: block; margin-top: $space-1;
+  font-size: $font-size-sm; color: $color-text-muted;
+}
+
+.photo-preview {
+  position: relative; display: inline-block; margin-top: $space-2;
+}
+
+.preview-img {
+  width: 120px; height: 120px; object-fit: cover;
+  border-radius: $radius-md; border: 1px solid $color-border; display: block;
+}
+
+.btn-remove-photo {
+  position: absolute; top: -8px; right: -8px;
+  width: 24px; height: 24px; border-radius: 50%;
+  border: none; background: $color-error; color: #fff;
+  font-size: 16px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  &:hover { background: #b91c1c; }
+}
+
+.btn-add-candidate {
+  display: inline-flex; align-items: center; gap: $space-2;
+  padding: 10px $space-5; border: none; border-radius: $radius-md;
+  background: $color-primary; color: #fff;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 700;
+  cursor: pointer; align-self: flex-start;
+  transition: background $transition-fast;
+  &:hover { background: $color-primary-dark; }
+}
+
+// ── Step navigation ────────────────────────────────────────────────────────────
+.step-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: $space-5; border-top: 1px solid $color-border;
+}
+
+.step-counter {
+  font-size: $font-size-sm; color: $color-text-muted; font-weight: 500;
+}
+
+.btn-primary {
+  padding: 10px $space-6; border: none; border-radius: $radius-md;
+  background: $color-primary; color: #fff;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 700;
+  cursor: pointer; transition: background $transition-fast;
+  &:hover:not(:disabled) { background: $color-primary-dark; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-ghost {
+  padding: 10px $space-5; border: 1px solid $color-border; border-radius: $radius-md;
+  background: transparent; color: $color-text;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600;
+  cursor: pointer; transition: background $transition-fast;
+  &:hover:not(:disabled) { background: #f3f4f6; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}

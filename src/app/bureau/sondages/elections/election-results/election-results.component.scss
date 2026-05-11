@@ -1,0 +1,104 @@
+@use '../../../../../styles/variables' as *;
+
+.results-page { display: flex; flex-direction: column; gap: $space-5; max-width: 800px; }
+
+.page-header { display: flex; align-items: center; }
+.btn-back {
+  display: flex; align-items: center; gap: $space-2; padding: 8px 14px;
+  background: #f3f4f6; color: $color-text; border: none; border-radius: $radius-md;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600; cursor: pointer;
+  &:hover { background: #e5e7eb; }
+}
+
+.loading-state { @include flex-center; padding: 60px; }
+.spinner {
+  width: 36px; height: 36px; border: 3px solid $color-border; border-top-color: $color-primary;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  @include reduced-motion { animation: none; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.election-header { display: flex; flex-direction: column; gap: $space-2; }
+.title-row  { display: flex; align-items: center; gap: $space-4; flex-wrap: wrap; }
+.election-title { font-size: $font-size-xl; font-weight: 700; color: $color-text; }
+.election-desc  { font-size: $font-size-base; color: $color-text-muted; line-height: 1.6; }
+.total-votes-info { font-size: $font-size-sm; color: $color-text-muted; font-weight: 600; }
+
+.status-badge {
+  display: inline-flex; align-items: center; height: 22px; padding: 0 10px;
+  border-radius: $radius-full; font-size: $font-size-xs; font-weight: 700;
+  &--closed { background: #dbeafe; color: #1e40af; }
+}
+
+.auto-badge {
+  display: inline-flex; align-items: center; height: 22px; padding: 0 10px;
+  border-radius: $radius-full; background: #fef3c7; color: #92400e;
+  font-size: $font-size-xs; font-weight: 700;
+}
+
+.positions-list { display: flex; flex-direction: column; gap: $space-7; }
+
+.position-section { display: flex; flex-direction: column; gap: $space-4; }
+
+.position-header {
+  display: flex; align-items: center; gap: $space-3; padding-bottom: $space-3;
+  border-bottom: 2px solid $color-primary;
+}
+.position-title { font-size: $font-size-lg; font-weight: 700; color: $color-text; }
+
+.candidates-list { display: flex; flex-direction: column; gap: $space-3; }
+
+.result-row {
+  @include card; padding: $space-4;
+  display: flex; align-items: center; gap: $space-4;
+  &--winner {
+    border: 2px solid $color-primary;
+    background: linear-gradient(135deg, #f0fdf4 0%, #fff 100%);
+  }
+}
+
+.rank {
+  width: 32px; flex-shrink: 0; @include flex-center;
+}
+.rank-num { font-size: $font-size-sm; font-weight: 700; color: $color-text-muted; }
+
+.candidate-photo {
+  flex-shrink: 0;
+  img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+}
+.candidate-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: $color-primary-light; color: $color-primary;
+  @include flex-center; font-size: $font-size-base; font-weight: 700;
+}
+
+.candidate-details { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+
+.name-row { display: flex; align-items: center; gap: $space-2; flex-wrap: wrap; }
+.candidate-name { font-size: $font-size-base; font-weight: 700; color: $color-text; }
+.candidate-desc { font-size: $font-size-xs; color: $color-text-muted; }
+
+.winner-badge {
+  display: inline-flex; align-items: center; height: 20px; padding: 0 8px;
+  border-radius: $radius-full; background: $color-primary; color: #fff;
+  font-size: 11px; font-weight: 700;
+}
+.auto-selected-badge {
+  display: inline-flex; align-items: center; height: 20px; padding: 0 8px;
+  border-radius: $radius-full; background: #fef3c7; color: #92400e;
+  font-size: 11px; font-weight: 700;
+}
+
+.progress-row {
+  display: flex; align-items: center; gap: $space-3;
+}
+.progress-track {
+  flex: 1; height: 8px; background: #f0f2f5; border-radius: $radius-full; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: $color-text-muted; border-radius: $radius-full;
+  transition: width 0.5s ease;
+  &--winner { background: $color-primary; }
+  @include reduced-motion { transition: none; }
+}
+.vote-stats { font-size: $font-size-xs; color: $color-text-muted; font-weight: 600; white-space: nowrap; }

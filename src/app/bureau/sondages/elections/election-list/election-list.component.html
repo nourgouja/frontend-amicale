@@ -1,0 +1,93 @@
+<div class="elections-page">
+
+  @if (toast()) {
+    <div class="page-toast" [class.page-toast--error]="toast()!.type === 'error'" role="alert">
+      {{ toast()!.msg }}
+    </div>
+  }
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Élections</h1>
+      <p class="page-sub">Votez pour les membres du bureau</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state"><div class="spinner"></div></div>
+  } @else {
+
+    <!-- Active elections -->
+    @if (activeElections().length > 0) {
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-dot section-dot--active"></span>
+          Vote en cours
+        </h2>
+        <div class="elections-grid">
+          @for (e of activeElections(); track e.id) {
+            <div class="election-card">
+              <div class="card-top">
+                <span class="status-badge status-badge--active">Vote en cours</span>
+                <span class="candidate-count">{{ totalCandidates(e) }} candidat(s)</span>
+              </div>
+              <h3 class="election-title">{{ e.titre }}</h3>
+              @if (e.description) {
+                <p class="election-desc">{{ e.description }}</p>
+              }
+              @if (e.votedPositions.length > 0) {
+                <div class="voted-indicator">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  {{ e.votedPositions.length }} poste(s) voté(s)
+                </div>
+              }
+              <button class="btn-vote-now" (click)="goVote(e.id)">
+                {{ e.votedPositions.length > 0 ? 'Continuer à voter' : 'Voter maintenant' }}
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Closed elections -->
+    @if (closedElections().length > 0) {
+      <div class="section">
+        <h2 class="section-title">
+          <span class="section-dot section-dot--closed"></span>
+          Clôturées
+        </h2>
+        <div class="elections-grid">
+          @for (e of closedElections(); track e.id) {
+            <div class="election-card election-card--closed">
+              <div class="card-top">
+                <span class="status-badge status-badge--closed">Clôturée</span>
+                <span class="candidate-count">{{ totalCandidates(e) }} candidat(s)</span>
+              </div>
+              <h3 class="election-title">{{ e.titre }}</h3>
+              @if (e.description) {
+                <p class="election-desc">{{ e.description }}</p>
+              }
+              @if (e.closedAt) {
+                <p class="card-date">Clôturée le {{ e.closedAt | date:'dd/MM/yyyy' }}</p>
+              }
+              <button class="btn-results" (click)="goResults(e.id)">
+                Voir les résultats
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (activeElections().length === 0 && closedElections().length === 0) {
+      <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".35"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <p class="empty-title">Aucune élection disponible</p>
+        <p class="empty-sub">Les élections apparaîtront ici lorsqu'elles seront ouvertes.</p>
+      </div>
+    }
+  }
+
+</div>

@@ -1,0 +1,86 @@
+<div class="elections-page">
+
+  <!-- Toast -->
+  @if (toast()) {
+    <div class="page-toast" [class.page-toast--error]="toast()!.type === 'error'" role="alert">
+      {{ toast()!.msg }}
+    </div>
+  }
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Élections</h1>
+      <p class="page-sub">Gérez les élections annuelles du bureau</p>
+    </div>
+    <button class="btn-add" (click)="goToCreate()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouvelle élection
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Chargement des élections…</span>
+    </div>
+  } @else if (elections().length === 0) {
+    <div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".35"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <p class="empty-title">Aucune élection</p>
+      <p class="empty-sub">Créez la première élection pour permettre aux membres de voter.</p>
+      <button class="btn-add-sm" (click)="goToCreate()">Créer une élection</button>
+    </div>
+  } @else {
+    <div class="elections-grid">
+      @for (e of elections(); track e.id) {
+        <div class="election-card">
+          <div class="card-top">
+            <span class="status-badge" [class]="'status-badge--' + e.status.toLowerCase()">
+              {{ statusLabel(e.status) }}
+            </span>
+            <span class="candidate-count">{{ e.candidates.length }} candidat(s)</span>
+          </div>
+
+          <h3 class="election-title">{{ e.titre }}</h3>
+          @if (e.description) {
+            <p class="election-desc">{{ e.description }}</p>
+          }
+
+          <div class="card-meta">
+            <span>Par {{ e.createdByPrenom }} {{ e.createdByNom }}</span>
+            @if (e.openedAt) { <span>Ouvert le {{ e.openedAt | date:'dd/MM/yyyy' }}</span> }
+            @if (e.closedAt) { <span>Clôturé le {{ e.closedAt | date:'dd/MM/yyyy' }}</span> }
+          </div>
+
+          <div class="card-actions">
+            @if (e.status === 'DRAFT') {
+              <button class="btn-action btn-manage" (click)="manageCandidates(e.id)">
+                Candidats
+              </button>
+              <button class="btn-action btn-open" (click)="openElection(e.id)">
+                Ouvrir le vote
+              </button>
+              <button class="btn-action btn-delete" (click)="deleteElection(e.id)" title="Supprimer ce brouillon">
+                Supprimer
+              </button>
+            }
+            @if (e.status === 'ACTIVE') {
+              <button class="btn-action btn-close-vote" (click)="closeElection(e.id)">
+                Clôturer
+              </button>
+            }
+            @if (e.status === 'CLOSED') {
+              <button class="btn-action btn-results" (click)="viewResults(e.id)">
+                Voir les résultats
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+
+</div>

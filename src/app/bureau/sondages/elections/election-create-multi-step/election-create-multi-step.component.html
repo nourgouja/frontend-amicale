@@ -1,0 +1,157 @@
+<div class="create-page">
+
+  @if (toast()) {
+    <div class="page-toast" [class.page-toast--error]="toast()!.type === 'error'" role="alert">
+      {{ toast()!.msg }}
+    </div>
+  }
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back" type="button" (click)="back()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Retour
+    </button>
+
+    <div class="header-text">
+      <h1 class="page-title">{{ stepTitle() }}</h1>
+      <p class="page-sub">{{ stepDescription() }}</p>
+    </div>
+
+    <div class="step-indicator">
+      @for (s of steps; track $index) {
+        <div class="step-dot" [class.step-dot--active]="currentStep() === $index" [class.step-dot--done]="currentStep() > $index">
+          @if (currentStep() > $index) {
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          } @else {
+            {{ $index + 1 }}
+          }
+        </div>
+        @if ($index < steps.length - 1) {
+          <div class="step-line" [class.step-line--done]="currentStep() > $index"></div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- STEP 0: Election info -->
+  @if (currentStep() === 0) {
+    <div class="step-content" [formGroup]="electionForm">
+      <div class="field">
+        <label class="field-label">Titre <span class="required">*</span></label>
+        <input class="field-input" type="text" formControlName="titre"
+               placeholder="Ex : Élection du bureau 2025"
+               [class.is-invalid]="isInvalid('titre')" />
+        @if (isInvalid('titre')) {
+          <span class="field-error">Le titre est obligatoire (3 caractères minimum)</span>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field-label">Description</label>
+        <textarea class="field-textarea" formControlName="description"
+                  placeholder="Description optionnelle…" rows="3"></textarea>
+      </div>
+    </div>
+  }
+
+  <!-- STEPS 1-3: Candidates per position -->
+  @if (currentStep() > 0) {
+    <div class="step-content">
+
+      <!-- Added candidates -->
+      @if (currentCandidates().length > 0) {
+        <div class="candidates-list">
+          @for (c of currentCandidates(); track $index; let i = $index) {
+            <div class="candidate-card">
+              <div class="candidate-photo-wrap">
+                @if (c.previewUrl) {
+                  <img [src]="c.previewUrl" [alt]="c.displayName" class="candidate-img" />
+                } @else {
+                  <div class="candidate-avatar">{{ c.displayName[0] || '?' }}</div>
+                }
+              </div>
+              <div class="candidate-info">
+                <span class="candidate-name">{{ c.displayName }}</span>
+                <span class="candidate-desc">{{ c.description }}</span>
+              </div>
+              <button class="btn-remove" type="button" (click)="removeCandidate(i)" aria-label="Retirer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Add candidate form -->
+      <div class="add-section">
+        <h3 class="add-title">
+          {{ currentCandidates().length === 0 ? 'Ajouter un candidat' : 'Ajouter un autre candidat' }}
+        </h3>
+
+        @if (addFormError()) {
+          <div class="add-error">{{ addFormError() }}</div>
+        }
+
+        <div class="add-form">
+          <div class="field">
+            <label class="field-label">Utilisateur <span class="required">*</span></label>
+            <select class="field-select" [(ngModel)]="addForm.userId">
+              <option [ngValue]="0">— Sélectionner —</option>
+              @for (u of users(); track u.id) {
+                <option [ngValue]="u.id">{{ u.prenom }} {{ u.nom }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Description <span class="required">*</span></label>
+            <textarea class="field-textarea" [(ngModel)]="addForm.description"
+                      placeholder="Pourquoi ce candidat est-il qualifié ?" rows="2"></textarea>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Photo <span class="required">*</span></label>
+            <input #photoInput type="file" accept="image/*" class="file-input"
+                   (change)="onPhotoChange($event)" />
+            @if (addForm.previewUrl) {
+              <div class="photo-preview">
+                <img [src]="addForm.previewUrl" alt="Aperçu" class="preview-img" />
+                <button type="button" class="btn-remove-photo" (click)="removePhoto(photoInput)" aria-label="Supprimer la photo">×</button>
+              </div>
+            } @else {
+              <button type="button" class="file-upload-btn" (click)="photoInput.click()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Choisir une photo
+              </button>
+              <span class="file-hint">JPG, PNG — max 5 Mo</span>
+            }
+          </div>
+
+          <button type="button" class="btn-add-candidate" (click)="addCandidate()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter le candidat
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Step navigation -->
+  <div class="step-nav">
+    <button type="button" class="btn-ghost" (click)="previousStep()" [disabled]="currentStep() === 0">
+      ← Précédent
+    </button>
+    <span class="step-counter">Étape {{ currentStep() + 1 }} / {{ steps.length }}</span>
+    @if (currentStep() < steps.length - 1) {
+      <button type="button" class="btn-primary" (click)="nextStep()" [disabled]="!canProceed()">
+        Suivant →
+      </button>
+    } @else {
+      <button type="button" class="btn-primary" (click)="submitElection()" [disabled]="!canProceed() || submitting()">
+        @if (submitting()) { Création en cours… } @else { Créer l'élection }
+      </button>
+    }
+  </div>
+
+</div>

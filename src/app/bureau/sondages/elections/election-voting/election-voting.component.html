@@ -1,0 +1,141 @@
+<div class="voting-page">
+
+  @if (toast()) {
+    <div class="page-toast" [class.page-toast--error]="toast()!.type === 'error'" role="alert">
+      {{ toast()!.msg }}
+    </div>
+  }
+
+  <div class="page-header">
+    <button class="btn-back" (click)="back()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Retour
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state"><div class="spinner"></div></div>
+  } @else if (election()) {
+
+    <div class="election-header">
+      <div class="election-title-row">
+        <h1 class="election-title">{{ election()!.titre }}</h1>
+        <span class="status-badge" [class]="'status-badge--' + election()!.status.toLowerCase()">
+          {{ election()!.status === 'ACTIVE' ? 'Vote en cours' : 'Clôturée' }}
+        </span>
+      </div>
+      @if (election()!.description) {
+        <p class="election-desc">{{ election()!.description }}</p>
+      }
+    </div>
+
+    <!-- Progress -->
+    @if (!isResultMode()) {
+      <div class="vote-progress">
+        <div class="progress-label">
+          <span>{{ votedCount() }} / {{ positionGroups().length }} poste(s) votés</span>
+          @if (allPositionsVoted()) {
+            <span class="all-done-badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Participation complète
+            </span>
+          }
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill"
+               [style.width.%]="positionGroups().length ? (votedCount() / positionGroups().length) * 100 : 0">
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Position tabs -->
+    <div class="position-tabs" role="tablist">
+      @for (group of positionGroups(); track group.position) {
+        <button class="pos-tab"
+                role="tab"
+                [class.pos-tab--active]="activePosition() === group.position"
+                [class.pos-tab--voted]="group.hasVoted"
+                (click)="setActivePosition(group.position)">
+          {{ group.label }}
+          @if (group.hasVoted) {
+            <span class="tab-voted-dot" aria-label="Voté">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          }
+        </button>
+      }
+    </div>
+
+    <!-- Active position candidates -->
+    @if (activeGroup()) {
+      <div class="candidates-grid">
+        @for (c of activeGroup()!.candidates; track c.id) {
+          <div class="candidate-card"
+               [class.candidate-card--winner]="isResultMode() && c.winner"
+               [class.candidate-card--auto]="isResultMode() && c.autoSelected">
+
+            <div class="candidate-photo">
+              @if (c.pictureUrl) {
+                <img [src]="c.pictureUrl" [alt]="c.prenom + ' ' + c.nom" />
+              } @else {
+                <div class="candidate-avatar">{{ c.prenom[0] }}{{ c.nom[0] }}</div>
+              }
+              @if (isResultMode() && c.winner) {
+                <div class="winner-crown" title="Élu(e)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2 19h20l-2-10-5 5-3-8-3 8-5-5z"/></svg>
+                </div>
+              }
+            </div>
+
+            <div class="candidate-info">
+              <p class="candidate-name">{{ c.prenom }} {{ c.nom }}</p>
+              @if (c.description) {
+                <p class="candidate-desc">{{ c.description }}</p>
+              }
+
+              @if (isResultMode()) {
+                <div class="vote-stats">
+                  <div class="vote-bar-row">
+                    <span class="vote-count">{{ c.voteCount }} vote(s)</span>
+                    <span class="vote-pct">{{ c.votePercentage | number:'1.0-0' }}%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill" [style.width.%]="c.votePercentage"
+                         [class.progress-fill--winner]="c.winner"></div>
+                  </div>
+                  @if (c.autoSelected) {
+                    <span class="auto-label">Sélectionné automatiquement (candidat unique)</span>
+                  }
+                  @if (c.winner && !c.autoSelected) {
+                    <span class="winner-label">Élu(e) avec le plus de votes</span>
+                  }
+                </div>
+              }
+            </div>
+
+            @if (!isResultMode()) {
+              <div class="vote-action">
+                @if (activeGroup()!.hasVoted) {
+                  <div class="already-voted-msg">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Vote enregistré pour ce poste
+                  </div>
+                } @else {
+                  <button class="btn-vote"
+                          [disabled]="voting() !== null"
+                          (click)="vote(election()!.id, c.id)"
+                          [class.btn-vote--loading]="voting() === c.id">
+                    @if (voting() === c.id) { Vote en cours… }
+                    @else { Voter pour {{ c.prenom }} }
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>

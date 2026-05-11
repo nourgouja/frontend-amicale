@@ -6,7 +6,7 @@ import { DatePipe, LowerCasePipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, TrendingUp, Users, Activity, Tag, CalendarDays } from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, TrendingUp, Users, Activity, Tag, CalendarDays, Award } from 'lucide-angular';
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Administrateur', MEMBRE_BUREAU: 'Membre Bureau', ADHERENT: 'Adhérent',
@@ -17,7 +17,7 @@ const ROLE_LABELS: Record<string, string> = {
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, ProfileCardComponent, LucideAngularModule, DatePipe, LowerCasePipe],
   providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, TrendingUp, Users, Activity, Tag, CalendarDays }) },
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, TrendingUp, Users, Activity, Tag, CalendarDays, Award }) },
   ],
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.scss',
@@ -67,7 +67,7 @@ export class AdminLayoutComponent implements OnInit {
 
   userRole = computed(() => this.authService.currentUser()?.role ?? '');
 
-  readonly icons = { LayoutDashboard, TrendingUp, Users, Activity, Tag, CalendarDays };
+  readonly icons = { LayoutDashboard, TrendingUp, Users, Activity, Tag, CalendarDays, Award };
 
   ngOnInit(): void {
     this.notifService.init();
@@ -80,6 +80,7 @@ export class AdminLayoutComponent implements OnInit {
     { label: 'Activités',     route: '/admin/activites',    icon: 'Activity'        },
     { label: 'Offres',        route: '/admin/offres',       icon: 'Tag'             },
     { label: 'Calendrier',    route: '/admin/calendrier',   icon: 'CalendarDays'    },
+    { label: 'Élections',     route: '/admin/elections',    icon: 'Award'           },
   ];
 
   profileOpen = signal(false);

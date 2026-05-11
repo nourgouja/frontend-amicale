@@ -1,0 +1,82 @@
+<div class="results-page">
+
+  <div class="page-header">
+    <button class="btn-back" (click)="back()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Retour aux élections
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state"><div class="spinner"></div></div>
+  } @else if (election()) {
+    <div class="election-header">
+      <div class="title-row">
+        <h1 class="election-title">{{ election()!.titre }}</h1>
+        <span class="status-badge status-badge--closed">Clôturée</span>
+      </div>
+      @if (election()!.description) {
+        <p class="election-desc">{{ election()!.description }}</p>
+      }
+      <p class="total-votes-info">Total : {{ totalVotes() }} vote(s) exprimé(s)</p>
+    </div>
+
+    <div class="positions-list">
+      @for (group of positionGroups(); track group.position) {
+        <div class="position-section">
+          <div class="position-header">
+            <h2 class="position-title">{{ group.label }}</h2>
+            @if (group.candidates.length === 1) {
+              <span class="auto-badge">Sélection automatique</span>
+            }
+          </div>
+
+          <div class="candidates-list">
+            @for (c of group.candidates; track c.id; let i = $index) {
+              <div class="result-row" [class.result-row--winner]="c.winner">
+                <div class="rank">
+                  @if (c.winner && !c.autoSelected) {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><path d="M2 19h20l-2-10-5 5-3-8-3 8-5-5z"/></svg>
+                  } @else {
+                    <span class="rank-num">{{ i + 1 }}</span>
+                  }
+                </div>
+
+                <div class="candidate-photo">
+                  @if (c.pictureUrl) {
+                    <img [src]="c.pictureUrl" [alt]="c.prenom + ' ' + c.nom" />
+                  } @else {
+                    <div class="candidate-avatar">{{ c.prenom[0] }}{{ c.nom[0] }}</div>
+                  }
+                </div>
+
+                <div class="candidate-details">
+                  <div class="name-row">
+                    <span class="candidate-name">{{ c.prenom }} {{ c.nom }}</span>
+                    @if (c.winner && !c.autoSelected) {
+                      <span class="winner-badge">Élu(e)</span>
+                    }
+                    @if (c.autoSelected) {
+                      <span class="auto-selected-badge">Auto-sélectionné(e)</span>
+                    }
+                  </div>
+                  @if (c.description) {
+                    <p class="candidate-desc">{{ c.description }}</p>
+                  }
+                  <div class="progress-row">
+                    <div class="progress-track">
+                      <div class="progress-fill" [style.width.%]="c.votePercentage"
+                           [class.progress-fill--winner]="c.winner"></div>
+                    </div>
+                    <span class="vote-stats">{{ c.voteCount }} vote(s) — {{ c.votePercentage | number:'1.0-0' }}%</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

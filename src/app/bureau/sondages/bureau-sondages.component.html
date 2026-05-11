@@ -1,0 +1,139 @@
+@if (toast(); as t) {
+  <div class="page-toast" [class.page-toast--error]="t.type === 'error'" role="alert">
+    @if (t.type === 'success') {
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    } @else {
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    }
+    {{ t.msg }}
+  </div>
+}
+
+<div class="sondages-page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Sondages</h1>
+      <p class="page-sub">{{ sondages().length }} sondage(s) au total</p>
+    </div>
+    <button class="btn-add" (click)="goToCreate()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Créer un sondage
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement des sondages…</p>
+    </div>
+  } @else if (sondages().length === 0) {
+    <div class="empty-state">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
+      </svg>
+      <p class="empty-title">Aucun sondage pour l'instant</p>
+      <p class="empty-sub">Créez votre premier sondage pour recueillir les avis des membres.</p>
+      <button class="btn-add-sm" (click)="goToCreate()">+ Créer un sondage</button>
+    </div>
+  } @else {
+    <div class="sondages-grid">
+      @for (s of sondages(); track s.id) {
+        <div class="sondage-card" (click)="openDetail(s)" role="button" tabindex="0"
+             (keydown.enter)="openDetail(s)" (keydown.space)="openDetail(s)">
+
+          <div class="card-top">
+            <span class="status-badge status-badge--{{ s.statut.toLowerCase() }}">
+              {{ statusLabel(s.statut) }}
+            </span>
+            <span class="total-votes">{{ totalVotes(s) }} vote(s)</span>
+          </div>
+
+          <h2 class="sondage-title">{{ s.titre }}</h2>
+
+          <div class="options-list">
+            @for (opt of s.options; track opt.id) {
+              <div class="option-item">
+                <div class="option-header">
+                  <span class="option-label">{{ opt.titre }}</span>
+                  <span class="option-votes">{{ optionPercent(opt.voteCount, totalVotes(s)) }}%</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" [style.width.%]="optionPercent(opt.voteCount, totalVotes(s))"></div>
+                </div>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- Detail side panel -->
+@if (showDetail() && selectedSondage(); as s) {
+  <div class="dp-overlay" (click)="closeDetail()"></div>
+  <div class="dp-panel" role="dialog" aria-modal="true">
+
+    <div class="dp-head">
+      <span class="status-badge status-badge--{{ s.statut.toLowerCase() }}">{{ statusLabel(s.statut) }}</span>
+      <button class="dp-close" (click)="closeDetail()" aria-label="Fermer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="dp-body">
+      <h2 class="dp-title">{{ s.titre }}</h2>
+      @if (s.description) { <p class="dp-desc">{{ s.description }}</p> }
+
+      <div class="dp-sep"></div>
+
+      <p class="dp-votes-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+        {{ totalVotes(s) }} vote(s) au total
+      </p>
+
+      <div class="dp-options">
+        @for (opt of s.options; track opt.id) {
+          <div class="dp-option">
+            <div class="dp-option-header">
+              <span class="dp-option-name">{{ opt.titre }}</span>
+              <span class="dp-option-pct">{{ opt.voteCount }} ({{ optionPercent(opt.voteCount, totalVotes(s)) }}%)</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" [style.width.%]="optionPercent(opt.voteCount, totalVotes(s))"></div>
+            </div>
+            @if (opt.description) {
+              <p class="dp-option-desc">{{ opt.description }}</p>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="dp-footer">
+      <button class="dp-btn dp-ghost" (click)="closeDetail()">Fermer</button>
+      @if (s.statut === 'DRAFT') {
+        <button class="dp-btn dp-primary" (click)="publish(s.id)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Publier
+        </button>
+      }
+      @if (s.statut === 'ACTIVE') {
+        <button class="dp-btn dp-outline" (click)="close(s.id)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          Résultats
+        </button>
+      }
+      <button class="dp-btn dp-danger" (click)="delete(s.id)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        Supprimer
+      </button>
+    </div>
+
+  </div>
+}

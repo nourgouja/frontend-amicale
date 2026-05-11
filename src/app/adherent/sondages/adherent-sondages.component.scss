@@ -1,0 +1,180 @@
+@use '../../../styles/variables' as *;
+
+.page-toast {
+  position: fixed; top: $space-5; right: $space-5; z-index: 2000;
+  display: flex; align-items: center; gap: $space-2;
+  padding: 12px $space-5; border-radius: $radius-md;
+  font-size: $font-size-sm; font-weight: 600; box-shadow: $shadow-dropdown;
+  background: $color-primary; color: #fff;
+  animation: slideIn 0.2s ease;
+  @include reduced-motion { animation: none; }
+  &--error { background: $color-error; }
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+.sondages-page { display: flex; flex-direction: column; gap: $space-6; max-width: 760px; }
+
+.page-head { }
+.page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; }
+.page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin-top: 2px; }
+
+/* ── Tabs ── */
+.tabs { display: flex; gap: $space-1; background: $color-bg; border-radius: $radius-md; padding: 3px; width: fit-content; }
+
+.tab-btn {
+  display: inline-flex; align-items: center; gap: $space-2;
+  padding: 7px $space-5; border-radius: calc(#{$radius-md} - 2px); border: none; background: none;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 500; color: $color-text-muted;
+  cursor: pointer; transition: background $transition-fast, color $transition-fast;
+  &.active { background: $color-surface; color: $color-primary; font-weight: 600; box-shadow: $shadow-card; }
+  &:hover:not(.active) { color: $color-text; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.tab-count {
+  background: $color-primary; color: #fff;
+  border-radius: $radius-full; font-size: $font-size-xs; font-weight: 700;
+  padding: 1px 7px; line-height: 1.5;
+}
+
+/* ── States ── */
+.loading-state, .empty-state {
+  @include flex-center; flex-direction: column; gap: $space-4; padding: 80px $space-4; color: $color-text-muted;
+}
+.spinner {
+  width: 34px; height: 34px; border: 3px solid $color-border; border-top-color: $color-primary;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  @include reduced-motion { animation: none; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-title { font-size: $font-size-lg; font-weight: 700; color: $color-text; text-align: center; }
+.empty-sub   { font-size: $font-size-sm; text-align: center; max-width: 320px; }
+
+/* ── Cards ── */
+.sondages-list { display: flex; flex-direction: column; gap: $space-5; }
+
+.sondage-card { @include card; padding: $space-6; display: flex; flex-direction: column; gap: $space-4; }
+
+.card-badge {
+  display: inline-flex; align-items: center; height: 22px; padding: 0 10px;
+  border-radius: $radius-full; font-size: $font-size-xs; font-weight: 700; width: fit-content;
+  &--active { background: #dcfce7; color: #166534; }
+  &--closed { background: #dbeafe; color: #1e40af; }
+}
+
+.card-title { font-size: $font-size-lg; font-weight: 700; color: $color-text; line-height: 1.35; }
+.card-desc  { font-size: $font-size-sm; color: $color-text-muted; line-height: 1.55; }
+
+/* ── Vote options ── */
+.vote-prompt { font-size: $font-size-sm; font-weight: 600; color: $color-text-muted; }
+
+.options-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: $space-4;
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.option-vote-card {
+  display: flex; flex-direction: column; gap: 0;
+  border: 2px solid $color-border; border-radius: $radius-lg;
+  background: $color-surface; cursor: pointer; text-align: left;
+  transition: border-color $transition-fast, box-shadow $transition-fast, transform $transition-fast;
+  overflow: hidden; font-family: $font-base;
+  &:hover {
+    border-color: $color-primary;
+    box-shadow: 0 6px 20px rgba(2,102,84,0.12);
+    transform: translateY(-2px);
+  }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; &:hover { transform: none; } }
+}
+
+.option-img {
+  width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
+}
+
+.option-img-placeholder {
+  width: 100%; aspect-ratio: 16/9; background: #f9fafb;
+  @include flex-center;
+}
+
+.option-info {
+  display: flex; flex-direction: column; gap: 4px; padding: $space-3 $space-4;
+}
+
+.option-titre { font-size: $font-size-base; font-weight: 700; color: $color-text; }
+.option-desc  { font-size: $font-size-xs; color: $color-text-muted; line-height: 1.4; }
+
+.option-vote-indicator {
+  display: flex; align-items: center; gap: $space-2; justify-content: center;
+  padding: 10px $space-4; background: $color-primary-light; color: $color-primary;
+  font-size: $font-size-sm; font-weight: 600;
+  margin-top: auto;
+}
+
+/* ── Voted confirmation ── */
+.voted-confirm {
+  display: flex; align-items: flex-start; gap: $space-3;
+  padding: $space-4; border-radius: $radius-md;
+  background: $color-primary-light; border: 1px solid rgba(2,102,84,0.18);
+}
+.voted-confirm-icon {
+  width: 36px; height: 36px; border-radius: 50%; background: $color-primary;
+  color: #fff; @include flex-center; flex-shrink: 0;
+}
+.voted-confirm-title { font-size: $font-size-base; font-weight: 700; color: $color-text; }
+.voted-confirm-sub   { font-size: $font-size-sm; color: $color-text-muted; margin-top: 2px; line-height: 1.5; }
+
+/* ── Results ── */
+.results-list { display: flex; flex-direction: column; gap: $space-4; }
+
+.result-item {
+  display: flex; flex-direction: column;
+  border-radius: $radius-md; overflow: hidden;
+  border: 1px solid $color-border; background: #fafafa;
+  transition: border-color $transition-fast;
+  &--voted { border-color: $color-primary; background: $color-primary-light; }
+  @include reduced-motion { transition: none; }
+}
+
+.result-opt-img {
+  width: 100%; aspect-ratio: 16/7; object-fit: cover; display: block;
+}
+.result-opt-placeholder {
+  width: 100%; aspect-ratio: 16/7; background: #f3f4f6; @include flex-center;
+}
+
+.result-content {
+  display: flex; flex-direction: column; gap: 6px; padding: $space-3 $space-4;
+}
+
+.result-header {
+  display: flex; align-items: center; justify-content: space-between; gap: $space-2; flex-wrap: wrap;
+}
+
+.result-name {
+  display: flex; align-items: center; gap: $space-2;
+  font-size: $font-size-base; font-weight: 600; color: $color-text;
+}
+
+.result-pct { font-size: $font-size-sm; color: $color-text-muted; white-space: nowrap; }
+
+.your-vote {
+  font-size: $font-size-xs; font-weight: 600; color: $color-primary;
+  background: $color-primary-light; border-radius: $radius-full; padding: 1px 8px;
+}
+
+.progress-track {
+  width: 100%; height: 7px; background: rgba(0,0,0,0.07); border-radius: $radius-full; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: $color-primary; border-radius: $radius-full;
+  transition: width 0.5s ease;
+  @include reduced-motion { transition: none; }
+}
+
+.opt-desc-sm { font-size: $font-size-xs; color: $color-text-muted; margin-top: 2px; }
+
+.total-votes-label {
+  font-size: $font-size-xs; color: $color-text-muted; font-weight: 500; text-align: right;
+}
