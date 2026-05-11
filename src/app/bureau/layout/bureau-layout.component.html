@@ -5,10 +5,10 @@
       <img src="logo.png" alt="AmicaleStar" class="sidebar-logo" />
     </div>
 
-    <div class="sidebar-area-label">  </div>
+    <div class="spacer"></div>
 
     <nav class="sidebar-nav" aria-label="Navigation bureau">
-      @for (item of navItems; track item.route) {
+      @for (item of navItems(); track item.route) {
         <a [routerLink]="item.route" routerLinkActive="active" class="nav-item">
           <lucide-icon [name]="item.icon" [size]="17" class="nav-icon"></lucide-icon>
           <span>{{ item.label }}</span>
@@ -26,7 +26,7 @@
       }
       <div class="sidebar-info">
         <span class="sidebar-name">{{ displayName() }}</span>
-        <span class="sidebar-role">Membre Bureau</span>
+        <span class="sidebar-role">{{ posteLabel() }}</span>
       </div>
     </div>
   </aside>

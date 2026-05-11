@@ -1,23 +1,56 @@
 @use '../../../styles/variables' as *;
 
-.adherent-offres { display: flex; flex-direction: column; gap: $space-6; }
-
-.page-head { }
-.page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; }
-.page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin-top: 2px; }
-
-.filters-bar {
-  display: flex; align-items: center; justify-content: space-between; gap: $space-4; flex-wrap: wrap;
+/* ── Page wrapper ── */
+.catalogue-page {
+  display: flex; flex-direction: column; gap: $space-6;
 }
 
-.tabs { display: flex; gap: $space-1; background: $color-bg; border-radius: $radius-md; padding: 3px; }
+/* ── Header ── */
+.page-head {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: $space-4; flex-wrap: wrap;
+}
+.page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; margin: 0 0 2px; }
+.page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin: 0; }
 
-.tab-btn {
-  padding: 6px $space-4; border-radius: calc(#{$radius-md} - 2px); border: none; background: none;
+.result-count {
+  font-size: $font-size-sm; font-weight: 600; color: $color-text-muted;
+  background: $color-bg; border: 1px solid $color-border;
+  padding: 4px 12px; border-radius: $radius-full;
+}
+
+/* ── Filters bar ── */
+.filters-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: $space-4; flex-wrap: wrap;
+}
+
+.type-tabs { display: flex; flex-wrap: wrap; gap: $space-2; }
+
+.type-tab {
+  padding: 7px 18px; border-radius: $radius-full; border: 1.5px solid $color-border;
+  background: $color-surface; font-family: $font-base; font-size: $font-size-sm;
+  font-weight: 500; color: $color-text-muted; cursor: pointer; transition: all $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; }
+  &.active { background: $color-primary; color: #fff; border-color: $color-primary; font-weight: 600; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+.bar-right {
+  display: flex; align-items: center; gap: $space-3; flex-wrap: wrap;
+}
+
+.statut-tabs {
+  display: flex; background: $color-bg; border-radius: $radius-md; padding: 3px; gap: 2px;
+}
+
+.statut-tab {
+  padding: 5px 14px; border-radius: calc(#{$radius-md} - 2px); border: none; background: none;
   font-family: $font-base; font-size: $font-size-sm; font-weight: 500; color: $color-text-muted;
   cursor: pointer; transition: background $transition-fast, color $transition-fast;
   &.active { background: $color-surface; color: $color-primary; font-weight: 600; box-shadow: $shadow-card; }
   &:hover:not(.active) { color: $color-text; }
+  &:focus-visible { @include focus-ring; }
   @include reduced-motion { transition: none; }
 }
 
@@ -25,31 +58,129 @@
   display: flex; align-items: center; gap: $space-2;
   background: $color-surface; border: 1px solid $color-border; border-radius: $radius-md;
   padding: 0 $space-3; height: 38px;
-  .search-icon { color: $color-text-muted; flex-shrink: 0; }
+  svg { color: $color-text-muted; flex-shrink: 0; }
+  &:focus-within { border-color: $color-primary; }
 }
 
 .search-input {
   border: none; background: none; outline: none;
-  font-family: $font-base; font-size: $font-size-sm; color: $color-text; width: 180px;
+  font-family: $font-base; font-size: $font-size-sm; color: $color-text; width: 190px;
   &::placeholder { color: $color-text-muted; }
 }
 
-.offres-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: $space-5;
-  @include tablet { grid-template-columns: repeat(2, 1fr); }
-  @include mobile { grid-template-columns: 1fr; }
+/* ── Offers grid ── */
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: $space-5;
 }
 
-.loading-state, .empty-state {
+/* ── Prop card ── */
+.prop-card {
+  background: $color-surface; border-radius: 18px;
+  box-shadow: $shadow-card; border: 1px solid $color-border;
+  overflow: hidden; cursor: pointer;
+  transition: transform $transition-base, box-shadow $transition-base;
+  &:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.13); }
+  @include reduced-motion { transition: none; &:hover { transform: none; } }
+}
+
+.prop-card--fermee { opacity: 0.72; }
+
+.prop-img-wrap {
+  position: relative; height: 195px; background: #e5e7eb; overflow: hidden;
+}
+
+.fermee-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.32);
+  display: flex; align-items: center; justify-content: center; z-index: 2;
+}
+.fermee-badge {
+  background: rgba(0,0,0,0.65); color: #fff;
+  padding: 6px 18px; border-radius: $radius-full;
+  font-size: $font-size-sm; font-weight: 700; text-transform: uppercase;
+}
+.prop-img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform $transition-slow;
+  .prop-card:hover & { transform: scale(1.04); }
+  @include reduced-motion { transition: none; }
+}
+.prop-img-placeholder {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.type-chip {
+  background: rgba(255,255,255,.22); color: #fff;
+  padding: 6px 16px; border-radius: $radius-full;
+  font-size: $font-size-sm; font-weight: 600;
+}
+.type-label-badge {
+  position: absolute; bottom: $space-2; left: $space-2; z-index: 2;
+  background: rgba(0,0,0,0.55); color: #fff; backdrop-filter: blur(4px);
+  padding: 3px 10px; border-radius: $radius-full;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+}
+.prop-arrow {
+  position: absolute; top: $space-3; right: $space-3;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,.9); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: $color-text; text-decoration: none;
+  transition: background $transition-fast, transform $transition-fast;
+  &:hover { background: #fff; transform: scale(1.08); }
+  @include reduced-motion { transition: none; }
+}
+.prop-info { padding: $space-4; }
+.prop-location {
+  display: flex; align-items: center; gap: 5px; margin-bottom: 5px;
+  span { font-size: 11px; color: $color-text-muted; }
+}
+.prop-title {
+  font-size: $font-size-base; font-weight: 700; color: $color-text;
+  margin-bottom: $space-3; line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.prop-footer { display: flex; align-items: center; justify-content: space-between; gap: $space-2; }
+.prop-host   { display: flex; align-items: center; gap: $space-2; }
+.host-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: $color-primary-light; color: $color-primary;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.host-name  { font-size: 11px; font-weight: 600; color: $color-text; }
+.prop-price { font-size: $font-size-md; font-weight: 700; color: $color-text; white-space: nowrap; }
+
+/* ── Skeleton ── */
+.offer-skeleton {
+  height: 300px; border-radius: 18px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s infinite;
+  @include reduced-motion { animation: none; background: #f0f0f0; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Empty state ── */
+.empty-state {
   display: flex; flex-direction: column; align-items: center; gap: $space-3;
-  padding: $space-8 $space-4; color: $color-text-muted; font-size: $font-size-sm; text-align: center;
+  padding: $space-8 $space-4; color: $color-text-muted;
+  p { font-size: $font-size-sm; }
 }
 
-.spinner {
-  width: 32px; height: 32px; border-radius: 50%;
-  border: 3px solid $color-border; border-top-color: $color-primary;
-  animation: spin 0.7s linear infinite;
-  @include reduced-motion { animation: none; opacity: 0.5; }
+.reset-btn {
+  padding: 8px $space-5; border-radius: $radius-md;
+  border: 1.5px solid $color-border; background: $color-surface;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600; color: $color-text;
+  cursor: pointer; transition: all $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
 }
-
-@keyframes spin { to { transform: rotate(360deg); } }

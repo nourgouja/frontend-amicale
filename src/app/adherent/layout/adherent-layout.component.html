@@ -18,8 +18,8 @@
     <div class="sidebar-spacer"></div>
 
     <div class="sidebar-footer">
-      @if (authService.photoUrl?.()) {
-        <img [src]="authService.photoUrl!()" class="sidebar-avatar sidebar-avatar--img" alt="Photo" />
+      @if (authService.photoUrl()) {
+        <img [src]="authService.photoUrl()!" class="sidebar-avatar sidebar-avatar--img" alt="Photo" />
       } @else {
         <div class="sidebar-avatar">{{ initials() }}</div>
       }

@@ -1,39 +1,116 @@
-<div class="adherent-offres">
+<div class="catalogue-page">
 
+  <!-- Page header -->
   <div class="page-head">
-    <h1 class="page-title">Offres disponibles</h1>
-    <p class="page-sub">Découvrez et inscrivez-vous aux activités de l'association</p>
+    <div>
+      <h1 class="page-title">Catalogue</h1>
+      <p class="page-sub">Découvrez toutes les activités de l'association</p>
+    </div>
+    @if (!loading()) {
+      <span class="result-count">{{ filtered().length }} résultat(s)</span>
+    }
   </div>
 
+  <!-- Filters bar -->
   <div class="filters-bar">
-    <div class="tabs">
-      @for (tab of tabs; track tab.key) {
-        <button class="tab-btn" [class.active]="activeTab() === tab.key" (click)="activeTab.set(tab.key)">
-          {{ tab.label }}
+    <!-- Type pills -->
+    <div class="type-tabs">
+      @for (f of typeFilters; track f.value) {
+        <button class="type-tab" [class.active]="activeFilter() === f.value"
+                (click)="activeFilter.set(f.value)" type="button">
+          {{ f.label }}
         </button>
       }
     </div>
-    <div class="search-wrap">
-      <lucide-icon name="search" [size]="15" class="search-icon"></lucide-icon>
-      <input type="search" class="search-input" placeholder="Rechercher…"
-             [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
+
+    <!-- Right: statut tabs + search -->
+    <div class="bar-right">
+      <div class="statut-tabs">
+        @for (s of statutFilters; track s.value) {
+          <button class="statut-tab" [class.active]="activeStatut() === s.value"
+                  (click)="activeStatut.set(s.value)" type="button">
+            {{ s.label }}
+          </button>
+        }
+      </div>
+
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="search" class="search-input" placeholder="Rechercher…"
+               [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
+      </div>
     </div>
   </div>
 
+  <!-- Loading skeletons -->
   @if (loading()) {
-    <div class="loading-state"><div class="spinner"></div><p>Chargement des offres…</p></div>
+    <div class="offers-grid">
+      @for (i of [1,2,3,4,5,6]; track i) { <div class="offer-skeleton"></div> }
+    </div>
+
+  <!-- Empty state -->
   } @else if (filtered().length === 0) {
     <div class="empty-state">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-        <line x1="7" y1="7" x2="7.01" y2="7"/>
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
-      <p>Aucune offre disponible pour le moment</p>
+      <p>Aucune offre ne correspond à votre recherche.</p>
+      <button class="reset-btn" (click)="resetFilters()">Réinitialiser les filtres</button>
     </div>
+
+  <!-- Grid -->
   } @else {
-    <div class="offres-grid">
-      @for (offre of filtered(); track offre.id) {
-        <app-offer-card [offre]="offre" mode="adherent" />
+    <div class="offers-grid">
+      @for (o of filtered(); track o.id) {
+        <div class="prop-card" [class.prop-card--fermee]="o.statutOffre !== 'OUVERTE'"
+             [routerLink]="['/adherent/offres', o.id]">
+
+          <div class="prop-img-wrap">
+            @if (coverUrl(o)) {
+              <img [src]="coverUrl(o)!" [alt]="o.titre" class="prop-img" />
+            } @else {
+              <div class="prop-img-placeholder">
+                <span class="type-chip">{{ typeLabel(o.typeOffre) }}</span>
+              </div>
+            }
+
+            @if (o.statutOffre !== 'OUVERTE') {
+              <div class="fermee-overlay"><span class="fermee-badge">Fermée</span></div>
+            }
+
+            <span class="type-label-badge">{{ typeLabel(o.typeOffre) }}</span>
+
+            <a class="prop-arrow" [routerLink]="['/adherent/offres', o.id]"
+               (click)="$event.stopPropagation()" aria-label="Voir l'offre">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+              </svg>
+            </a>
+          </div>
+
+          <div class="prop-info">
+            <div class="prop-location">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#26d07c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>{{ o.lieu || 'Tunisie' }}</span>
+            </div>
+            <h3 class="prop-title">{{ o.titre }}</h3>
+            <div class="prop-footer">
+              <div class="prop-host">
+                <div class="host-avatar">A</div>
+                <span class="host-name">Amicale STAR</span>
+              </div>
+              <span class="prop-price">
+                @if (o.prixParPersonne) { {{ o.prixParPersonne | number:'1.0-0' }} DT }
+                @else { Gratuit }
+              </span>
+            </div>
+          </div>
+
+        </div>
       }
     </div>
   }

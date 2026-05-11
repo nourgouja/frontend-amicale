@@ -15,11 +15,16 @@ interface Offre {
 
 interface MembreBureau {
   id: number; nom: string; prenom: string; poste: string | null; poleNom: string | null;
+  photoBase64?: string | null; photoType?: string | null;
 }
 
 const TYPE_LABELS: Record<string, string> = {
   VOYAGE: 'Voyage', SEJOUR: 'Séjour', ACTIVITE: 'Activité',
   CONVENTION: 'Convention', EVENEMENT: 'Événement',
+};
+
+const POSTE_ORDER: Record<string, number> = {
+  PRESIDENT: 0, TRESORIER: 1, SECRETAIRE: 2, RESPONSABLE_POLE: 3,
 };
 
 @Component({
@@ -35,7 +40,6 @@ export class AdherentDashboardComponent implements OnInit {
 
   offres       = signal<Offre[]>([]);
   membres      = signal<MembreBureau[]>([]);
-  searchQuery  = signal('');
   activeFilter = signal('');
   loading      = signal(true);
 
@@ -47,27 +51,30 @@ export class AdherentDashboardComponent implements OnInit {
 
   readonly filters = [
     { value: '', label: 'Tout' },
-    { value: 'VOYAGE',   label: 'Voyage' },
-    { value: 'SEJOUR',   label: 'Séjour' },
-    { value: 'ACTIVITE', label: 'Activité' },
+    { value: 'VOYAGE',    label: 'Voyage' },
+    { value: 'SEJOUR',    label: 'Séjour' },
+    { value: 'ACTIVITE',  label: 'Activité' },
     { value: 'EVENEMENT', label: 'Événement' },
   ];
 
-  /** Regular offers — conventions excluded */
-  filteredOffres = computed(() => {
+  allActivites = computed(() =>
+    this.offres().filter(o => o.typeOffre !== 'CONVENTION')
+  );
+
+  filteredActivites = computed(() => {
     const type = this.activeFilter();
-    const q    = this.searchQuery().toLowerCase().trim();
-    return this.offres().filter(o => {
-      if (o.typeOffre === 'CONVENTION') return false;
-      const matchType  = !type || o.typeOffre === type;
-      const matchQuery = !q || o.titre.toLowerCase().includes(q) || (o.description ?? '').toLowerCase().includes(q);
-      return matchType && matchQuery;
-    });
+    const list = this.allActivites();
+    return type ? list.filter(o => o.typeOffre === type) : list;
   });
 
-  /** Convention/partner offers — separate section */
-  conventions = computed(() =>
-    this.offres().filter(o => o.typeOffre === 'CONVENTION')
+  recentActivites = computed(() => this.filteredActivites().slice(0, 6));
+
+  conventions = computed(() => this.offres().filter(o => o.typeOffre === 'CONVENTION').slice(0, 4));
+
+  sortedMembres = computed(() =>
+    [...this.membres()].sort((a, b) =>
+      (POSTE_ORDER[a.poste ?? ''] ?? 99) - (POSTE_ORDER[b.poste ?? ''] ?? 99)
+    )
   );
 
   ngOnInit(): void {
@@ -87,6 +94,10 @@ export class AdherentDashboardComponent implements OnInit {
 
   coverUrl(o: Offre): string | null {
     return o.imageBase64 && o.imageType ? `data:${o.imageType};base64,${o.imageBase64}` : null;
+  }
+
+  memberPhotoUrl(m: MembreBureau): string | null {
+    return m.photoBase64 && m.photoType ? `data:${m.photoType};base64,${m.photoBase64}` : null;
   }
 
   typeLabel(type: string): string { return TYPE_LABELS[type] ?? type; }
