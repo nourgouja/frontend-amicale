@@ -11,12 +11,8 @@
     <!-- Table des offres -->
     <div class="offres-table-wrap">
       <div class="offres-toolbar">
-        <div class="toolbar-left">
-          <a class="toolbar-back" routerLink="/bureau/offres">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Offres
-          </a>
-        </div>
+        <span class="toolbar-title">Offres récentes</span>
+        <a class="toolbar-link" routerLink="/bureau/offres">Voir toutes les offres →</a>
       </div>
 
       @if (loading()) {
@@ -44,40 +40,52 @@
               <tr [class.selected]="selectedOffre()?.id === offre.id" (click)="openDetail(offre)">
                 <td>
                   <div class="offre-cell">
-                    <div class="offre-avatar offre-avatar--{{ offre.statutOffre.toLowerCase() }}">
-                      @if (getOffreImage(offre); as src) {
-                        <img [src]="src" [alt]="offre.titre" class="offre-avatar-img" />
-                      } @else {
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>
-                        </svg>
-                      }
-                    </div>
+                    @if (getOffreImage(offre); as src) {
+                      <img [src]="src" [alt]="offre.titre" class="offre-thumb" />
+                    } @else {
+                      <div class="offre-thumb-fallback" [style.background]="typeColor(offre.typeOffre)"></div>
+                    }
                     <span class="offre-titre">{{ offre.titre }}</span>
                   </div>
                 </td>
                 <td>
-                  <span class="type-chip" [style.background]="typeColor(offre.typeOffre) + '18'" [style.color]="typeColor(offre.typeOffre)">
+                  <span class="type-pill" [style.background]="typeColor(offre.typeOffre)">
                     {{ typeLabel(offre.typeOffre) }}
                   </span>
                 </td>
-                <td><app-status-badge [statut]="offre.statutOffre" type="offre" /></td>
+                <td>
+                  <span class="statut-pill"
+                    [class.statut--open]="offre.statutOffre === 'OUVERTE'"
+                    [class.statut--draft]="offre.statutOffre === 'BROUILLON'"
+                    [class.statut--closed]="offre.statutOffre === 'FERMEE'"
+                    [class.statut--archived]="offre.statutOffre === 'ARCHIVEE'">
+                    @switch (offre.statutOffre) {
+                      @case ('OUVERTE')   { Ouverte }
+                      @case ('BROUILLON') { Brouillon }
+                      @case ('FERMEE')    { Fermée }
+                      @case ('ARCHIVEE')  { Archivée }
+                      @default            { {{ offre.statutOffre }} }
+                    }
+                  </span>
+                </td>
                 <td class="td-num">{{ inscrits(offre) }}</td>
                 <td class="td-num">{{ offre.placesRestantes ?? '—' }}</td>
                 <td class="td-actions" (click)="$event.stopPropagation()">
-                  <a class="row-btn row-btn--edit" [routerLink]="['/bureau/offres', offre.id, 'edit']">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                    </svg>
-                  </a>
-                  @if (offre.statutOffre !== 'ARCHIVEE' && offre.statutOffre !== 'ANNULEE') {
-                    <button class="row-btn row-btn--archive" (click)="archiver(offre.id)">
+                  <div class="row-actions">
+                    <a class="btn-row-edit" [routerLink]="['/bureau/offres', offre.id, 'edit']" title="Modifier">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                       </svg>
-                    </button>
-                  }
+                    </a>
+                    @if (offre.statutOffre !== 'ARCHIVEE' && offre.statutOffre !== 'ANNULEE') {
+                      <button class="btn-row-archive" (click)="archiver(offre.id)" title="Archiver">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+                        </svg>
+                      </button>
+                    }
+                  </div>
                 </td>
               </tr>
             } @empty {
@@ -88,7 +96,6 @@
 
         <div class="table-footer">
           <span class="footer-count">{{ recentOffres().length }} offre(s)</span>
-          <a class="footer-link" routerLink="/bureau/offres">Voir toutes les offres →</a>
         </div>
       }
     </div>

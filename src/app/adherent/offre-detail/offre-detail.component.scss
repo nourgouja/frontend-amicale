@@ -4,15 +4,13 @@
 .offre-detail {
   display: flex;
   flex-direction: column;
-  gap: $space-5;
-  max-width: 920px;
+  gap: $space-4;
+  max-width: 1020px;
   margin: 0 auto;
   padding-bottom: $space-8;
 }
 
-// ─── Top bar ──────────────────────────────────────────────────────────────────
-.top-bar { display: flex; align-items: center; }
-
+// ─── Back link ────────────────────────────────────────────────────────────────
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -21,35 +19,42 @@
   font-weight: 600;
   color: $color-text-muted;
   text-decoration: none;
+  width: fit-content;
   transition: color $transition-fast;
-
   &:hover { color: $color-primary; }
   @include reduced-motion { transition: none; }
 }
 
-// ─── Hero gallery ─────────────────────────────────────────────────────────────
-.hero-gallery {
+// ─── Two-column grid ──────────────────────────────────────────────────────────
+.detail-grid {
   display: grid;
-  grid-template-columns: 1fr 140px;
-  gap: $space-3;
-  height: 300px;
+  grid-template-columns: 1fr 300px;
+  gap: $space-6;
+  align-items: start;
 
-  &--single { grid-template-columns: 1fr; }
-
-  @include mobile { grid-template-columns: 1fr; height: auto; }
+  @include mobile { grid-template-columns: 1fr; }
 }
 
+// ─── Left column ──────────────────────────────────────────────────────────────
+.detail-left {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+}
+
+// ─── Hero image ───────────────────────────────────────────────────────────────
 .hero-main {
   position: relative;
   border-radius: $radius-xl;
   overflow: hidden;
   background: $color-bg;
   border: 1px solid $color-border;
+  height: 320px;
 
-  @include mobile { aspect-ratio: 16/9; }
+  @include mobile { height: auto; aspect-ratio: 16/9; }
 }
 
-.hero-img   { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-img        { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .hero-placeholder {
   width: 100%; height: 100%;
@@ -76,29 +81,12 @@
   backdrop-filter: blur(4px);
 }
 
-.hero-thumbs {
-  display: flex; flex-direction: column; gap: $space-2;
-  @include mobile { display: none; }
-}
-
-.thumb {
-  flex: 1;
-  border-radius: $radius-md;
-  border: 1px solid $color-border;
-
-  &--1 { background: linear-gradient(135deg, #3b82f6 0%, #93c5fd 100%); }
-  &--2 { background: linear-gradient(135deg, #10b981 0%, #6ee7b7 100%); }
-  &--3 { background: linear-gradient(135deg, #f59e0b 0%, #fcd34d 100%); }
-}
-
-// ─── Offer header ─────────────────────────────────────────────────────────────
+// ─── Offer header (title + star + meta) ───────────────────────────────────────
 .offer-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: $space-4;
-  padding-bottom: $space-4;
-  border-bottom: 1px solid $color-border;
 }
 
 .offer-header-text {
@@ -113,15 +101,18 @@
   margin: 0;
 }
 
-.offer-location,
-.offer-dates {
+.offer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+}
+
+.offer-meta-item {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: $font-size-sm;
   color: $color-text-muted;
-  margin: 0;
-
   svg { flex-shrink: 0; }
 }
 
@@ -141,23 +132,39 @@
   @include reduced-motion { transition: none; }
 }
 
-// ─── Main layout grid ─────────────────────────────────────────────────────────
-.apercu-grid {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: $space-6;
-  align-items: start;
-
-  @include mobile { grid-template-columns: 1fr; }
+// ─── Supplementary image cards ────────────────────────────────────────────────
+.extra-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
 }
 
-.apercu-left {
-  display: flex; flex-direction: column; gap: $space-5;
+.extra-img-card {
+  width: 100px;
+  height: 72px;
+  border-radius: $radius-md;
+  overflow: hidden;
+  border: 2.5px solid $color-border;
+  padding: 0;
+  cursor: pointer;
+  background: #d6cfc7;
+  transition: border-color $transition-fast, transform $transition-fast;
+
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  &:hover { border-color: $color-primary; transform: scale(1.04); }
+
+  &--active {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 2px rgba(2,102,84,0.2);
+  }
+
+  @include reduced-motion { transition: none; &:hover { transform: none; } }
 }
 
-.apercu-right {
-  display: flex; flex-direction: column; gap: $space-4;
-}
+// ─── Section blocks ───────────────────────────────────────────────────────────
+.section-block { display: flex; flex-direction: column; gap: $space-3; }
+.section-title { font-size: $font-size-base; font-weight: 700; color: $color-text; margin: 0; }
 
 // ─── Description ──────────────────────────────────────────────────────────────
 .desc-text {
@@ -165,41 +172,11 @@
   color: $color-text-muted;
   line-height: 1.8;
   margin: 0;
-
   &--muted { font-style: italic; }
 }
 
-// ─── Section blocks ───────────────────────────────────────────────────────────
-.section-block { display: flex; flex-direction: column; gap: $space-3; }
-.section-title { font-size: $font-size-base; font-weight: 700; color: $color-text; margin: 0; }
-
-// ─── Pole card ────────────────────────────────────────────────────────────────
-.pole-card {
-  display: flex;
-  align-items: center;
-  gap: $space-3;
-  padding: $space-3 $space-4;
-  background: $color-bg;
-  border-radius: $radius-md;
-  border: 1px solid $color-border;
-}
-
-.pole-avatar {
-  width: 38px; height: 38px;
-  border-radius: $radius-full;
-  background: $color-primary;
-  color: #fff;
-  font-size: $font-size-md;
-  font-weight: 700;
-  @include flex-center;
-  flex-shrink: 0;
-}
-
-.pole-name { font-size: $font-size-sm; font-weight: 600; color: $color-text; }
-.pole-sub  { font-size: $font-size-xs; color: $color-text-muted; margin-top: 2px; }
-
 // ─── Avantages ────────────────────────────────────────────────────────────────
-.avantages-list { list-style: none; display: flex; flex-direction: column; gap: $space-2; }
+.avantages-list { list-style: none; display: flex; flex-direction: column; gap: $space-2; margin: 0; padding: 0; }
 
 .avantage-item {
   display: flex; align-items: flex-start; gap: $space-2;
@@ -224,104 +201,30 @@
   &:hover { opacity: 0.8; }
 }
 
-// ─── Right-column map card ────────────────────────────────────────────────────
-.right-card {
-  @include card;
-  padding: $space-4;
+// ─── Pole card ────────────────────────────────────────────────────────────────
+.pole-card {
+  display: flex; align-items: center; gap: $space-3;
+  padding: $space-3 $space-4;
+  background: $color-bg; border-radius: $radius-md; border: 1px solid $color-border;
+}
+
+.pole-avatar {
+  width: 38px; height: 38px; border-radius: $radius-full;
+  background: $color-primary; color: #fff;
+  font-size: $font-size-md; font-weight: 700;
+  @include flex-center; flex-shrink: 0;
+}
+
+.pole-name { font-size: $font-size-sm; font-weight: 600; color: $color-text; }
+.pole-sub  { font-size: $font-size-xs; color: $color-text-muted; margin-top: 2px; }
+
+// ─── Right column ─────────────────────────────────────────────────────────────
+.detail-right {
   display: flex;
   flex-direction: column;
-  gap: $space-3;
-}
-
-.map-address {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: $font-size-sm;
-  color: $color-text-muted;
-
-  svg { flex-shrink: 0; }
-}
-
-.map-preview {
-  display: block;
-  border-radius: $radius-md;
-  overflow: hidden;
-  border: 1px solid $color-border;
-  text-decoration: none;
-  transition: box-shadow $transition-base, transform $transition-base;
-
-  &:hover {
-    box-shadow: $shadow-card;
-    transform: translateY(-2px);
-    .map-open-label { color: $color-primary-dark; }
-  }
-
-  @include reduced-motion { transition: none; &:hover { transform: none; } }
-}
-
-.map-visual {
-  position: relative;
-  height: 130px;
-  background: #e8f0e9;
-  overflow: hidden;
-}
-
-.map-grid {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(2,102,84,0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(2,102,84,0.07) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-.map-road {
-  position: absolute;
-  background: rgba(255,255,255,0.55);
-  &--h { top: 50%; left: 0; right: 0; height: 9px; transform: translateY(-50%); }
-  &--v { left: 44%; top: 0; bottom: 0; width: 9px; }
-}
-
-.map-pin-wrap {
-  position: absolute; inset: 0;
-  @include flex-center;
-  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
-}
-
-.map-open-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: $space-2 $space-3;
-  font-size: $font-size-xs;
-  font-weight: 600;
-  color: $color-primary;
-  background: $color-surface;
-  transition: color $transition-fast;
-}
-
-// ─── Convention info card ─────────────────────────────────────────────────────
-.convention-card {
-  @include card;
-  padding: $space-6 $space-5;
-  display: flex; flex-direction: column; align-items: center; gap: $space-3;
-  text-align: center;
-  border-top: 3px solid $color-primary;
-}
-.convention-icon {
-  width: 56px; height: 56px; border-radius: 50%;
-  background: $color-primary-light; color: $color-primary;
-  @include flex-center;
-}
-.convention-title { font-size: $font-size-base; font-weight: 700; color: $color-text; }
-.convention-desc  { font-size: $font-size-sm; color: $color-text-muted; line-height: 1.6; }
-.convention-link {
-  display: inline-flex; align-items: center; gap: $space-2;
-  padding: 8px $space-5; border-radius: $radius-md;
-  background: $color-primary; color: #fff;
-  font-size: $font-size-sm; font-weight: 600; text-decoration: none;
-  transition: background $transition-fast;
-  &:hover { background: $color-primary-dark; }
+  gap: $space-4;
+  position: sticky;
+  top: $space-4;
 }
 
 // ─── Booking card ─────────────────────────────────────────────────────────────
@@ -339,9 +242,9 @@
   gap: 5px;
 }
 
-.booking-amount  { font-size: $font-size-2xl; font-weight: 800; color: $color-text; }
-.booking-currency { font-size: $font-size-lg; font-weight: 700; color: $color-text; }
-.booking-per     { font-size: $font-size-sm; color: $color-text-muted; margin-left: 2px; }
+.booking-amount   { font-size: $font-size-2xl; font-weight: 800; color: $color-text; }
+.booking-currency { font-size: $font-size-lg;  font-weight: 700; color: $color-text; }
+.booking-per      { font-size: $font-size-sm;  color: $color-text-muted; margin-left: 2px; }
 
 .booking-fields {
   border: 1px solid $color-border;
@@ -354,7 +257,6 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px $space-3;
-
   & + & { border-top: 1px solid $color-border; }
 }
 
@@ -370,87 +272,54 @@
   font-size: $font-size-sm;
   font-weight: 500;
   color: $color-text;
-
   &--low  { color: #d97706; font-weight: 700; }
   &--full { color: $color-error; font-weight: 700; }
 }
 
-// ─── Guest / accompagnants ────────────────────────────────────────────────────
-.guest-section {
-  padding: $space-3 0;
-  border-top: 1px solid $color-border;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.guest-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.guest-label-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: $color-text-muted;
-}
-
-.guest-title {
-  font-size: $font-size-sm;
-  font-weight: 600;
-  color: $color-text;
-}
-
-.guest-ctrl {
+// ─── Inscription status ───────────────────────────────────────────────────────
+.inscribed-msg {
   display: flex;
   align-items: center;
   gap: $space-2;
+  padding: $space-3;
+  border-radius: $radius-md;
+  background: rgba(245,158,11,0.10);
+  color: #b45309;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  border: 1px solid rgba(245,158,11,0.25);
+
+  &--confirmed {
+    background: rgba(16,185,129,0.10);
+    color: #047857;
+    border-color: rgba(16,185,129,0.25);
+  }
 }
 
-.guest-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: $radius-full;
-  border: 1.5px solid $color-border;
-  background: $color-surface;
-  font-size: $font-size-base;
-  font-weight: 700;
-  cursor: pointer;
-  @include flex-center;
-  transition: border-color $transition-fast, color $transition-fast;
-
-  &:hover:not(:disabled) { border-color: $color-primary; color: $color-primary; }
-  &:disabled { opacity: 0.35; cursor: not-allowed; }
-  @include reduced-motion { transition: none; }
+// ─── Guests panel ─────────────────────────────────────────────────────────────
+.guests-panel {
+  display: flex; flex-direction: column; gap: $space-2;
+  padding: $space-3; border-radius: $radius-md;
+  border: 1px solid $color-border; background: $color-bg;
 }
 
-.guest-count {
-  font-size: $font-size-base;
-  font-weight: 700;
-  min-width: 20px;
-  text-align: center;
-  color: $color-text;
+.guests-label {
+  display: flex; align-items: center; gap: $space-1;
+  font-size: $font-size-xs; font-weight: 700; color: $color-text-muted;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  svg { flex-shrink: 0; }
 }
 
-.guest-hint {
-  font-size: $font-size-xs;
-  color: $color-text-muted;
-  margin-left: 2px;
+.guest-row-ro {
+  display: flex; align-items: center; gap: $space-2;
+  padding: $space-2 $space-1; border-radius: $radius-sm;
+  font-size: $font-size-sm;
 }
 
-.booking-total {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: $space-3;
-  border-top: 1px solid $color-border;
-}
+.guest-name { font-weight: 600; flex: 1; }
+.guest-meta { font-size: $font-size-xs; color: $color-text-muted; }
 
-.booking-total-label { font-size: $font-size-base; font-weight: 600; color: $color-text; }
-.booking-total-val   { font-size: $font-size-base; font-weight: 700; color: $color-text; }
-
+// ─── Book / cancel buttons ────────────────────────────────────────────────────
 .btn-book {
   width: 100%;
   padding: 13px;
@@ -477,35 +346,6 @@
   @include reduced-motion { transition: none; }
 }
 
-.inscribe-error {
-  display: flex;
-  align-items: flex-start;
-  gap: $space-2;
-  padding: $space-3;
-  border-radius: $radius-md;
-  background: rgba(220, 38, 38, 0.08);
-  color: $color-error;
-  font-size: $font-size-xs;
-  font-weight: 500;
-  border: 1px solid rgba(220, 38, 38, 0.2);
-  line-height: 1.5;
-
-  svg { flex-shrink: 0; margin-top: 1px; }
-}
-
-.btn-spinner {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #fff;
-  animation: spin 0.7s linear infinite;
-  vertical-align: middle;
-  margin-right: 4px;
-  @include reduced-motion { animation: none; }
-}
-
 .btn-cancel-insc {
   width: 100%;
   padding: 10px;
@@ -524,89 +364,122 @@
   @include reduced-motion { transition: none; }
 }
 
-.inscribed-msg {
+.inscribe-error {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: $space-2;
   padding: $space-3;
   border-radius: $radius-md;
-  background: rgba(16,185,129,0.10);
-  color: #047857;
-  font-size: $font-size-sm;
-  font-weight: 600;
-  border: 1px solid rgba(16,185,129,0.2);
+  background: rgba(220, 38, 38, 0.08);
+  color: $color-error;
+  font-size: $font-size-xs;
+  font-weight: 500;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  line-height: 1.5;
+  svg { flex-shrink: 0; margin-top: 1px; }
 }
 
-// ─── Guests panel ────────────────────────────────────────────────────────────
-.guests-panel {
-  display: flex; flex-direction: column; gap: $space-2;
-  padding: $space-3; border-radius: $radius-md;
-  border: 1px solid $color-border; background: $color-bg;
+.btn-spinner {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 4px;
+  @include reduced-motion { animation: none; }
 }
 
-.guests-header {
-  display: flex; align-items: center; justify-content: space-between;
+// ─── Map card ─────────────────────────────────────────────────────────────────
+.right-card {
+  @include card;
+  padding: $space-4;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
 }
 
-.guests-label {
-  display: flex; align-items: center; gap: $space-1;
-  font-size: $font-size-xs; font-weight: 700; color: $color-text-muted;
-  text-transform: uppercase; letter-spacing: 0.4px;
+.map-address {
+  display: flex; align-items: center; gap: 6px;
+  font-size: $font-size-sm; color: $color-text-muted;
   svg { flex-shrink: 0; }
 }
 
-.btn-add-guest {
-  border: none; background: none; padding: 0;
-  font-family: $font-base; font-size: $font-size-xs; font-weight: 600;
-  color: $color-primary; cursor: pointer;
-  &:hover { text-decoration: underline; }
+.map-preview {
+  display: block;
+  border-radius: $radius-md;
+  overflow: hidden;
+  border: 1px solid $color-border;
+  text-decoration: none;
+  transition: box-shadow $transition-base, transform $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-card;
+    transform: translateY(-2px);
+    .map-open-label { color: $color-primary-dark; }
+  }
+
+  @include reduced-motion { transition: none; &:hover { transform: none; } }
 }
 
-.guest-row, .guest-row-ro {
-  display: flex; align-items: center; gap: $space-2;
-  padding: $space-2 $space-1; border-radius: $radius-sm;
-  font-size: $font-size-sm;
+.map-visual {
+  position: relative; height: 130px;
+  background: #e8f0e9; overflow: hidden;
 }
 
-.guest-name { font-weight: 600; flex: 1; }
-.guest-meta { font-size: $font-size-xs; color: $color-text-muted; }
-
-.guest-del {
-  display: flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px; border-radius: $radius-sm; border: none;
-  background: transparent; color: $color-text-muted; cursor: pointer;
-  &:hover { background: rgba(239,68,68,0.10); color: $color-error; }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
+.map-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(2,102,84,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(2,102,84,0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-.guest-form { display: flex; flex-direction: column; gap: $space-2; }
-
-.guest-form-row { display: flex; gap: $space-2; }
-
-.guest-input {
-  flex: 1; height: 34px; padding: 0 $space-2;
-  border: 1px solid $color-border; border-radius: $radius-sm;
-  background: $color-surface; font-family: $font-base;
-  font-size: $font-size-sm; color: $color-text; outline: none;
-  &:focus { border-color: $color-primary; }
-  &::placeholder { color: $color-text-muted; }
+.map-road {
+  position: absolute; background: rgba(255,255,255,0.55);
+  &--h { top: 50%; left: 0; right: 0; height: 9px; transform: translateY(-50%); }
+  &--v { left: 44%; top: 0; bottom: 0; width: 9px; }
 }
 
-.guest-form-actions { display: flex; gap: $space-2; }
+.map-pin-wrap {
+  position: absolute; inset: 0;
+  @include flex-center;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
+}
 
-.btn-guest-save {
-  height: 30px; padding: 0 $space-3; border: none; border-radius: $radius-sm;
+.map-open-label {
+  display: flex; align-items: center; gap: 6px;
+  padding: $space-2 $space-3;
+  font-size: $font-size-xs; font-weight: 600; color: $color-primary;
+  background: $color-surface; transition: color $transition-fast;
+}
+
+// ─── Convention card ──────────────────────────────────────────────────────────
+.convention-card {
+  @include card;
+  padding: $space-6 $space-5;
+  display: flex; flex-direction: column; align-items: center; gap: $space-3;
+  text-align: center;
+  border-top: 3px solid $color-primary;
+}
+
+.convention-icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: $color-primary-light; color: $color-primary;
+  @include flex-center;
+}
+
+.convention-title { font-size: $font-size-base; font-weight: 700; color: $color-text; }
+.convention-desc  { font-size: $font-size-sm; color: $color-text-muted; line-height: 1.6; }
+
+.convention-link {
+  display: inline-flex; align-items: center; gap: $space-2;
+  padding: 8px $space-5; border-radius: $radius-md;
   background: $color-primary; color: #fff;
-  font-family: $font-base; font-size: $font-size-xs; font-weight: 600;
-  cursor: pointer;
-  &:disabled { opacity: 0.55; cursor: not-allowed; }
-}
-
-.btn-guest-cancel {
-  height: 30px; padding: 0 $space-3; border: 1px solid $color-border; border-radius: $radius-sm;
-  background: transparent; color: $color-text-muted;
-  font-family: $font-base; font-size: $font-size-xs; font-weight: 500;
-  cursor: pointer; &:hover { background: $color-bg; }
+  font-size: $font-size-sm; font-weight: 600; text-decoration: none;
+  transition: background $transition-fast;
+  &:hover { background: $color-primary-dark; }
 }
 
 // ─── Loading ──────────────────────────────────────────────────────────────────

@@ -22,6 +22,7 @@ interface Offre {
   prixParPersonne?: number | null;
   imageBase64?: string | null;
   imageType?: string | null;
+  description?: string | null;
 }
 
 interface Inscription {
@@ -309,6 +310,11 @@ export class ActivitesComponent implements OnInit, OnDestroy {
 
   inscritsCount(o: Offre): number {
     return Math.max(0, (o.capaciteMax ?? 0) - (o.placesRestantes ?? 0));
+  }
+
+  offreImage(o: Offre): string | null {
+    if (!o.imageBase64 || !o.imageType) return null;
+    return `data:${o.imageType};base64,${o.imageBase64}`;
   }
 
   private updateInsStatut(id: number, statut: string): void {

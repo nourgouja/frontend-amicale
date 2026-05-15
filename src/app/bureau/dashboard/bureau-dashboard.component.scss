@@ -132,13 +132,13 @@
   background: $color-surface;
 }
 
-.toolbar-left { display: flex; align-items: center; gap: $space-2; }
+.toolbar-title {
+  font-size: $font-size-base; font-weight: 700; color: $color-text;
+}
 
-.toolbar-back {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: $font-size-sm; font-weight: 600; color: $color-text-muted;
-  text-decoration: none;
-  &:hover { color: $color-text; }
+.toolbar-link {
+  font-size: $font-size-sm; color: $color-primary; text-decoration: none; font-weight: 500;
+  &:hover { text-decoration: underline; }
 }
 
 .btn-add {
@@ -181,30 +181,38 @@
 
 .offre-cell { display: flex; align-items: center; gap: $space-3; }
 
-.offre-avatar {
+.offre-thumb {
   width: 36px; height: 36px; border-radius: $radius-md;
-  flex-shrink: 0; @include flex-center; overflow: hidden;
-
-  &--ouverte   { background: linear-gradient(135deg, #026654 0%, #04a07b 100%); }
-  &--brouillon { background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%); }
-  &--fermee    { background: linear-gradient(135deg, #dc2626 0%, #f87171 100%); }
-  &--archivee  { background: linear-gradient(135deg, #9ca3af 0%, #d1d5db 100%); }
-  &--annulee   { background: linear-gradient(135deg, #78350f 0%, #d97706 100%); }
+  object-fit: cover; flex-shrink: 0;
 }
 
-.offre-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+.offre-thumb-fallback {
+  width: 36px; height: 36px; border-radius: $radius-md;
+  flex-shrink: 0; opacity: 0.8;
+}
 
 .offre-titre {
   font-size: $font-size-sm; font-weight: 600; color: $color-text;
-  max-width: 220px; @include truncate;
+  max-width: 280px; @include truncate;
 }
 
-.type-chip {
-  display: inline-block; padding: 2px 8px; border-radius: $radius-full;
-  font-size: $font-size-xs; font-weight: 600;
+.type-pill {
+  display: inline-flex; align-items: center; padding: 2px 10px;
+  border-radius: $radius-full; font-size: $font-size-xs; font-weight: 700;
+  color: #fff; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
 }
 
-.td-num { color: $color-text-muted; font-variant-numeric: tabular-nums; }
+.statut-pill {
+  display: inline-flex; align-items: center; padding: 3px 10px;
+  border-radius: $radius-full; font-size: $font-size-xs; font-weight: 600; white-space: nowrap;
+
+  &--open     { background: rgba(16,185,129,0.12); color: #047857; }
+  &--draft    { background: rgba(245,158,11,0.12);  color: #92400e; }
+  &--closed   { background: rgba(156,163,175,0.15); color: #4b5563; }
+  &--archived { background: rgba(156,163,175,0.12); color: #9ca3af; }
+}
+
+.td-num { color: $color-text-muted; font-variant-numeric: tabular-nums; text-align: center; }
 
 .td-actions { width: 80px; }
 
@@ -213,20 +221,26 @@
   font-size: $font-size-sm;
 }
 
-.table-loading {
-  display: flex; justify-content: center; padding: $space-8;
-}
+.table-loading { display: flex; justify-content: center; padding: $space-8; }
 
-.row-btn {
-  display: inline-flex; @include flex-center;
-  width: 28px; height: 28px; border-radius: $radius-sm;
-  border: none; cursor: pointer; margin-right: 4px;
-  transition: background $transition-fast;
+.row-actions { display: flex; align-items: center; gap: $space-1; }
+
+.btn-row-edit, .btn-row-archive {
+  width: 30px; height: 30px; border-radius: $radius-sm;
+  border: 1px solid $color-border; background: $color-surface;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; color: $color-text-muted; text-decoration: none;
+  transition: background $transition-fast, border-color $transition-fast, color $transition-fast;
+  flex-shrink: 0;
   &:focus-visible { @include focus-ring; }
   @include reduced-motion { transition: none; }
+}
 
-  &--edit    { background: $color-primary-light; color: $color-primary; &:hover { background: rgba(2,102,84,0.15); } }
-  &--archive { background: rgba(245,158,11,0.12); color: #92400e; &:hover { background: rgba(245,158,11,0.2); } }
+.btn-row-edit:hover {
+  background: $color-primary-light; border-color: rgba(2,102,84,0.3); color: $color-primary;
+}
+.btn-row-archive:hover {
+  background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.25); color: #dc2626;
 }
 
 .table-footer {

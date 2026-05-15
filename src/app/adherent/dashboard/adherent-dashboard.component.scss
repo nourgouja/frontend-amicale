@@ -1,45 +1,130 @@
 @use '../../../styles/variables' as *;
 
-/* ── Header ── */
-.dashboard-header { margin-bottom: $space-6; }
+// ─── Quote banner ─────────────────────────────────────────────────────────────
+.quote-banner {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  border-radius: $radius-xl;
+  padding: $space-6 $space-8;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  margin-bottom: $space-2;
 
-.section-title {
-  font-size: $font-size-xl; font-weight: 700; color: $color-text;
-  margin-bottom: $space-4;
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  &::before { width: 200px; height: 200px; top: -60px; right: -40px; }
+  &::after  { width: 130px; height: 130px; bottom: -50px; left: 20px; }
 }
 
-.filters { display: flex; flex-wrap: wrap; gap: $space-2; }
+.quote-icon  { opacity: 0.4; flex-shrink: 0; }
 
-.filter-btn {
-  padding: 7px 20px; border-radius: $radius-full; border: 1.5px solid $color-border;
-  background: $color-surface; font-family: $font-base; font-size: $font-size-sm;
-  font-weight: 500; color: $color-text-muted; cursor: pointer; transition: all $transition-fast;
-  &:hover { border-color: $color-primary; color: $color-primary; }
-  &.active { background: $color-primary; color: #fff; border-color: $color-primary; }
+.quote-text  {
+  font-size: $font-size-lg;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
 }
 
-/* ── Property cards grid ── */
-.offers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: $space-5;
+.quote-author {
+  font-size: $font-size-sm;
+  color: rgba(255,255,255,0.7);
+  margin: 0;
+  font-weight: 500;
+}
+
+// ─── Home sections ────────────────────────────────────────────────────────────
+.home-section {
   margin-bottom: $space-8;
 }
 
+.section-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-4;
+  flex-wrap: wrap;
+  gap: $space-2;
+}
+
+.section-hd-left {
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+.section-title {
+  font-size: $font-size-xl;
+  font-weight: 700;
+  color: $color-text;
+  margin: 0;
+}
+
+.section-sub {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+}
+
+.view-all-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $color-primary;
+  text-decoration: none;
+  transition: gap $transition-fast;
+  &:hover { gap: 8px; }
+  @include reduced-motion { transition: none; }
+}
+
+// ─── Filter buttons ───────────────────────────────────────────────────────────
+.filters { display: flex; flex-wrap: wrap; gap: $space-2; margin-bottom: $space-4; }
+
+.filter-btn {
+  padding: 7px 18px;
+  border-radius: $radius-full;
+  border: 1.5px solid $color-border;
+  background: $color-surface;
+  font-family: $font-base;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-text-muted;
+  cursor: pointer;
+  transition: all $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; }
+  &.active { background: $color-primary; color: #fff; border-color: $color-primary; font-weight: 600; }
+  @include reduced-motion { transition: none; }
+}
+
+// ─── Offers grid (prop-card style) ────────────────────────────────────────────
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: $space-5;
+}
+
 .prop-card {
-  background: $color-surface; border-radius: 18px;
-  box-shadow: $shadow-card; border: 1px solid $color-border;
-  overflow: hidden; cursor: pointer;
+  background: $color-surface;
+  border-radius: 18px;
+  box-shadow: $shadow-card;
+  border: 1px solid $color-border;
+  overflow: hidden;
+  cursor: pointer;
   transition: transform $transition-base, box-shadow $transition-base;
   &:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.13); }
+  @include reduced-motion { transition: none; &:hover { transform: none; } }
 }
 
 .prop-card--fermee { opacity: 0.72; }
 
-
-/* Image section */
 .prop-img-wrap {
-  position: relative; height: 195px; background: #e5e7eb; overflow: hidden;
+  position: relative; height: 185px; background: #e5e7eb; overflow: hidden;
 }
 
 .fermee-overlay {
@@ -47,26 +132,30 @@
   background: rgba(0,0,0,0.32);
   display: flex; align-items: center; justify-content: center; z-index: 2;
 }
+
 .fermee-badge {
   background: rgba(0,0,0,0.65); color: #fff;
   padding: 6px 18px; border-radius: $radius-full;
-  font-size: $font-size-sm; font-weight: 700; letter-spacing: 0.5px;
-  text-transform: uppercase;
+  font-size: $font-size-sm; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
 }
+
 .prop-img {
   width: 100%; height: 100%; object-fit: cover; display: block;
   transition: transform $transition-slow;
   .prop-card:hover & { transform: scale(1.04); }
+  @include reduced-motion { transition: none; }
 }
+
 .prop-img-placeholder {
   width: 100%; height: 100%;
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
   display: flex; align-items: center; justify-content: center;
 }
+
 .type-chip {
   background: rgba(255,255,255,.22); color: #fff;
   padding: 6px 16px; border-radius: $radius-full;
-  font-size: $font-size-sm; font-weight: 600; letter-spacing: 0.3px;
+  font-size: $font-size-sm; font-weight: 600;
 }
 
 .prop-arrow {
@@ -77,9 +166,9 @@
   color: $color-text; text-decoration: none;
   transition: background $transition-fast, transform $transition-fast;
   &:hover { background: #fff; transform: scale(1.08); }
+  @include reduced-motion { transition: none; }
 }
 
-/* Info section */
 .prop-info { padding: $space-4; }
 
 .prop-location {
@@ -90,14 +179,12 @@
 .prop-title {
   font-size: $font-size-base; font-weight: 700; color: $color-text;
   margin-bottom: $space-3; line-height: 1.35;
-  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
 }
 
-.prop-footer {
-  display: flex; align-items: center; justify-content: space-between; gap: $space-2;
-}
-
-.prop-host { display: flex; align-items: center; gap: $space-2; }
+.prop-footer { display: flex; align-items: center; justify-content: space-between; gap: $space-2; }
+.prop-host   { display: flex; align-items: center; gap: $space-2; }
 
 .host-avatar {
   width: 30px; height: 30px; border-radius: 50%;
@@ -105,22 +192,36 @@
   font-size: 11px; font-weight: 700;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.host-details { display: flex; flex-direction: column; gap: 1px; }
-.host-name    { font-size: 11px; font-weight: 600; color: $color-text; }
-.host-rating  {
-  display: flex; align-items: center; gap: 3px;
-  font-size: 10px; color: $color-text-muted;
+
+.host-name  { font-size: 11px; font-weight: 600; color: $color-text; }
+.prop-price { font-size: $font-size-md; font-weight: 700; color: $color-text; white-space: nowrap; }
+
+// ─── Section footer (voir tout) ───────────────────────────────────────────────
+.section-footer {
+  margin-top: $space-5;
+  display: flex;
+  justify-content: center;
 }
 
-.prop-price {
-  font-size: $font-size-md; font-weight: 700; color: $color-text; white-space: nowrap;
+.btn-see-more {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px $space-6;
+  border-radius: $radius-full;
+  border: 1.5px solid $color-border;
+  background: $color-surface;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600; color: $color-text;
+  text-decoration: none;
+  transition: border-color $transition-fast, color $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; }
+  @include reduced-motion { transition: none; }
 }
 
-/* Skeleton */
-.offer-card--skeleton {
-  height: 300px; border-radius: 18px;
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+.offer-skeleton {
+  height: 280px; border-radius: 18px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
   background-size: 200% 100%; animation: shimmer 1.4s infinite;
+  @include reduced-motion { animation: none; background: #f0f0f0; }
 }
 
 @keyframes shimmer {
@@ -128,91 +229,110 @@
   100% { background-position: -200% 0; }
 }
 
-// ── Conventions / Partners section ────────────────────────────────────────────
-.section--conventions {
-  margin-top: $space-2;
-}
-
-.section-sub {
-  font-size: $font-size-sm; color: $color-text-muted; margin-top: 4px;
-}
-
+// ─── Conventions grid ─────────────────────────────────────────────────────────
 .conventions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: $space-4;
-  margin-top: $space-4;
+  @include mobile { grid-template-columns: 1fr; }
 }
 
 .convention-card {
-  display: flex; gap: $space-4; align-items: stretch;
-  background: $color-surface; border-radius: $radius-lg;
-  border: 1px solid $color-border; overflow: hidden;
-  text-decoration: none; color: inherit;
+  display: flex; flex-direction: column;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  border: 1px solid $color-border;
+  background: $color-surface;
   box-shadow: $shadow-card;
+  text-decoration: none;
   transition: transform $transition-base, box-shadow $transition-base;
-  &:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.1); }
+  &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.1); }
   @include reduced-motion { transition: none; &:hover { transform: none; } }
 }
 
 .convention-img {
-  position: relative; width: 110px; flex-shrink: 0; overflow: hidden;
-}
-.convention-cover {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-}
-.convention-img-placeholder {
-  width: 100%; height: 100%; min-height: 100px;
-  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
-  display: flex; align-items: center; justify-content: center;
-}
-.convention-pill {
-  position: absolute; top: $space-2; left: $space-2;
-  background: rgba(109,40,217,0.85); color: #fff;
-  padding: 2px 8px; border-radius: $radius-full;
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  position: relative; height: 130px; overflow: hidden; background: $color-primary;
 }
 
-.convention-info {
-  flex: 1; padding: $space-4; display: flex; flex-direction: column; gap: $space-2; min-width: 0;
+.convention-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.convention-img-placeholder {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  display: flex; align-items: center; justify-content: center;
 }
-.convention-name {
-  font-size: $font-size-base; font-weight: 700; color: $color-text; line-height: 1.3;
-  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+
+.convention-pill {
+  position: absolute; top: $space-2; left: $space-2;
+  background: rgba(255,255,255,0.9); color: $color-primary;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  padding: 3px 10px; border-radius: $radius-full; backdrop-filter: blur(4px);
 }
+
+.convention-info { padding: $space-3 $space-4; display: flex; flex-direction: column; gap: $space-1; flex: 1; }
+
+.convention-name { font-size: $font-size-sm; font-weight: 700; color: $color-text; margin: 0; }
+
 .convention-desc {
-  font-size: $font-size-xs; color: $color-text-muted; line-height: 1.5; flex: 1;
+  font-size: $font-size-xs; color: $color-text-muted; line-height: 1.5; margin: 0;
   display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
+
 .convention-footer {
-  display: flex; align-items: center; justify-content: space-between; gap: $space-2; margin-top: auto;
+  display: flex; align-items: center; justify-content: space-between; margin-top: $space-2;
 }
+
 .convention-lieu {
   display: flex; align-items: center; gap: 4px;
   font-size: $font-size-xs; color: $color-text-muted;
 }
-.convention-cta {
-  font-size: $font-size-xs; font-weight: 600; color: #6d28d9; white-space: nowrap;
-}
 
-/* ── Bureau members ── */
-.section--members {
-  background: #f0f2f5; border-radius: $radius-lg; padding: $space-6; margin-top: $space-2;
+.convention-cta { font-size: $font-size-xs; font-weight: 600; color: $color-primary; }
+
+// ─── Members grid ─────────────────────────────────────────────────────────────
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: $space-4;
 }
-.section-head  { margin-bottom: $space-5; }
-.members-grid  { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: $space-5; }
 
 .member-card {
-  background: $color-surface; border-radius: $radius-lg; padding: $space-5;
-  box-shadow: $shadow-card; border: 1px solid $color-border;
   display: flex; flex-direction: column; align-items: center; gap: $space-3;
-  text-align: center; transition: transform $transition-base;
-  &:hover { transform: translateY(-2px); }
+  padding: $space-5 $space-3;
+  background: $color-surface;
+  border-radius: $radius-xl;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-card;
+  text-align: center;
 }
-.member-avatar { width: 64px; height: 64px; border-radius: 50%; background: $color-primary; color: #fff; font-size: $font-size-lg; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-.member-info   { display: flex; flex-direction: column; gap: 3px; }
-.member-name   { font-size: $font-size-base; font-weight: 600; color: $color-text; }
-.member-poste  { font-size: $font-size-sm; color: $color-text-muted; }
-.member-pole   { font-size: $font-size-xs; color: $color-primary; font-weight: 500; }
 
-.empty-state { text-align: center; padding: $space-8; color: $color-text-muted; font-size: $font-size-base; }
+.member-photo-wrap {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 3px solid $color-primary;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.member-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.member-avatar {
+  width: 100%; height: 100%;
+  background: $color-primary-light;
+  color: $color-primary;
+  font-size: $font-size-lg;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.member-info  { display: flex; flex-direction: column; gap: 3px; }
+.member-name  { font-size: $font-size-sm; font-weight: 700; color: $color-text; }
+.member-poste { font-size: $font-size-xs; color: $color-text-muted; font-weight: 500; }
+.member-pole  { font-size: $font-size-xs; color: $color-primary; font-weight: 600; }
+
+// ─── Empty state ──────────────────────────────────────────────────────────────
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; gap: $space-3;
+  padding: $space-8 $space-4; color: $color-text-muted;
+  p { font-size: $font-size-sm; }
+}

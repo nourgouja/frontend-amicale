@@ -21,11 +21,11 @@ interface OffreDetail {
   capaciteMax?: number;
   placesRestantes?: number;
   prixParPersonne?: number;
-  modePaiement?: string;
   avantages?: string;
   poleNom?: string;
   imageBase64?: string;
   imageType?: string;
+  imagesSupplementaires?: { base64: string; type: string }[];
 }
 
 interface InscriptionSummary {
@@ -46,15 +46,17 @@ export class OffreDetailComponent implements OnInit {
   private route  = inject(ActivatedRoute);
   private router = inject(Router);
 
-  offre          = signal<OffreDetail | null>(null);
-  loading        = signal(true);
-  inscribed      = signal(false);
-  inscriptionId  = signal<number | null>(null);
-  inscribedGuests = signal<InscriptionResult['guests']>([]);
-  favorited      = signal(false);
-  cancelling     = signal(false);
-  cancelErr      = signal<string | null>(null);
-  modalOpen      = signal(false);
+  offre             = signal<OffreDetail | null>(null);
+  loading           = signal(true);
+  inscribed         = signal(false);
+  inscriptionId     = signal<number | null>(null);
+  inscriptionStatus = signal<string | null>(null);
+  inscribedGuests   = signal<InscriptionResult['guests']>([]);
+  favorited         = signal(false);
+  cancelling        = signal(false);
+  cancelErr         = signal<string | null>(null);
+  modalOpen         = signal(false);
+  activeImageIndex  = signal(0);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -73,6 +75,7 @@ export class OffreDetailComponent implements OnInit {
         );
         this.inscribed.set(!!existing);
         this.inscriptionId.set(existing?.id ?? null);
+        this.inscriptionStatus.set(existing?.statut ?? null);
         this.loading.set(false);
       },
       error: () => { this.loading.set(false); this.router.navigate(['/adherent/offres']); },
@@ -85,6 +88,7 @@ export class OffreDetailComponent implements OnInit {
   onInscribed(res: InscriptionResult): void {
     this.inscribed.set(true);
     this.inscriptionId.set(res.id);
+    this.inscriptionStatus.set('EN_ATTENTE');
     this.inscribedGuests.set(res.guests ?? []);
     this.modalOpen.set(false);
   }
@@ -98,6 +102,7 @@ export class OffreDetailComponent implements OnInit {
       next: () => {
         this.inscribed.set(false);
         this.inscriptionId.set(null);
+        this.inscriptionStatus.set(null);
         this.inscribedGuests.set([]);
         this.cancelling.set(false);
       },
@@ -115,15 +120,26 @@ export class OffreDetailComponent implements OnInit {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lieu)}`;
   }
 
-  get imageUrl(): string | null {
+  get allImages(): string[] {
     const o = this.offre();
-    if (!o?.imageBase64) return null;
-    return `data:${o.imageType ?? 'image/jpeg'};base64,${o.imageBase64}`;
+    if (!o) return [];
+    const imgs: string[] = [];
+    if (o.imageBase64) imgs.push(`data:${o.imageType ?? 'image/jpeg'};base64,${o.imageBase64}`);
+    (o.imagesSupplementaires ?? []).forEach(s => imgs.push(`data:${s.type};base64,${s.base64}`));
+    return imgs;
   }
 
-  get hasMultipleImages(): boolean { return false; }
-  get isFull(): boolean        { return this.offre()?.placesRestantes === 0; }
-  get isConvention(): boolean  { return this.offre()?.typeOffre === 'CONVENTION'; }
+  get imageUrl(): string | null {
+    const imgs = this.allImages;
+    return imgs[this.activeImageIndex()] ?? null;
+  }
+
+  get hasMultipleImages(): boolean { return this.allImages.length > 1; }
+
+  selectImage(index: number): void { this.activeImageIndex.set(index); }
+
+  get isFull(): boolean       { return this.offre()?.placesRestantes === 0; }
+  get isConvention(): boolean { return this.offre()?.typeOffre === 'CONVENTION'; }
 
   sexeLabel(s?: string | null): string {
     return s === 'M' ? 'H' : s === 'F' ? 'F' : s === 'AUTRE' ? 'Autre' : '';

@@ -215,7 +215,7 @@ export class AdminDashboardComponent implements OnInit {
 
   fmtDate(d: string | undefined | null): string { return d ? formatDate(d) : '—'; }
   typeLabel(t: string): string { return getOffreTypeLabel(t); }
-  recentFive = computed(() => this.recentInscriptions().slice(0, 8));
+  recentFive = computed(() => this.recentInscriptions().slice(0, 4));
 
   inscrits(offre: Offre): number {
     const cap  = offre.capaciteMax ?? 0;

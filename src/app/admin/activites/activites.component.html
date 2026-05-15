@@ -141,151 +141,245 @@
 ════════════════════════════════════════════ -->
 @if (view() === 'participants' || view() === 'detail') {
   <div class="act-shell">
+    <div class="parts-layout">
 
-    <!-- Header -->
-    <div class="page-hd page-hd--back">
-      <button class="back-btn" (click)="backToOffres()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        Offres
-      </button>
-      @if (selectedOffre(); as o) {
-        <div class="hd-title-wrap">
-          <h1 class="page-title">
-            <span class="type-pill type-pill--sm" [style.background]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span>
-            {{ o.titre }}
-          </h1>
-          <div class="stat-chips">
-            <span class="stat-chip">{{ insCounts().total }} inscrits</span>
-            @if (insCounts().attente > 0) {
-              <span class="stat-chip stat-chip--warn">{{ insCounts().attente }} en attente</span>
+      <!-- Left: participants list -->
+      <div class="parts-main">
+
+        <!-- Header -->
+        <div class="page-hd page-hd--back">
+          <button class="back-btn" (click)="backToOffres()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Offres
+          </button>
+          @if (selectedOffre(); as o) {
+            <div class="hd-title-wrap">
+              <h1 class="page-title">
+                <span class="type-pill type-pill--sm" [style.background]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span>
+                {{ o.titre }}
+              </h1>
+              <div class="stat-chips">
+                <span class="stat-chip">{{ insCounts().total }} inscrits</span>
+                @if (insCounts().attente > 0) {
+                  <span class="stat-chip stat-chip--warn">{{ insCounts().attente }} en attente</span>
+                }
+                <span class="stat-chip stat-chip--ok">{{ insCounts().confirmee }} confirmés</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-row">
+          <div class="tab-group">
+            @for (s of insStatuts; track s.key) {
+              <button class="tab-btn" [class.active]="insStatut() === s.key"
+                      (click)="insStatut.set(s.key)">{{ s.label }}</button>
             }
-            <span class="stat-chip stat-chip--ok">{{ insCounts().confirmee }} confirmés</span>
+          </div>
+          <div class="search-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input" type="search" placeholder="Rechercher un participant…"
+                   [value]="insSearch()" (input)="onInsSearch($any($event.target).value)" />
           </div>
         </div>
-      }
-    </div>
 
-    <!-- Filters -->
-    <div class="filter-row">
-      <div class="tab-group">
-        @for (s of insStatuts; track s.key) {
-          <button class="tab-btn" [class.active]="insStatut() === s.key"
-                  (click)="insStatut.set(s.key)">{{ s.label }}</button>
+        <!-- Convention notice -->
+        @if (selectedOffre()?.typeOffre === 'CONVENTION') {
+          <div class="convention-notice">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            </svg>
+            <p>Les conventions sont des publications partenaires — elles n'ont pas de liste de participants ni d'inscriptions.</p>
+          </div>
         }
-      </div>
-      <div class="search-box">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="search-input" type="search" placeholder="Rechercher un participant…"
-               [value]="insSearch()" (input)="onInsSearch($any($event.target).value)" />
-      </div>
-    </div>
 
-    <!-- Convention notice -->
-    @if (selectedOffre()?.typeOffre === 'CONVENTION') {
-      <div class="convention-notice">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-        </svg>
-        <p>Les conventions sont des publications partenaires — elles n'ont pas de liste de participants ni d'inscriptions.</p>
-      </div>
-    }
-
-    <!-- Table -->
-    @if (selectedOffre()?.typeOffre !== 'CONVENTION') {
-    <div class="table-card">
-      @if (insLoading()) {
-        <div class="state-row">
-          <div class="spinner"></div>
-          <span>Chargement des participants…</span>
-        </div>
-      } @else if (filteredIns().length === 0) {
-        <div class="empty-state">
-          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-          </svg>
-          <p class="empty-title">Aucun participant trouvé</p>
-        </div>
-      } @else {
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Participant</th>
-              <th>Email</th>
-              <th>Date d'inscription</th>
-              <th>Statut</th>
-              <th>Paiement</th>
-              <th># Invités</th>
-              <th>Total</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (ins of filteredIns(); track ins.id) {
-              <tr class="data-row data-row--clickable" (click)="openDetail(ins)">
-                <td>
-                  <div class="member-cell">
-                    <div class="avatar">{{ initials(ins.adherentNom, ins.adherentPrenom) }}</div>
-                    <span class="member-name">{{ ins.adherentPrenom }} {{ ins.adherentNom }}</span>
-                  </div>
-                </td>
-                <td class="muted-cell">{{ ins.mailAdherent }}</td>
-                <td class="muted-cell">{{ fmtDate(ins.dateInscription) }}</td>
-                <td>
-                  <span class="ins-badge"
-                        [class.ins--attente]="ins.statut === 'EN_ATTENTE'"
-                        [class.ins--ok]="ins.statut === 'CONFIRMEE'"
-                        [class.ins--rejet]="ins.statut === 'REJETEE'"
-                        [class.ins--annul]="ins.statut === 'ANNULEE'">
-                    @switch (ins.statut) {
-                      @case ('EN_ATTENTE') { En attente }
-                      @case ('CONFIRMEE')  { Confirmée }
-                      @case ('REJETEE')    { Rejetée }
-                      @case ('ANNULEE')    { Annulée }
-                    }
-                  </span>
-                </td>
-                <td>
-                  @if (ins.statutPaiement) {
-                    <span class="pay-badge"
-                          [class.pay--ok]="ins.statutPaiement === 'PAYEE'"
-                          [class.pay--late]="ins.statutPaiement === 'EN_RETARD'"
-                          [class.pay--attente]="ins.statutPaiement === 'EN_ATTENTE'">
-                      @switch (ins.statutPaiement) {
-                        @case ('PAYEE')      { Payée }
-                        @case ('EN_RETARD')  { En retard }
-                        @case ('EN_ATTENTE') { En attente }
+        <!-- Table -->
+        @if (selectedOffre()?.typeOffre !== 'CONVENTION') {
+        <div class="table-card">
+          @if (insLoading()) {
+            <div class="state-row">
+              <div class="spinner"></div>
+              <span>Chargement des participants…</span>
+            </div>
+          } @else if (filteredIns().length === 0) {
+            <div class="empty-state">
+              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              </svg>
+              <p class="empty-title">Aucun participant trouvé</p>
+            </div>
+          } @else {
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Participant</th>
+                  <th>Email</th>
+                  <th>Date d'inscription</th>
+                  <th>Statut</th>
+                  <th>Paiement</th>
+                  <th># Invités</th>
+                  <th>Total</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (ins of filteredIns(); track ins.id) {
+                  <tr class="data-row data-row--clickable" (click)="openDetail(ins)">
+                    <td>
+                      <div class="member-cell">
+                        <div class="avatar">{{ initials(ins.adherentNom, ins.adherentPrenom) }}</div>
+                        <span class="member-name">{{ ins.adherentPrenom }} {{ ins.adherentNom }}</span>
+                      </div>
+                    </td>
+                    <td class="muted-cell">{{ ins.mailAdherent }}</td>
+                    <td class="muted-cell">{{ fmtDate(ins.dateInscription) }}</td>
+                    <td>
+                      <span class="ins-badge"
+                            [class.ins--attente]="ins.statut === 'EN_ATTENTE'"
+                            [class.ins--ok]="ins.statut === 'CONFIRMEE'"
+                            [class.ins--rejet]="ins.statut === 'REJETEE'"
+                            [class.ins--annul]="ins.statut === 'ANNULEE'">
+                        @switch (ins.statut) {
+                          @case ('EN_ATTENTE') { En attente }
+                          @case ('CONFIRMEE')  { Confirmée }
+                          @case ('REJETEE')    { Rejetée }
+                          @case ('ANNULEE')    { Annulée }
+                        }
+                      </span>
+                    </td>
+                    <td>
+                      @if (ins.statutPaiement) {
+                        <span class="pay-badge"
+                              [class.pay--ok]="ins.statutPaiement === 'PAYEE'"
+                              [class.pay--late]="ins.statutPaiement === 'EN_RETARD'"
+                              [class.pay--attente]="ins.statutPaiement === 'EN_ATTENTE'">
+                          @switch (ins.statutPaiement) {
+                            @case ('PAYEE')      { Payée }
+                            @case ('EN_RETARD')  { En retard }
+                            @case ('EN_ATTENTE') { En attente }
+                          }
+                        </span>
+                      } @else {
+                        <span class="muted-cell">—</span>
                       }
-                    </span>
-                  } @else {
-                    <span class="muted-cell">—</span>
-                  }
-                </td>
-                <td class="muted-cell center-cell">{{ ins.guests?.length ?? ins.nombreAccompagnants }}</td>
-                <td class="muted-cell center-cell">{{ ins.totalPeople ?? (1 + ins.nombreAccompagnants) }}</td>
-                <td (click)="$event.stopPropagation()">
-                  @if (ins.statut === 'EN_ATTENTE') {
-                    <div class="action-btns">
-                      <button class="btn-approve" [disabled]="actionLoading() === ins.id"
-                              (click)="confirmer(ins.id)">
-                        @if (actionLoading() === ins.id) { … } @else { Valider }
-                      </button>
-                      <button class="btn-reject" [disabled]="actionLoading() === ins.id"
-                              (click)="refuser(ins.id)">
-                        @if (actionLoading() === ins.id) { … } @else { Rejeter }
-                      </button>
-                    </div>
-                  } @else {
-                    <span class="muted-cell">—</span>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </div>
-    } <!-- end @if not CONVENTION -->
+                    </td>
+                    <td class="muted-cell center-cell">{{ ins.guests?.length ?? ins.nombreAccompagnants }}</td>
+                    <td class="muted-cell center-cell">{{ ins.totalPeople ?? (1 + ins.nombreAccompagnants) }}</td>
+                    <td (click)="$event.stopPropagation()">
+                      @if (ins.statut === 'EN_ATTENTE') {
+                        <div class="action-btns">
+                          <button class="btn-approve" [disabled]="actionLoading() === ins.id"
+                                  (click)="confirmer(ins.id)">
+                            @if (actionLoading() === ins.id) { … } @else { Valider }
+                          </button>
+                          <button class="btn-reject" [disabled]="actionLoading() === ins.id"
+                                  (click)="refuser(ins.id)">
+                            @if (actionLoading() === ins.id) { … } @else { Rejeter }
+                          </button>
+                        </div>
+                      } @else {
+                        <span class="muted-cell">—</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+        } <!-- end @if not CONVENTION -->
 
+      </div>
+
+      <!-- Right: offer detail panel -->
+      @if (selectedOffre(); as o) {
+        <aside class="parts-aside">
+          @if (offreImage(o); as src) {
+            <img [src]="src" [alt]="o.titre" class="aside-cover-img" />
+          } @else {
+            <div class="aside-cover-fallback" [style.background]="typeColor(o.typeOffre)">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+            </div>
+          }
+          <div class="aside-body">
+            <span class="aside-type-badge" [style.background]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span>
+            <h2 class="aside-title">{{ o.titre }}</h2>
+            @if (o.description) { <p class="aside-desc">{{ o.description }}</p> }
+            <div class="aside-sep"></div>
+            <div class="aside-rows">
+              <div class="aside-row">
+                <span class="aside-label">Statut</span>
+                <span class="statut-badge"
+                  [class.statut--open]="o.statutOffre === 'OUVERTE'"
+                  [class.statut--draft]="o.statutOffre === 'BROUILLON'"
+                  [class.statut--closed]="o.statutOffre === 'FERMEE'"
+                  [class.statut--archived]="o.statutOffre === 'ARCHIVEE'">
+                  @switch (o.statutOffre) {
+                    @case ('OUVERTE')   { Ouverte }
+                    @case ('BROUILLON') { Brouillon }
+                    @case ('FERMEE')    { Fermée }
+                    @case ('ARCHIVEE')  { Archivée }
+                    @default            { {{ o.statutOffre }} }
+                  }
+                </span>
+              </div>
+              @if (o.lieu) {
+                <div class="aside-row">
+                  <span class="aside-label">Lieu</span>
+                  <span class="aside-value">{{ o.lieu }}</span>
+                </div>
+              }
+              @if (o.dateDebut) {
+                <div class="aside-row">
+                  <span class="aside-label">Date</span>
+                  <span class="aside-value">
+                    {{ fmtDate(o.dateDebut) }}
+                    @if (o.dateFin) { → {{ fmtDate(o.dateFin) }} }
+                  </span>
+                </div>
+              }
+              @if (o.prixParPersonne != null) {
+                <div class="aside-row">
+                  <span class="aside-label">Prix</span>
+                  <span class="aside-value aside-value--price">{{ o.prixParPersonne | number:'1.0-0' }} TND</span>
+                </div>
+              }
+            </div>
+            <div class="aside-cap-box">
+              <div class="aside-cap-row">
+                <span class="aside-cap-label">Capacité totale</span>
+                <span class="aside-cap-value">{{ o.capaciteMax ?? '—' }} places</span>
+              </div>
+              <div class="aside-cap-row">
+                <span class="aside-cap-label">Confirmés</span>
+                <span class="aside-cap-value aside-cap--ok">{{ insCounts().confirmee }}</span>
+              </div>
+              <div class="aside-cap-row">
+                <span class="aside-cap-label">En attente</span>
+                <span class="aside-cap-value aside-cap--warn">{{ insCounts().attente }}</span>
+              </div>
+              <div class="aside-cap-row">
+                <span class="aside-cap-label">Places restantes</span>
+                <span class="aside-cap-value">{{ o.placesRestantes ?? '—' }}</span>
+              </div>
+              @if (o.capaciteMax) {
+                <div class="aside-cap-bar-wrap">
+                  <div class="aside-cap-bar"
+                    [style.width.%]="(inscrits() / (o.capaciteMax || 1)) * 100">
+                  </div>
+                </div>
+                <p class="aside-cap-hint">{{ inscrits() }}/{{ o.capaciteMax }} places occupées</p>
+              }
+            </div>
+          </div>
+        </aside>
+      }
+
+    </div>
   </div>
 }
 

@@ -113,6 +113,7 @@ export const routes: Routes = [
         loadComponent: () => import('./bureau/offres/bureau-offres.component').then(m => m.BureauOffresComponent),
       },
       {
+<<<<<<< HEAD
         path: 'sondages',
         loadComponent: () => import('./bureau/sondages/bureau-sondages.component').then(m => m.BureauSondagesComponent),
       },
@@ -135,6 +136,10 @@ export const routes: Routes = [
       {
         path: 'elections/:id/resultats',
         loadComponent: () => import('./bureau/sondages/elections/election-results/election-results.component').then(m => m.ElectionResultsComponent),
+=======
+        path: 'offres/mon-pole',
+        loadComponent: () => import('./bureau/offres/mon-pole/bureau-mon-pole.component').then(m => m.BureauMonPoleComponent),
+>>>>>>> 3d95afcba61c50d6157d516348402465974a98c4
       },
       {
         path: 'offres/creer',

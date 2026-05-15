@@ -28,7 +28,7 @@ export class BureauOffresComponent implements OnInit {
   private router = inject(Router);
   private http   = inject(HttpClient);
 
-  activeFilter  = signal<CategoryFilter>('tout');
+  activeFilter  = signal<CategoryFilter>('mes-offres');
   statusFilter  = signal<StatusFilter>('tous');
   searchTerm    = signal('');
   offres        = signal<Offre[]>([]);
@@ -69,7 +69,11 @@ export class BureauOffresComponent implements OnInit {
     const q     = this.searchTerm().toLowerCase().trim();
 
     if (cat === 'mes-offres') {
-      data = data.filter(o => types.includes(o.typeOffre) && o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'FERMEE');
+      if (types.length) {
+        data = data.filter(o => types.includes(o.typeOffre) && o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'FERMEE');
+      } else {
+        data = data.filter(o => o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'FERMEE');
+      }
     } else if (cat === 'fermees') {
       data = data.filter(o => o.statutOffre === 'FERMEE');
     } else if (cat === 'tout') {
@@ -90,10 +94,10 @@ export class BureauOffresComponent implements OnInit {
       next: p => {
         const types: string[] = p.poleTypesOffre ?? [];
         this.poleTypesOffre.set(types);
-        if (types.length > 0) {
-          this.activeFilter.set('mes-offres');
-        }
+        // If no pole types, fall back to showing all offers
+        if (!types.length) this.activeFilter.set('tout');
       },
+      error: () => this.activeFilter.set('tout'),
     });
     this.loadOffres();
   }

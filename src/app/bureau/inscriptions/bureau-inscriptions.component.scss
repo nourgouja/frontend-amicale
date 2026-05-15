@@ -13,20 +13,9 @@
   font-size: $font-size-xs; font-weight: 700;
 }
 
-.filters-bar { display: flex; align-items: center; gap: $space-3; flex-wrap: wrap; }
-
-.search-wrap {
-  display: flex; align-items: center; gap: $space-2;
-  background: $color-surface; border: 1px solid $color-border; border-radius: $radius-md;
-  padding: 0 $space-3; height: 38px; flex: 1; max-width: 320px;
-  .search-icon { color: $color-text-muted; flex-shrink: 0; }
-}
-
-.search-input {
-  flex: 1; border: none; background: none; outline: none;
-  font-family: $font-base; font-size: $font-size-sm; color: $color-text;
-  &::placeholder { color: $color-text-muted; }
-}
+.filters-bar  { display: flex; align-items: center; gap: $space-3; flex-wrap: wrap; }
+.search-wrap  { @include filter-search-wrap; flex: 1; max-width: 320px; .search-icon { color: $color-text-muted; flex-shrink: 0; } }
+.search-input { @include filter-search-input; }
 
 .filter-select {
   height: 38px; padding: 0 $space-3; border: 1px solid $color-border; border-radius: $radius-md;
