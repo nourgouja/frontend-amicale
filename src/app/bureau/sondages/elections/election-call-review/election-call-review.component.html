@@ -1,0 +1,104 @@
+<div class="review-page">
+
+  @if (toast()) {
+    <div class="page-toast" [class.page-toast--error]="toast()!.type === 'error'" role="alert">
+      {{ toast()!.msg }}
+    </div>
+  }
+
+  <div class="page-header">
+    <button class="btn-back" (click)="back()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Retour
+    </button>
+    @if (call()) {
+      <div class="page-header__info">
+        <h1 class="page-title">{{ call()!.title }}</h1>
+        <span class="status-badge" [class.status-badge--open]="call()!.status === 'OPEN'" [class.status-badge--closed]="call()!.status === 'CLOSED'">
+          {{ call()!.status === 'OPEN' ? 'Ouvert' : 'Clôturé' }}
+        </span>
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state"><div class="spinner"></div></div>
+  } @else {
+
+    <!-- Publish action bar -->
+    <div class="action-bar">
+      @if (call()?.publishedElectionId) {
+        <div class="published-notice">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Élection déjà publiée — les membres peuvent voter
+        </div>
+      } @else {
+        <div class="publish-hint">
+          @if (canPublish()) {
+            <span class="hint-ready">Toutes les positions ont au moins un candidat accepté</span>
+          } @else {
+            <span class="hint-wait">Acceptez au moins un candidat par poste pour publier</span>
+          }
+        </div>
+        <button class="btn-publish" [disabled]="!canPublish() || publishing()" (click)="publish()">
+          @if (publishing()) { Publication… } @else { Publier l'élection }
+        </button>
+      }
+    </div>
+
+    <!-- Applications by position -->
+    @for (group of byPosition(); track group.position) {
+      <div class="position-section">
+        <h2 class="position-title">{{ group.label }}</h2>
+
+        @if (group.apps.length === 0) {
+          <p class="no-apps">Aucune candidature pour ce poste</p>
+        } @else {
+          <div class="apps-grid">
+            @for (app of group.apps; track app.id) {
+              <div class="app-card" [class.app-card--accepted]="app.status === 'ACCEPTED'" [class.app-card--rejected]="app.status === 'REJECTED'">
+
+                <div class="app-photo">
+                  @if (app.pictureUrl) {
+                    <img [src]="app.pictureUrl" [alt]="app.prenom + ' ' + app.nom" />
+                  } @else {
+                    <div class="app-avatar">{{ app.prenom[0] }}{{ app.nom[0] }}</div>
+                  }
+                </div>
+
+                <div class="app-info">
+                  <p class="app-name">{{ app.prenom }} {{ app.nom }}</p>
+                  <p class="app-email">{{ app.email }}</p>
+                  <p class="app-motivation">{{ app.motivation }}</p>
+                </div>
+
+                <div class="app-footer">
+                  @if (app.status === 'PENDING') {
+                    <div class="app-actions">
+                      <button class="btn-accept" [disabled]="isProcessing(app.id)" (click)="accept(app)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        Accepter
+                      </button>
+                      <button class="btn-reject" [disabled]="isProcessing(app.id)" (click)="reject(app)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        Refuser
+                      </button>
+                    </div>
+                  } @else {
+                    <span class="app-status-badge"
+                          [class.app-status-badge--accepted]="app.status === 'ACCEPTED'"
+                          [class.app-status-badge--rejected]="app.status === 'REJECTED'">
+                      {{ app.status === 'ACCEPTED' ? 'Acceptée' : 'Refusée' }}
+                    </span>
+                  }
+                </div>
+
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>

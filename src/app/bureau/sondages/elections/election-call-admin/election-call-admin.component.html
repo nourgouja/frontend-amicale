@@ -1,0 +1,163 @@
+<div class="admin-page">
+
+  @if (toast()) {
+    <div class="page-toast" [class.page-toast--error]="toast()!.type === 'error'" role="alert">
+      {{ toast()!.msg }}
+    </div>
+  }
+
+  <div class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-title">Élections</h1>
+      <p class="page-subtitle">Gérez les appels à candidature et publiez les élections</p>
+    </div>
+    <button class="btn-primary" (click)="openForm()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouvel appel à candidature
+    </button>
+  </div>
+
+  <!-- Create form overlay -->
+  @if (showForm()) {
+    <div class="form-overlay" (click)="closeForm()">
+      <div class="form-panel" (click)="$event.stopPropagation()">
+        <div class="form-panel__header">
+          <h2>Créer un appel à candidature</h2>
+          <button class="btn-close" (click)="closeForm()" aria-label="Fermer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="form-body">
+          <div class="form-group" [class.form-group--error]="isInvalid('title')">
+            <label class="form-label">Titre <span class="req">*</span></label>
+            <input class="form-input" formControlName="title" placeholder="Ex : Élections du bureau 2025-2026" />
+            @if (isInvalid('title')) {
+              <span class="form-error">Le titre doit contenir au moins 3 caractères</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-input form-textarea" formControlName="description"
+                      placeholder="Décrivez l'objectif de cette élection…" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Date limite de candidature</label>
+            <input class="form-input" type="datetime-local" formControlName="deadline" />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="closeForm()">Annuler</button>
+            <button type="submit" class="btn-primary" [disabled]="form.invalid || saving()">
+              @if (saving()) { Création… } @else { Ouvrir l'appel }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Calls list -->
+  @if (loading()) {
+    <div class="loading-state"><div class="spinner"></div></div>
+  } @else if (calls().length === 0) {
+    <div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p>Aucun appel à candidature</p>
+      <span>Créez un appel pour permettre aux membres de se porter candidats</span>
+    </div>
+  } @else {
+    <div class="calls-list">
+      @for (call of calls(); track call.id) {
+        <div class="call-card" [class.call-card--closed]="call.status === 'CLOSED'">
+          <div class="call-card__header">
+            <div class="call-card__title-row">
+              <h3 class="call-title">{{ call.title }}</h3>
+              <span class="status-badge" [class.status-badge--open]="call.status === 'OPEN'" [class.status-badge--closed]="call.status === 'CLOSED'">
+                {{ call.status === 'OPEN' ? 'Ouvert' : 'Clôturé' }}
+              </span>
+            </div>
+            @if (call.description) {
+              <p class="call-desc">{{ call.description }}</p>
+            }
+            @if (call.deadline) {
+              <p class="call-deadline">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Deadline : {{ call.deadline | date:'dd/MM/yyyy HH:mm' }}
+              </p>
+            }
+          </div>
+
+          <div class="call-stats">
+            <div class="stat">
+              <span class="stat-value">{{ call.applicationCount }}</span>
+              <span class="stat-label">Candidatures</span>
+            </div>
+            <div class="stat stat--pending">
+              <span class="stat-value">{{ call.pendingCount }}</span>
+              <span class="stat-label">En attente</span>
+            </div>
+            <div class="stat stat--accepted">
+              <span class="stat-value">{{ call.acceptedCount }}</span>
+              <span class="stat-label">Acceptées</span>
+            </div>
+            <div class="stat stat--rejected">
+              <span class="stat-value">{{ call.rejectedCount }}</span>
+              <span class="stat-label">Refusées</span>
+            </div>
+          </div>
+
+          <div class="call-actions">
+            @if (call.status === 'OPEN') {
+              <button class="btn-action btn-close-call" (click)="closeCall(call)">
+                Clôturer les candidatures
+              </button>
+            }
+            @if (call.publishedElectionId) {
+              <div class="election-controls">
+                <span class="election-status-badge"
+                      [class.election-status-badge--active]="call.publishedElectionStatus === 'ACTIVE'"
+                      [class.election-status-badge--closed]="call.publishedElectionStatus === 'CLOSED'">
+                  <span class="dot"></span>
+                  {{ call.publishedElectionStatus === 'ACTIVE' ? 'Vote en cours' : 'Vote clôturé' }}
+                </span>
+                @if (call.publishedElectionStatus === 'ACTIVE') {
+                  <button class="btn-action btn-close-election" (click)="closeElection(call)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                    Clôturer le vote
+                  </button>
+                }
+                <button class="btn-action btn-results" (click)="goToResults(call)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  Voir les résultats
+                </button>
+              </div>
+            }
+            <button class="btn-action btn-review" (click)="goToReview(call)">
+              Candidatures
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            @if (call.publishedElectionStatus !== 'ACTIVE') {
+              <button class="btn-action btn-delete-call"
+                      (click)="deleteCall(call)"
+                      [disabled]="deletingCall() === call.id"
+                      title="Supprimer cet appel à candidature">
+                @if (deletingCall() === call.id) {
+                  <span class="btn-spin-danger"></span>
+                } @else {
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>
+                  </svg>
+                }
+                Supprimer l'appel
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

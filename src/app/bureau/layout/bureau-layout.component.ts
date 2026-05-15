@@ -8,22 +8,14 @@ import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
 import { getDisplayName, getInitials } from '../../shared/utils/format.utils';
-<<<<<<< HEAD
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays, ChartPie, Award } from 'lucide-angular';
-=======
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays } from 'lucide-angular';
->>>>>>> 3d95afcba61c50d6157d516348402465974a98c4
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie, Award } from 'lucide-angular';
 
 @Component({
   selector: 'app-bureau-layout',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LowerCasePipe, ProfileCardComponent, LucideAngularModule],
   providers: [
-<<<<<<< HEAD
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays, ChartPie, Award }) },
-=======
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays }) },
->>>>>>> 3d95afcba61c50d6157d516348402465974a98c4
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie, Award }) },
   ],
   templateUrl: './bureau-layout.component.html',
   styleUrl: './bureau-layout.component.scss',
@@ -51,36 +43,25 @@ export class BureauLayoutComponent implements OnInit {
   isResponsablePole  = signal(false);
   posteLabel         = signal('Membre Bureau');
 
-<<<<<<< HEAD
-  readonly navItems = [
-    { label: 'Tableau de bord', route: '/bureau/dashboard',    icon: 'LayoutDashboard' },
-    { label: 'Mes Offres',      route: '/bureau/offres',       icon: 'Tag'             },
-    { label: 'Sondages',        route: '/bureau/sondages',     icon: 'ChartPie'        },
-    { label: 'Inscriptions',    route: '/bureau/inscriptions', icon: 'ClipboardList'   },
-    { label: 'Cotisations',     route: '/bureau/cotisations',  icon: 'DollarSign'      },
-    { label: 'Calendrier',      route: '/bureau/calendrier',   icon: 'CalendarDays'    },
-    { label: 'Élections',       route: '/bureau/elections',    icon: 'Award'           },
-  ];
-
-  readonly icons = { LayoutDashboard, Tag, ClipboardList, DollarSign, CalendarDays, ChartPie, Award };
-
-  ngOnInit(): void { this.notifService.init(); }
-=======
   navItems = computed(() => {
     const items: { label: string; route: string; icon: string }[] = [
-      { label: 'Tableau de bord', route: '/bureau/dashboard',         icon: 'LayoutDashboard' },
-      { label: 'Catalogue',       route: '/bureau/offres',            icon: 'BookOpen'        },
+      { label: 'Tableau de bord', route: '/bureau/dashboard',    icon: 'LayoutDashboard' },
+      { label: 'Mes Offres',      route: '/bureau/offres',       icon: 'Tag'             },
     ];
     if (this.isResponsablePole()) {
       items.push({ label: 'Mon Pôle', route: '/bureau/offres/mon-pole', icon: 'Building2' });
     }
     items.push(
+      { label: 'Sondages',     route: '/bureau/sondages',     icon: 'ChartPie'      },
       { label: 'Inscriptions', route: '/bureau/inscriptions', icon: 'ClipboardList' },
-      { label: 'Cotisations',  route: '/bureau/cotisations',  icon: 'DollarSign'   },
-      { label: 'Calendrier',   route: '/bureau/calendrier',   icon: 'CalendarDays' },
+      { label: 'Cotisations',  route: '/bureau/cotisations',  icon: 'DollarSign'    },
+      { label: 'Calendrier',   route: '/bureau/calendrier',   icon: 'CalendarDays'  },
+      { label: 'Élections',    route: '/bureau/elections',    icon: 'Award'         },
     );
     return items;
   });
+
+  readonly icons = { LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie, Award };
 
   ngOnInit(): void {
     this.notifService.init();
@@ -98,7 +79,6 @@ export class BureauLayoutComponent implements OnInit {
       },
     });
   }
->>>>>>> 3d95afcba61c50d6157d516348402465974a98c4
 
   toggleProfile(e: MouseEvent): void { e.stopPropagation(); this.notifOpen.set(false); this.profileOpen.update(v => !v); }
   toggleNotif(e: MouseEvent): void   { e.stopPropagation(); this.profileOpen.set(false); this.notifOpen.update(v => !v); }

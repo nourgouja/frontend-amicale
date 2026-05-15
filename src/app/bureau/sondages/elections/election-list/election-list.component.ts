@@ -2,7 +2,9 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ElectionService } from '../../../../core/services/election.service';
+import { ElectionCallService } from '../../../../core/services/election-call.service';
 import { Election, positionLabel } from '../../../../core/models/election.model';
+import { ElectionCall } from '../../../../core/models/election-call.model';
 
 @Component({
   selector: 'app-election-list',
@@ -13,11 +15,14 @@ import { Election, positionLabel } from '../../../../core/models/election.model'
 })
 export class ElectionListComponent implements OnInit {
   private electionService = inject(ElectionService);
+  private callService     = inject(ElectionCallService);
   private router          = inject(Router);
 
   activeElections = signal<Election[]>([]);
   closedElections = signal<Election[]>([]);
+  activeCall      = signal<ElectionCall | null>(null);
   loading         = signal(true);
+  deleting        = signal<number | null>(null);
   toast           = signal<{ msg: string; type: 'success' | 'error' } | null>(null);
   positionLabel = positionLabel;
 
@@ -26,7 +31,7 @@ export class ElectionListComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     let done = 0;
-    const check = () => { if (++done === 2) this.loading.set(false); };
+    const check = () => { if (++done === 3) this.loading.set(false); };
 
     this.electionService.getActiveElections().subscribe({
       next: res => { this.activeElections.set(res); check(); },
@@ -36,6 +41,16 @@ export class ElectionListComponent implements OnInit {
       next: res => { this.closedElections.set(res); check(); },
       error: () => check(),
     });
+    this.callService.getActiveCall().subscribe({
+      next: call => { this.activeCall.set(call); check(); },
+      error: () => check(),
+    });
+  }
+
+  goApply(): void {
+    const call = this.activeCall();
+    if (!call) return;
+    this.router.navigate([`${this.base}/elections/apply`, call.id]);
   }
 
   private get base(): string {
@@ -44,8 +59,27 @@ export class ElectionListComponent implements OnInit {
          : '/adherent';
   }
 
+  get isAdmin(): boolean { return this.router.url.startsWith('/admin'); }
+
   goVote(id: number): void    { this.router.navigate([`${this.base}/elections`, id]); }
   goResults(id: number): void { this.router.navigate([`${this.base}/elections`, id, 'resultats']); }
+
+  deleteElection(id: number): void {
+    if (this.deleting() !== null) return;
+    if (!confirm('Supprimer cette élection ? Cette action est irréversible.')) return;
+    this.deleting.set(id);
+    this.electionService.deleteElection(id).subscribe({
+      next: () => {
+        this.closedElections.update(list => list.filter(e => e.id !== id));
+        this.deleting.set(null);
+        this.showToast('Élection supprimée.', 'success');
+      },
+      error: err => {
+        this.deleting.set(null);
+        this.showToast(err?.error?.message ?? 'Impossible de supprimer cette élection.', 'error');
+      },
+    });
+  }
 
   statusLabel(status: string): string {
     return status === 'ACTIVE' ? 'Vote en cours' : 'Clôturée';

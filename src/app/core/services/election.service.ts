@@ -83,4 +83,12 @@ export class ElectionService {
   deleteElection(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${id}`);
   }
+
+  publishResults(id: number): Observable<Election> {
+    return this.http.post<Election>(`${this.base}/${id}/publish-results`, {});
+  }
+
+  createExtraRound(id: number): Observable<Election> {
+    return this.http.post<Election>(`${this.base}/${id}/extra-round`, {});
+  }
 }

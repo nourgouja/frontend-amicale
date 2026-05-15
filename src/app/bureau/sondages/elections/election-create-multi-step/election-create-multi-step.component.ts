@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { forkJoin, switchMap, of } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { from, switchMap, of } from 'rxjs';
+import { map, startWith, concatMap, toArray } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ElectionService } from '../../../../core/services/election.service';
 import { UserSummary, Position, POSITIONS, AddCandidateRequest } from '../../../../core/models/election.model';
@@ -176,7 +176,7 @@ export class ElectionCreateMultiStepComponent implements OnInit {
             return this.electionService.addCandidate(election.id, req, c.file ?? undefined);
           })
         );
-        return calls.length ? forkJoin(calls) : of([]);
+        return calls.length ? from(calls).pipe(concatMap(c => c), toArray()) : of([]);
       })
     ).subscribe({
       next: () => {

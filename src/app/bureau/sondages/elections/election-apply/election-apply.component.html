@@ -1,0 +1,152 @@
+<div class="apply-page">
+
+  @if (toast()) {
+    <div class="page-toast" [class.page-toast--error]="toast()!.type === 'error'" role="alert">
+      {{ toast()!.msg }}
+    </div>
+  }
+
+  <div class="page-header">
+    <button class="btn-back" (click)="back()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Retour aux élections
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state"><div class="spinner"></div></div>
+  } @else if (call()) {
+
+    <div class="call-banner">
+      <div class="call-banner__icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+      </div>
+      <div class="call-banner__text">
+        <h1 class="call-title">{{ call()!.title }}</h1>
+        @if (call()!.description) {
+          <p class="call-desc">{{ call()!.description }}</p>
+        }
+        @if (call()!.deadline) {
+          <p class="call-deadline">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Candidatures ouvertes jusqu'au {{ call()!.deadline | date:'dd/MM/yyyy à HH:mm' }}
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- Already applied: show status -->
+    @if (myApplication()) {
+      <div class="already-applied">
+        <div class="already-applied__icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="already-applied__body">
+          <h2>Candidature soumise</h2>
+          <p>Statut de votre candidature</p>
+          <div class="app-detail">
+            <div class="app-detail__row">
+              <span class="app-detail__label">Poste</span>
+              <span class="app-detail__value">
+                @switch (myApplication()!.position) {
+                  @case ('PRESIDENT')        { Président }
+                  @case ('TRESORIER')        { Trésorier }
+                  @case ('RESPONSABLE_POLE') { Responsable de pôle }
+                }
+              </span>
+            </div>
+            <div class="app-detail__row">
+              <span class="app-detail__label">Statut</span>
+              <span class="app-status-badge"
+                    [class.app-status-badge--pending]="myApplication()!.status === 'PENDING'"
+                    [class.app-status-badge--accepted]="myApplication()!.status === 'ACCEPTED'"
+                    [class.app-status-badge--rejected]="myApplication()!.status === 'REJECTED'">
+                {{ statusLabel(myApplication()!.status) }}
+              </span>
+            </div>
+            <div class="app-detail__row">
+              <span class="app-detail__label">Motivation</span>
+              <span class="app-detail__value app-detail__value--motivation">{{ myApplication()!.motivation }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Application form (only if not yet applied) -->
+    @if (!myApplication()) {
+      <div class="form-card">
+        <h2 class="form-title">Soumettre ma candidature</h2>
+        <p class="form-subtitle">Vous ne pouvez postuler qu'une seule fois et pour un seul poste.</p>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="form-body">
+
+          <!-- Auto-filled name (read-only) -->
+          <div class="form-group">
+            <label class="form-label">Nom complet</label>
+            <input class="form-input form-input--readonly" type="text"
+                   [value]="(currentUser?.prenom || '') + ' ' + (currentUser?.nom || '')" readonly />
+          </div>
+
+          <!-- Position -->
+          <div class="form-group" [class.form-group--error]="isInvalid('position')">
+            <label class="form-label">Poste souhaité <span class="req">*</span></label>
+            <select class="form-input form-select" formControlName="position">
+              <option value="" disabled>Choisissez un poste…</option>
+              @for (p of positions; track p.value) {
+                <option [value]="p.value">{{ p.label }}</option>
+              }
+            </select>
+            @if (isInvalid('position')) {
+              <span class="form-error">Veuillez sélectionner un poste</span>
+            }
+          </div>
+
+          <!-- Motivation -->
+          <div class="form-group" [class.form-group--error]="isInvalid('motivation')">
+            <label class="form-label">Lettre de motivation <span class="req">*</span></label>
+            <textarea class="form-input form-textarea" formControlName="motivation" rows="5"
+                      placeholder="Expliquez pourquoi vous souhaitez vous présenter à ce poste (20 caractères minimum)…"></textarea>
+            @if (isInvalid('motivation')) {
+              <span class="form-error">La motivation doit contenir au moins 20 caractères</span>
+            }
+          </div>
+
+          <!-- Photo -->
+          <div class="form-group" [class.form-group--error]="photoError()">
+            <label class="form-label">Photo de profil <span class="req">*</span></label>
+            @if (photoPreview()) {
+              <div class="photo-preview">
+                <img [src]="photoPreview()!" alt="Aperçu" />
+                <button type="button" class="btn-remove-photo" (click)="removePhoto()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  Supprimer
+                </button>
+              </div>
+            } @else {
+              <label class="photo-upload-label" for="photo-input">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Cliquez pour choisir une photo</span>
+                <span class="upload-hint">JPG, PNG — max 5 Mo</span>
+              </label>
+              <input id="photo-input" type="file" accept="image/*" class="hidden-input" (change)="onPhotoChange($event)" />
+            }
+            @if (photoError()) {
+              <span class="form-error">{{ photoError() }}</span>
+            }
+          </div>
+
+          <div class="form-submit">
+            <button type="button" class="btn-secondary" (click)="back()">Annuler</button>
+            <button type="submit" class="btn-primary" [disabled]="form.invalid || submitting()">
+              @if (submitting()) { Envoi en cours… } @else { Soumettre ma candidature }
+            </button>
+          </div>
+
+        </form>
+      </div>
+    }
+
+  }
+
+</div>

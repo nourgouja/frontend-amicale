@@ -93,10 +93,123 @@
   transition: background $transition-fast; margin-top: $space-1;
   &:hover { background: #bfdbfe; }
   @include reduced-motion { transition: none; }
+  &--flex { flex: 1; width: auto; margin-top: 0; }
 }
 
 .election-card--closed { opacity: 0.9; }
 
 .card-date { font-size: $font-size-xs; color: $color-text-muted; }
 
+.card-actions {
+  display: flex; gap: $space-2; margin-top: $space-1;
+}
+
+.btn-delete-election {
+  flex-shrink: 0; width: 38px; height: 38px; border-radius: $radius-md; border: none;
+  background: #fee2e2; color: #dc2626; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background $transition-fast;
+  &:hover:not(:disabled) { background: #fca5a5; }
+  &:disabled { opacity: .5; cursor: not-allowed; }
+}
+
+.btn-spinner-sm {
+  width: 12px; height: 12px; border: 2px solid rgba(220,38,38,.3);
+  border-top-color: #dc2626; border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+
 .empty-sub { font-size: $font-size-sm; color: $color-text-muted; text-align: center; max-width: 300px; }
+
+// ── Active call banner ──────────────────────────────────────────────────────
+.call-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: linear-gradient(135deg, rgba($color-primary, .07), rgba($color-primary, .02));
+  border: 1px solid rgba($color-primary, .25);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  flex-wrap: wrap;
+
+  &__body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  &__icon {
+    flex-shrink: 0;
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: rgba($color-primary, .12);
+    color: $color-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  &__label {
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: $color-primary;
+    margin: 0 0 .2rem;
+  }
+  &__title {
+    font-size: .9375rem;
+    font-weight: 700;
+    color: $color-text;
+    margin: 0 0 .15rem;
+  }
+  &__deadline {
+    font-size: .8125rem;
+    color: $color-text-muted;
+    margin: 0;
+  }
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    flex-wrap: wrap;
+  }
+}
+
+.applied-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .375rem;
+  font-size: .8125rem;
+  font-weight: 700;
+  color: #16a34a;
+  background: rgba(#16a34a, .1);
+  padding: .3rem .75rem;
+  border-radius: 999px;
+}
+
+.btn-apply {
+  display: inline-flex;
+  align-items: center;
+  gap: .375rem;
+  padding: .6rem 1.25rem;
+  background: $color-primary;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: .875rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  &:hover { background: $color-primary-dark; }
+}
+
+.btn-view-app {
+  padding: .5rem 1rem;
+  background: rgba($color-primary, .08);
+  color: $color-primary;
+  border: none;
+  border-radius: 8px;
+  font-size: .8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover { background: rgba($color-primary, .15); }
+}

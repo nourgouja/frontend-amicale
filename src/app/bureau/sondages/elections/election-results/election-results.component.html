@@ -1,5 +1,11 @@
 <div class="results-page">
 
+  @if (toast()) {
+    <div class="toast" [class.toast--success]="toast()!.type === 'success'" [class.toast--error]="toast()!.type === 'error'">
+      {{ toast()!.msg }}
+    </div>
+  }
+
   <div class="page-header">
     <button class="btn-back" (click)="back()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
@@ -13,7 +19,14 @@
     <div class="election-header">
       <div class="title-row">
         <h1 class="election-title">{{ election()!.titre }}</h1>
-        <span class="status-badge status-badge--closed">Clôturée</span>
+        @if (election()!.status === 'ACTIVE') {
+          <span class="status-badge status-badge--active">En cours</span>
+        } @else {
+          <span class="status-badge status-badge--closed">Clôturée</span>
+        }
+        @if (election()!.isExtraRound) {
+          <span class="extra-round-badge">Tour supplémentaire</span>
+        }
       </div>
       @if (election()!.description) {
         <p class="election-desc">{{ election()!.description }}</p>
@@ -21,19 +34,72 @@
       <p class="total-votes-info">Total : {{ totalVotes() }} vote(s) exprimé(s)</p>
     </div>
 
+    @if (isAdmin()) {
+      <div class="admin-action-bar">
+
+        @if (election()!.status === 'ACTIVE') {
+          <button class="btn-close-vote" (click)="closeElection()" [disabled]="closing()">
+            @if (closing()) { <span class="btn-spinner btn-spinner--dark"></span> } @else {
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            }
+            Clôturer le vote
+          </button>
+          <span class="action-hint">Les résultats seront visibles une fois le vote clôturé.</span>
+        }
+
+        @if (election()!.status === 'CLOSED') {
+          @if (election()!.resultsPublished) {
+            <div class="published-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Résultats publiés aux membres
+            </div>
+          } @else if (election()!.hasTie) {
+            <div class="tie-warning">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Égalité sur : {{ tiedLabels() }} — un tour supplémentaire est requis.
+            </div>
+            @if (!election()!.extraRoundElectionId) {
+              <button class="btn-extra" (click)="createExtraRound()" [disabled]="extraRound()">
+                @if (extraRound()) { <span class="btn-spinner"></span> } @else {
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                }
+                Tour supplémentaire
+              </button>
+            } @else {
+              <button class="btn-goto-extra" (click)="goToExtraRound()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>
+                Voir le tour supplémentaire
+              </button>
+            }
+          } @else {
+            <button class="btn-publish" (click)="publishResults()" [disabled]="publishing()">
+              @if (publishing()) { <span class="btn-spinner"></span> } @else {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              }
+              Publier les résultats
+            </button>
+          }
+        }
+
+      </div>
+    }
+
     <div class="positions-list">
       @for (group of positionGroups(); track group.position) {
         <div class="position-section">
           <div class="position-header">
             <h2 class="position-title">{{ group.label }}</h2>
-            @if (group.candidates.length === 1) {
-              <span class="auto-badge">Sélection automatique</span>
+            @if (group.tied) {
+              <span class="tied-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                Égalité
+              </span>
             }
           </div>
 
           <div class="candidates-list">
             @for (c of group.candidates; track c.id; let i = $index) {
-              <div class="result-row" [class.result-row--winner]="c.winner">
+              <div class="result-row" [class.result-row--winner]="c.winner" [class.result-row--tied]="group.tied">
                 <div class="rank">
                   @if (c.winner && !c.autoSelected) {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><path d="M2 19h20l-2-10-5 5-3-8-3 8-5-5z"/></svg>
@@ -57,7 +123,7 @@
                       <span class="winner-badge">Élu(e)</span>
                     }
                     @if (c.autoSelected) {
-                      <span class="auto-selected-badge">Auto-sélectionné(e)</span>
+                      <span class="winner-badge">Élu(e)</span>
                     }
                   </div>
                   @if (c.description) {

@@ -30,6 +30,12 @@ export interface Election {
   candidates: Candidate[];
   candidatesByPosition: Record<Position, Candidate[]>;
   votedPositions: Position[];
+  resultsPublished: boolean;
+  hasTie: boolean;
+  tiedPositions: Position[];
+  isExtraRound: boolean;
+  parentElectionId?: number;
+  extraRoundElectionId?: number;
 }
 
 export interface UserSummary {

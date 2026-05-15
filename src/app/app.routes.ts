@@ -76,15 +76,11 @@ export const routes: Routes = [
       },
       {
         path: 'elections',
-        loadComponent: () => import('./bureau/sondages/elections/election-admin/election-admin.component').then(m => m.ElectionAdminComponent),
+        loadComponent: () => import('./bureau/sondages/elections/election-call-admin/election-call-admin.component').then(m => m.ElectionCallAdminComponent),
       },
       {
-        path: 'elections/create',
-        loadComponent: () => import('./bureau/sondages/elections/election-create-multi-step/election-create-multi-step.component').then(m => m.ElectionCreateMultiStepComponent),
-      },
-      {
-        path: 'elections/:id/candidats',
-        loadComponent: () => import('./bureau/sondages/elections/election-candidates/election-candidates.component').then(m => m.ElectionCandidatesComponent),
+        path: 'elections/review/:id',
+        loadComponent: () => import('./bureau/sondages/elections/election-call-review/election-call-review.component').then(m => m.ElectionCallReviewComponent),
       },
       {
         path: 'elections/:id/resultats',
@@ -113,7 +109,10 @@ export const routes: Routes = [
         loadComponent: () => import('./bureau/offres/bureau-offres.component').then(m => m.BureauOffresComponent),
       },
       {
-<<<<<<< HEAD
+        path: 'offres/mon-pole',
+        loadComponent: () => import('./bureau/offres/mon-pole/bureau-mon-pole.component').then(m => m.BureauMonPoleComponent),
+      },
+      {
         path: 'sondages',
         loadComponent: () => import('./bureau/sondages/bureau-sondages.component').then(m => m.BureauSondagesComponent),
       },
@@ -126,8 +125,8 @@ export const routes: Routes = [
         loadComponent: () => import('./bureau/sondages/elections/election-list/election-list.component').then(m => m.ElectionListComponent),
       },
       {
-        path: 'elections/create',
-        loadComponent: () => import('./bureau/sondages/elections/election-create-multi-step/election-create-multi-step.component').then(m => m.ElectionCreateMultiStepComponent),
+        path: 'elections/apply/:id',
+        loadComponent: () => import('./bureau/sondages/elections/election-apply/election-apply.component').then(m => m.ElectionApplyComponent),
       },
       {
         path: 'elections/:id',
@@ -136,10 +135,6 @@ export const routes: Routes = [
       {
         path: 'elections/:id/resultats',
         loadComponent: () => import('./bureau/sondages/elections/election-results/election-results.component').then(m => m.ElectionResultsComponent),
-=======
-        path: 'offres/mon-pole',
-        loadComponent: () => import('./bureau/offres/mon-pole/bureau-mon-pole.component').then(m => m.BureauMonPoleComponent),
->>>>>>> 3d95afcba61c50d6157d516348402465974a98c4
       },
       {
         path: 'offres/creer',
@@ -220,6 +215,10 @@ export const routes: Routes = [
       {
         path: 'elections',
         loadComponent: () => import('./bureau/sondages/elections/election-list/election-list.component').then(m => m.ElectionListComponent),
+      },
+      {
+        path: 'elections/apply/:id',
+        loadComponent: () => import('./bureau/sondages/elections/election-apply/election-apply.component').then(m => m.ElectionApplyComponent),
       },
       {
         path: 'elections/:id',

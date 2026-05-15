@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem \"c:\\\\Users\\\\kossa\\\\frontend-amicale\\\\src\\\\app\\\\bureau\\\\sondages\\\\elections\" -Recurse -Name)"
+    ]
+  }
+}
