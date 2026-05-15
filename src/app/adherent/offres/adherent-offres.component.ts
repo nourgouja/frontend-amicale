@@ -63,8 +63,10 @@ export class AdherentOffresComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const q = this.route.snapshot.queryParamMap.get('q');
-    if (q) this.searchQuery.set(q);
+    const q    = this.route.snapshot.queryParamMap.get('q');
+    const type = this.route.snapshot.queryParamMap.get('type');
+    if (q)    this.searchQuery.set(q);
+    if (type) this.activeFilter.set(type);
 
     this.http.get<Offre[]>('/api/offres/publiques').pipe(
       catchError(() => this.http.get<Offre[]>('/api/offres').pipe(catchError(() => of([]))))

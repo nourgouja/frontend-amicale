@@ -65,36 +65,32 @@
 }
 
 /* ── Filters ── */
-.filter-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: $space-4; flex-wrap: wrap;
-}
+.filter-bar   { @include filter-bar; }
+.filter-right { display: flex; align-items: center; gap: $space-3; flex-wrap: wrap; }
+.export-btns  { display: flex; align-items: center; gap: $space-2; }
 
-.stat-tabs { display: flex; gap: $space-1; }
-
-.stat-tab {
-  padding: 6px 14px; border-radius: $radius-md;
-  border: 1px solid transparent; background: transparent;
-  font-family: $font-base; font-size: $font-size-sm; color: $color-text-muted;
-  cursor: pointer; transition: all $transition-fast;
-  &:hover  { background: $color-primary-light; color: $color-primary; }
-  &.active { background: $color-primary; color: #fff; border-color: $color-primary; }
+.btn-export {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: $radius-md;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600;
+  cursor: pointer; border: 1px solid $color-border; background: $color-surface;
+  color: $color-text-muted; white-space: nowrap;
+  transition: all $transition-fast;
   &:focus-visible { @include focus-ring; }
   @include reduced-motion { transition: none; }
+
+  &--csv {
+    &:hover { background: rgba(5,150,105,0.07); border-color: rgba(5,150,105,0.35); color: #047857; }
+  }
+  &--pdf {
+    &:hover { background: rgba(59,130,246,0.07); border-color: rgba(59,130,246,0.35); color: #2563eb; }
+  }
 }
 
-.search-wrap {
-  display: flex; align-items: center; gap: 8px;
-  background: $color-surface; border: 1px solid $color-border;
-  border-radius: $radius-md; padding: 8px 12px; min-width: 220px;
-  svg { color: $color-text-muted; flex-shrink: 0; }
-}
-
-.search-input {
-  border: none; outline: none; background: transparent;
-  font-family: $font-base; font-size: $font-size-sm; color: $color-text; width: 100%;
-  &::placeholder { color: $color-text-muted; }
-}
+.stat-tabs    { @include filter-tab-group; }
+.stat-tab     { @include filter-tab; }
+.search-wrap  { @include filter-search-wrap; svg { color: $color-text-muted; flex-shrink: 0; } }
+.search-input { @include filter-search-input; }
 
 /* ── Table card ── */
 .table-card { @include card; overflow: hidden; }

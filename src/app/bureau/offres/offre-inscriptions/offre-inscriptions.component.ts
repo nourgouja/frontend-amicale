@@ -209,6 +209,75 @@ export class OffreInscriptionsComponent implements OnInit {
   onSearch(e: Event): void { this.searchTerm.set((e.target as HTMLInputElement).value); }
   setStatut(s: string): void { this.statutFilter.set(s); }
 
+  exportCsv(): void {
+    const offre = this.offre();
+    const rows  = this.filtered();
+    const sep   = ';';
+    const headers = ['Prénom', 'Nom', 'Email', "Date d'inscription", 'Statut', 'Montant (TND)'];
+    const lines = rows.map(i => [
+      i.adherentPrenom,
+      i.adherentNom,
+      i.mailAdherent,
+      this.fmtDate(i.dateInscription),
+      this.statutLabel(i.statut),
+      i.montant != null ? String(i.montant) : '',
+    ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(sep));
+
+    const csv  = '﻿' + [headers.join(sep), ...lines].join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `participants_${(offre?.titre ?? 'offre').replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  exportPrint(): void {
+    const offre = this.offre();
+    const rows  = this.filtered();
+    const html  = `<!DOCTYPE html><html><head>
+      <meta charset="utf-8">
+      <title>Participants — ${offre?.titre ?? ''}</title>
+      <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; color: #111; padding: 24px; }
+        h1   { font-size: 16px; margin-bottom: 4px; }
+        p    { color: #666; margin: 0 0 16px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f3f4f6; padding: 8px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e5e7eb; }
+        td { padding: 8px 12px; border-bottom: 1px solid #e5e7eb; }
+      </style></head><body>
+      <h1>Participants — ${offre?.titre ?? ''}</h1>
+      <p>Exporté le ${new Date().toLocaleDateString('fr-FR')} · ${rows.length} participant(s)</p>
+      <table><thead><tr>
+        <th>#</th><th>Participant</th><th>Email</th><th>Date d'inscription</th><th>Statut</th><th>Montant</th>
+      </tr></thead><tbody>
+      ${rows.map((i, idx) => `<tr>
+        <td>${idx + 1}</td>
+        <td>${i.adherentPrenom} ${i.adherentNom}</td>
+        <td>${i.mailAdherent}</td>
+        <td>${this.fmtDate(i.dateInscription)}</td>
+        <td>${this.statutLabel(i.statut)}</td>
+        <td>${i.montant != null ? i.montant + ' TND' : '—'}</td>
+      </tr>`).join('')}
+      </tbody></table>
+      <script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script>
+      </body></html>`;
+
+    const win = window.open('', '_blank');
+    if (win) { win.document.write(html); win.document.close(); }
+  }
+
+  private statutLabel(s: string): string {
+    switch (s) {
+      case 'EN_ATTENTE': return 'En attente';
+      case 'CONFIRMEE':  return 'Confirmée';
+      case 'REJETEE':    return 'Rejetée';
+      case 'ANNULEE':    return 'Annulée';
+      default:           return s;
+    }
+  }
+
   sexeLabel(s?: string | null): string {
     return s === 'M' ? 'Homme' : s === 'F' ? 'Femme' : s === 'AUTRE' ? 'Autre' : '—';
   }

@@ -54,6 +54,10 @@
   gap: $space-2;
 }
 
+.section-hd-left {
+  display: flex; flex-direction: column; gap: 2px;
+}
+
 .section-title {
   font-size: $font-size-xl;
   font-weight: 700;
@@ -228,8 +232,9 @@
 // ─── Conventions grid ─────────────────────────────────────────────────────────
 .conventions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: $space-4;
+  @include mobile { grid-template-columns: 1fr; }
 }
 
 .convention-card {

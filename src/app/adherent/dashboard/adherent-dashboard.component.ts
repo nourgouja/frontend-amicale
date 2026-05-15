@@ -69,7 +69,8 @@ export class AdherentDashboardComponent implements OnInit {
 
   recentActivites = computed(() => this.filteredActivites().slice(0, 6));
 
-  conventions = computed(() => this.offres().filter(o => o.typeOffre === 'CONVENTION').slice(0, 4));
+  allConventions = computed(() => this.offres().filter(o => o.typeOffre === 'CONVENTION'));
+  conventions    = computed(() => this.allConventions().slice(0, 4));
 
   sortedMembres = computed(() =>
     [...this.membres()].sort((a, b) =>

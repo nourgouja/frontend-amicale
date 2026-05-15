@@ -119,3 +119,43 @@ $bp-xl:  1280px;
   outline: 2px solid $color-primary;
   outline-offset: 2px;
 }
+
+// ─── Filter bar — shared layout + visuals ─────────────────────────────────────
+@mixin filter-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: $space-4; flex-wrap: wrap;
+}
+
+@mixin filter-tab-group {
+  display: flex; gap: $space-1; flex-wrap: wrap;
+}
+
+// Pill-shaped category / status toggle button
+@mixin filter-tab {
+  padding: 7px $space-4; border-radius: $radius-full;
+  border: 1px solid transparent; background: $color-surface;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 500;
+  color: $color-text-muted; cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+
+  &:hover       { border-color: $color-primary; color: $color-primary; }
+  &.active      { background: $color-primary; color: #fff; border-color: $color-primary; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+// Search box used alongside filter tabs
+@mixin filter-search-wrap {
+  display: flex; align-items: center; gap: $space-2;
+  background: $color-surface; border: 1px solid $color-border;
+  border-radius: $radius-md; padding: 0 $space-3;
+  height: 38px; min-width: 220px; color: $color-text-muted;
+  &:focus-within { border-color: $color-primary; }
+}
+
+@mixin filter-search-input {
+  flex: 1; border: none; background: none; outline: none;
+  font-family: $font-base; font-size: $font-size-sm; color: $color-text;
+  &::placeholder { color: #b5b5b5; }
+}

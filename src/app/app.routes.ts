@@ -97,6 +97,10 @@ export const routes: Routes = [
         loadComponent: () => import('./bureau/offres/bureau-offres.component').then(m => m.BureauOffresComponent),
       },
       {
+        path: 'offres/mon-pole',
+        loadComponent: () => import('./bureau/offres/mon-pole/bureau-mon-pole.component').then(m => m.BureauMonPoleComponent),
+      },
+      {
         path: 'offres/creer',
         canActivate: [adminOrBureauGuard],
         loadComponent: () => import('./admin/creer-offre/creer-offre.component').then(m => m.CreerOffreComponent),

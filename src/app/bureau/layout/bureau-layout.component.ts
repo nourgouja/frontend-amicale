@@ -46,7 +46,7 @@ export class BureauLayoutComponent implements OnInit {
   navItems = computed(() => {
     const items: { label: string; route: string; icon: string }[] = [
       { label: 'Tableau de bord', route: '/bureau/dashboard',         icon: 'LayoutDashboard' },
-      { label: 'Catalogue',       route: '/bureau/offres/catalogue',  icon: 'BookOpen'        },
+      { label: 'Catalogue',       route: '/bureau/offres',            icon: 'BookOpen'        },
     ];
     if (this.isResponsablePole()) {
       items.push({ label: 'Mon Pôle', route: '/bureau/offres/mon-pole', icon: 'Building2' });
