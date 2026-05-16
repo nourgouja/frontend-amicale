@@ -113,7 +113,7 @@
       <div class="dp-fields">
         <div class="dp-row">
           <span class="dp-label">Status:</span>
-          <span class="dp-status" [class.open]="o.statutOffre==='OUVERTE'" [class.draft]="o.statutOffre==='BROUILLON'" [class.closed]="o.statutOffre==='FERMEE'">
+          <span class="dp-status" [class.open]="o.statutOffre==='OPEN'" [class.draft]="o.statutOffre==='DRAFT'" [class.closed]="o.statutOffre==='CLOSED'">
             {{ o.statutOffre }}
           </span>
         </div>
@@ -144,7 +144,7 @@
       }
     </div>
 
-    @if ((o.statutOffre === 'OUVERTE' || o.statutOffre === 'FERMEE') && o.typeOffre !== 'CONVENTION') {
+    @if ((o.statutOffre === 'OPEN' || o.statutOffre === 'CLOSED') && o.typeOffre !== 'CONVENTION') {
       <div class="dp-participants">
         <button class="dp-participants-btn" (click)="goToParticipants(o.id)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -162,7 +162,7 @@
     <div class="dp-footer">
       <button class="dp-btn dp-ghost" (click)="closeDetail()">Fermer</button>
       <button class="dp-btn dp-primary" (click)="onModifier(o.id)">Modifier</button>
-      @if (o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'ANNULEE') {
+      @if (o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CANCELLED') {
         <button class="dp-btn dp-danger" (click)="onArchive(o.id); closeDetail()">Archiver</button>
       }
     </div>

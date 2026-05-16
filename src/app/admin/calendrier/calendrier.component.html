@@ -104,7 +104,7 @@
         <div class="dp-fields">
           <div class="dp-row">
             <span class="dp-label">Status:</span>
-            <span class="dp-status-badge" [class.open]="o.statutOffre === 'OUVERTE'" [class.draft]="o.statutOffre === 'BROUILLON'" [class.closed]="o.statutOffre === 'FERMEE'">
+            <span class="dp-status-badge" [class.open]="o.statutOffre === 'OPEN'" [class.draft]="o.statutOffre === 'DRAFT'" [class.closed]="o.statutOffre === 'CLOSED'">
               {{ o.statutOffre }}
             </span>
           </div>

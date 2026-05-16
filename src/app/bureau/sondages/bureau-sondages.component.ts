@@ -61,7 +61,7 @@ export class BureauSondagesComponent implements OnInit {
   }
 
   statusLabel(statut: string): string {
-    return statut === 'DRAFT' ? 'Brouillon' : statut === 'ACTIVE' ? 'Actif' : 'Clôturé';
+    return statut === 'DRAFT' ? 'Brouillon' : statut === 'OPEN' ? 'Actif' : 'Clôturé';
   }
 
   totalVotes(s: Sondage): number {

@@ -24,7 +24,7 @@ export interface ElectionCall {
   totalApplicationsCount: number;
   approvedCandidatesCount: number;
   publishedElectionId?: number;
-  publishedElectionStatus?: 'ACTIVE' | 'CLOSED' | null;
+  publishedElectionStatus?: 'OPEN' | 'CLOSED' | null;
   canApply: boolean;
   canPublish: boolean;
 }

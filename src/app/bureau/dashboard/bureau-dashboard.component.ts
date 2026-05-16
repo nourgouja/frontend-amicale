@@ -45,10 +45,10 @@ const TYPE_META = [
 ];
 
 const INSC_META = [
-  { statut: 'EN_ATTENTE', label: 'En Attente', color: '#f59e0b' },
-  { statut: 'CONFIRMEE',  label: 'Confirmé',   color: '#10b981' },
+  { statut: 'PENDING', label: 'En Attente', color: '#f59e0b' },
+  { statut: 'APPROVED',  label: 'Confirmé',   color: '#10b981' },
   { statut: 'REFUSEE',    label: 'Rejeté',     color: '#ef4444' },
-  { statut: 'ANNULEE',    label: 'Annulé',     color: '#6366f1' },
+  { statut: 'CANCELLED',    label: 'Annulé',     color: '#6366f1' },
 ];
 
 @Component({
@@ -84,17 +84,17 @@ export class BureauDashboardComponent implements OnInit {
   });
 
   recentOffres = computed(() =>
-    this.fullOffres().filter(o => o.statutOffre !== 'ARCHIVEE')
+    this.fullOffres().filter(o => o.statutOffre !== 'ARCHIVED')
   );
 
   calendarOffres = computed<CalendarOffre[]>(() =>
     this.fullOffres()
-      .filter(o => o.statutOffre === 'OUVERTE' && o.dateDebut)
+      .filter(o => o.statutOffre === 'OPEN' && o.dateDebut)
       .map(o => ({ id: o.id, titre: o.titre, typeOffre: o.typeOffre, dateDebut: o.dateDebut }))
   );
 
   typeDistribution = computed(() => {
-    const all   = this.fullOffres().filter(o => o.statutOffre !== 'ARCHIVEE');
+    const all   = this.fullOffres().filter(o => o.statutOffre !== 'ARCHIVED');
     const total = all.length;
     const items = TYPE_META.map(m => ({
       ...m,
@@ -131,7 +131,7 @@ export class BureauDashboardComponent implements OnInit {
     const all   = this.allInscriptions();
     const total = all.length;
     if (!total) return { score: 0, breakdown: INSC_META.map(m => ({ ...m, count: 0, pct: 0 })) };
-    const confirmed = all.filter(i => i.statut === 'CONFIRMEE').length;
+    const confirmed = all.filter(i => i.statut === 'APPROVED').length;
     return {
       score: +(confirmed / total * 10).toFixed(1),
       breakdown: INSC_META.map(m => {
@@ -142,7 +142,7 @@ export class BureauDashboardComponent implements OnInit {
   });
 
   tauxOccupation = computed(() => {
-    const offres = this.fullOffres().filter(o => o.statutOffre === 'OUVERTE' && (o.capaciteMax ?? 0) > 0);
+    const offres = this.fullOffres().filter(o => o.statutOffre === 'OPEN' && (o.capaciteMax ?? 0) > 0);
     if (!offres.length) return { score: 0, breakdown: [] as { label: string; color: string; count: number; pct: number }[] };
     const totalCap = offres.reduce((s, o) => s + (o.capaciteMax ?? 0), 0);
     const totalIns = offres.reduce((s, o) => s + Math.max(0, (o.capaciteMax ?? 0) - (o.placesRestantes ?? 0)), 0);
@@ -161,7 +161,7 @@ export class BureauDashboardComponent implements OnInit {
   });
 
   typeStats = computed(() => {
-    const all   = this.fullOffres().filter(o => o.statutOffre !== 'ARCHIVEE');
+    const all   = this.fullOffres().filter(o => o.statutOffre !== 'ARCHIVED');
     const total = all.length;
     return {
       score: total,
@@ -193,7 +193,7 @@ export class BureauDashboardComponent implements OnInit {
     this.loading.set(true);
     this.http.get<BureauDashboardData>('/api/bureau/dashboard').subscribe({
       next: data => {
-        this.offresActives.set(data.mesOffres?.filter(o => o.statut === 'OUVERTE').length ?? 0);
+        this.offresActives.set(data.mesOffres?.filter(o => o.statut === 'OPEN').length ?? 0);
         this.inscriptionsPending.set(data.totalInscriptionsEnAttente ?? 0);
         this.pendingList.set((data.inscriptionsEnAttente ?? []).slice(0, 5));
         this.cotisationsImpayees.set(data.totalPaiementsEnRetard ?? 0);

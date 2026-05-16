@@ -47,7 +47,7 @@
   } @else {
     <div class="offers-grid">
       @for (o of recentActivites(); track o.id) {
-        <div class="prop-card" [class.prop-card--fermee]="o.statutOffre !== 'OUVERTE'" [routerLink]="['/adherent/offres', o.id]">
+        <div class="prop-card" [class.prop-card--fermee]="o.statutOffre !== 'OPEN'" [routerLink]="['/adherent/offres', o.id]">
 
           <div class="prop-img-wrap">
             @if (coverUrl(o)) {
@@ -57,7 +57,7 @@
                 <span class="type-chip">{{ typeLabel(o.typeOffre) }}</span>
               </div>
             }
-            @if (o.statutOffre !== 'OUVERTE') {
+            @if (o.statutOffre !== 'OPEN') {
               <div class="fermee-overlay"><span class="fermee-badge">Fermée</span></div>
             }
             <a class="prop-arrow" [routerLink]="['/adherent/offres', o.id]" (click)="$event.stopPropagation()" aria-label="Voir l'offre">

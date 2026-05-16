@@ -64,12 +64,12 @@
 
             <!-- Inscription row -->
             <tr class="main-row"
-                [class.row--retard]="groupStatut(g) === 'EN_RETARD'"
+                [class.row--retard]="groupStatut(g) === 'OVERDUE'"
                 [class.row--expanded]="isExpanded(g.inscriptionId)"
                 (click)="toggleExpand(g.inscriptionId)">
               <td>
                 <div class="member-cell">
-                  <div class="member-avatar" [class.member-avatar--red]="groupStatut(g) === 'EN_RETARD'">
+                  <div class="member-avatar" [class.member-avatar--red]="groupStatut(g) === 'OVERDUE'">
                     {{ initials(g.adherentNom, g.adherentPrenom) }}
                   </div>
                   <div class="member-info">
@@ -122,14 +122,14 @@
                         </thead>
                         <tbody>
                           @for (ec of g.echeances; track ec.id) {
-                            <tr [class.inner-row--retard]="ec.statut === 'EN_RETARD'">
+                            <tr [class.inner-row--retard]="ec.statut === 'OVERDUE'">
                               <td>{{ ec.numero }}/{{ g.echeances.length }}</td>
                               <td><strong>{{ ec.montant | number }} DT</strong></td>
                               <td>{{ formatDate(ec.dateEcheance) }}</td>
                               <td>{{ formatDate(ec.datePaiement ?? '') }}</td>
                               <td><app-status-badge [statut]="ec.statut" type="cotisation" /></td>
                               <td>
-                                @if (ec.statut !== 'PAYEE') {
+                                @if (ec.statut !== 'PAID') {
                                   <button class="btn-marquer" (click)="openPay(ec, $event)">
                                     <lucide-icon name="credit-card" [size]="13"></lucide-icon>
                                     Marquer paiement

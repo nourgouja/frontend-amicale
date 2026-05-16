@@ -12,7 +12,7 @@ export interface Sondage {
   id: number;
   titre: string;
   description?: string;
-  statut: 'DRAFT' | 'ACTIVE' | 'CLOSED' | 'ARCHIVED';
+  statut: 'DRAFT' | 'OPEN' | 'CLOSED' | 'ARCHIVED';
   options: SondageOption[];
   hasVoted: boolean;
   votedOptionId: number | null;

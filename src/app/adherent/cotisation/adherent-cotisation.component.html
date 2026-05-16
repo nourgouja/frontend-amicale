@@ -75,9 +75,9 @@
           @for (e of ins.echeances; track e.id) {
             <li class="hist-row" [class.hist-row--retard]="e.overdue">
               <span class="hist-icon"
-                [class.hist-icon--green]="e.statut === 'PAYEE'"
-                [class.hist-icon--red]="e.statut === 'EN_RETARD'"
-                [class.hist-icon--orange]="e.statut === 'EN_ATTENTE' && e.daysUntilDue <= 7 && !e.overdue">
+                [class.hist-icon--green]="e.statut === 'PAID'"
+                [class.hist-icon--red]="e.statut === 'OVERDUE'"
+                [class.hist-icon--orange]="e.statut === 'PENDING' && e.daysUntilDue <= 7 && !e.overdue">
                 {{ statusIcon(e.statut) }}
               </span>
               <div class="hist-info">

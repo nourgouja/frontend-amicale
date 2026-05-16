@@ -103,15 +103,15 @@
                 </td>
                 <td>
                   <span class="statut-badge"
-                        [class.statut--open]="o.statutOffre === 'OUVERTE'"
-                        [class.statut--draft]="o.statutOffre === 'BROUILLON'"
-                        [class.statut--closed]="o.statutOffre === 'FERMEE'"
-                        [class.statut--archived]="o.statutOffre === 'ARCHIVEE'">
+                        [class.statut--open]="o.statutOffre === 'OPEN'"
+                        [class.statut--draft]="o.statutOffre === 'DRAFT'"
+                        [class.statut--closed]="o.statutOffre === 'CLOSED'"
+                        [class.statut--archived]="o.statutOffre === 'ARCHIVED'">
                     @switch (o.statutOffre) {
-                      @case ('OUVERTE')   { Ouverte }
-                      @case ('BROUILLON') { Brouillon }
-                      @case ('FERMEE')    { Fermée }
-                      @case ('ARCHIVEE')  { Archivée }
+                      @case ('OPEN')   { Ouverte }
+                      @case ('DRAFT') { Brouillon }
+                      @case ('CLOSED')    { Fermée }
+                      @case ('ARCHIVED')  { Archivée }
                       @default            { {{ o.statutOffre }} }
                     }
                   </span>
@@ -236,28 +236,28 @@
                     <td class="muted-cell">{{ fmtDate(ins.dateInscription) }}</td>
                     <td>
                       <span class="ins-badge"
-                            [class.ins--attente]="ins.statut === 'EN_ATTENTE'"
-                            [class.ins--ok]="ins.statut === 'CONFIRMEE'"
-                            [class.ins--rejet]="ins.statut === 'REJETEE'"
-                            [class.ins--annul]="ins.statut === 'ANNULEE'">
+                            [class.ins--attente]="ins.statut === 'PENDING'"
+                            [class.ins--ok]="ins.statut === 'APPROVED'"
+                            [class.ins--rejet]="ins.statut === 'REJECTED'"
+                            [class.ins--annul]="ins.statut === 'CANCELLED'">
                         @switch (ins.statut) {
-                          @case ('EN_ATTENTE') { En attente }
-                          @case ('CONFIRMEE')  { Confirmée }
-                          @case ('REJETEE')    { Rejetée }
-                          @case ('ANNULEE')    { Annulée }
+                          @case ('PENDING') { En attente }
+                          @case ('APPROVED')  { Confirmée }
+                          @case ('REJECTED')    { Rejetée }
+                          @case ('CANCELLED')    { Annulée }
                         }
                       </span>
                     </td>
                     <td>
                       @if (ins.statutPaiement) {
                         <span class="pay-badge"
-                              [class.pay--ok]="ins.statutPaiement === 'PAYEE'"
-                              [class.pay--late]="ins.statutPaiement === 'EN_RETARD'"
-                              [class.pay--attente]="ins.statutPaiement === 'EN_ATTENTE'">
+                              [class.pay--ok]="ins.statutPaiement === 'PAID'"
+                              [class.pay--late]="ins.statutPaiement === 'OVERDUE'"
+                              [class.pay--attente]="ins.statutPaiement === 'PENDING'">
                           @switch (ins.statutPaiement) {
-                            @case ('PAYEE')      { Payée }
-                            @case ('EN_RETARD')  { En retard }
-                            @case ('EN_ATTENTE') { En attente }
+                            @case ('PAID')      { Payée }
+                            @case ('OVERDUE')  { En retard }
+                            @case ('PENDING') { En attente }
                           }
                         </span>
                       } @else {
@@ -267,7 +267,7 @@
                     <td class="muted-cell center-cell">{{ ins.guests?.length ?? ins.nombreAccompagnants }}</td>
                     <td class="muted-cell center-cell">{{ ins.totalPeople ?? (1 + ins.nombreAccompagnants) }}</td>
                     <td (click)="$event.stopPropagation()">
-                      @if (ins.statut === 'EN_ATTENTE') {
+                      @if (ins.statut === 'PENDING') {
                         <div class="action-btns">
                           <button class="btn-approve" [disabled]="actionLoading() === ins.id"
                                   (click)="confirmer(ins.id)">
@@ -314,15 +314,15 @@
               <div class="aside-row">
                 <span class="aside-label">Statut</span>
                 <span class="statut-badge"
-                  [class.statut--open]="o.statutOffre === 'OUVERTE'"
-                  [class.statut--draft]="o.statutOffre === 'BROUILLON'"
-                  [class.statut--closed]="o.statutOffre === 'FERMEE'"
-                  [class.statut--archived]="o.statutOffre === 'ARCHIVEE'">
+                  [class.statut--open]="o.statutOffre === 'OPEN'"
+                  [class.statut--draft]="o.statutOffre === 'DRAFT'"
+                  [class.statut--closed]="o.statutOffre === 'CLOSED'"
+                  [class.statut--archived]="o.statutOffre === 'ARCHIVED'">
                   @switch (o.statutOffre) {
-                    @case ('OUVERTE')   { Ouverte }
-                    @case ('BROUILLON') { Brouillon }
-                    @case ('FERMEE')    { Fermée }
-                    @case ('ARCHIVEE')  { Archivée }
+                    @case ('OPEN')   { Ouverte }
+                    @case ('DRAFT') { Brouillon }
+                    @case ('CLOSED')    { Fermée }
+                    @case ('ARCHIVED')  { Archivée }
                     @default            { {{ o.statutOffre }} }
                   }
                 </span>
@@ -420,15 +420,15 @@
             <div class="detail-kv">
               <span class="kv-label">Statut inscription</span>
               <span class="ins-badge"
-                    [class.ins--attente]="ins.statut === 'EN_ATTENTE'"
-                    [class.ins--ok]="ins.statut === 'CONFIRMEE'"
-                    [class.ins--rejet]="ins.statut === 'REJETEE'"
-                    [class.ins--annul]="ins.statut === 'ANNULEE'">
+                    [class.ins--attente]="ins.statut === 'PENDING'"
+                    [class.ins--ok]="ins.statut === 'APPROVED'"
+                    [class.ins--rejet]="ins.statut === 'REJECTED'"
+                    [class.ins--annul]="ins.statut === 'CANCELLED'">
                 @switch (ins.statut) {
-                  @case ('EN_ATTENTE') { En attente }
-                  @case ('CONFIRMEE')  { Confirmée }
-                  @case ('REJETEE')    { Rejetée }
-                  @case ('ANNULEE')    { Annulée }
+                  @case ('PENDING') { En attente }
+                  @case ('APPROVED')  { Confirmée }
+                  @case ('REJECTED')    { Rejetée }
+                  @case ('CANCELLED')    { Annulée }
                 }
               </span>
             </div>
@@ -493,18 +493,18 @@
                       <td class="echeance-montant">{{ e.montant | number:'1.0-2' }} TND</td>
                       <td>
                         <span class="pay-badge"
-                              [class.pay--ok]="e.statut === 'PAYEE'"
-                              [class.pay--late]="e.statut === 'EN_RETARD'"
-                              [class.pay--attente]="e.statut === 'EN_ATTENTE'">
+                              [class.pay--ok]="e.statut === 'PAID'"
+                              [class.pay--late]="e.statut === 'OVERDUE'"
+                              [class.pay--attente]="e.statut === 'PENDING'">
                           @switch (e.statut) {
-                            @case ('PAYEE')      { Payée }
-                            @case ('EN_RETARD')  { En retard }
-                            @case ('EN_ATTENTE') { En attente }
+                            @case ('PAID')      { Payée }
+                            @case ('OVERDUE')  { En retard }
+                            @case ('PENDING') { En attente }
                           }
                         </span>
                       </td>
                       <td>
-                        @if (e.statut !== 'PAYEE') {
+                        @if (e.statut !== 'PAID') {
                           <button class="btn-pay" [disabled]="payLoading() === e.id"
                                   (click)="payer(e.id, ins.id)">
                             @if (payLoading() === e.id) { … } @else { Marquer payée }
@@ -535,7 +535,7 @@
 
         <!-- Modal footer – main actions -->
         <div class="modal-footer">
-          @if (ins.statut === 'EN_ATTENTE') {
+          @if (ins.statut === 'PENDING') {
             <button class="btn-confirm-main" [disabled]="actionLoading() === ins.id"
                     (click)="confirmer(ins.id)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -549,15 +549,15 @@
           } @else {
             <span class="status-final">
               @switch (ins.statut) {
-                @case ('CONFIRMEE') {
+                @case ('APPROVED') {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                   Inscription confirmée
                 }
-                @case ('REJETEE') {
+                @case ('REJECTED') {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   Inscription rejetée
                 }
-                @case ('ANNULEE') { Inscription annulée }
+                @case ('CANCELLED') { Inscription annulée }
               }
             </span>
           }

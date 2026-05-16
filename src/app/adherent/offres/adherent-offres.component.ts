@@ -32,7 +32,7 @@ export class AdherentOffresComponent implements OnInit {
   loading       = signal(true);
   searchQuery   = signal('');
   activeFilter  = signal('');
-  activeStatut  = signal('OUVERTE');
+  activeStatut  = signal('OPEN');
 
   readonly typeFilters = [
     { value: '',           label: 'Tout'       },
@@ -44,9 +44,9 @@ export class AdherentOffresComponent implements OnInit {
   ];
 
   readonly statutFilters = [
-    { value: 'OUVERTE', label: 'Ouvertes' },
+    { value: 'OPEN', label: 'Ouvertes' },
     { value: '',        label: 'Toutes'   },
-    { value: 'FERMEE',  label: 'Fermées'  },
+    { value: 'CLOSED',  label: 'Fermées'  },
   ];
 
   filtered = computed(() => {
@@ -78,7 +78,7 @@ export class AdherentOffresComponent implements OnInit {
 
   resetFilters(): void {
     this.activeFilter.set('');
-    this.activeStatut.set('OUVERTE');
+    this.activeStatut.set('OPEN');
     this.searchQuery.set('');
   }
 

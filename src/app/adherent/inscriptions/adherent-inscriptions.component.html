@@ -49,7 +49,7 @@
               </div>
               <div class="ins-right">
                 <app-status-badge [statut]="ins.statut" type="inscription" />
-                @if (ins.statut === 'EN_ATTENTE' || ins.statut === 'CONFIRMEE') {
+                @if (ins.statut === 'PENDING' || ins.statut === 'APPROVED') {
                   <button class="btn-cancel" (click)="openCancel(ins); $event.stopPropagation()" aria-label="Annuler">
                     <lucide-icon name="circle-x" [size]="14"></lucide-icon>
                     Annuler

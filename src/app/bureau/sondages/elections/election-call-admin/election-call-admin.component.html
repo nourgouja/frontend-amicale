@@ -113,12 +113,12 @@
             @if (call.publishedElectionId) {
               <div class="election-controls">
                 <span class="election-status-badge"
-                      [class.election-status-badge--active]="call.publishedElectionStatus === 'ACTIVE'"
+                      [class.election-status-badge--active]="call.publishedElectionStatus === 'OPEN'"
                       [class.election-status-badge--closed]="call.publishedElectionStatus === 'CLOSED'">
                   <span class="dot"></span>
-                  {{ call.publishedElectionStatus === 'ACTIVE' ? 'Vote en cours' : 'Vote clôturé' }}
+                  {{ call.publishedElectionStatus === 'OPEN' ? 'Vote en cours' : 'Vote clôturé' }}
                 </span>
-                @if (call.publishedElectionStatus === 'ACTIVE') {
+                @if (call.publishedElectionStatus === 'OPEN') {
                   <button class="btn-action btn-close-election" (click)="closeElection(call)">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
                     Clôturer le vote
@@ -134,7 +134,7 @@
               Candidatures
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
-            @if (call.publishedElectionStatus !== 'ACTIVE') {
+            @if (call.publishedElectionStatus !== 'OPEN') {
               <button class="btn-action btn-delete-call"
                       (click)="deleteCall(call)"
                       [disabled]="deletingCall() === call.id"

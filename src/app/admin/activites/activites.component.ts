@@ -6,8 +6,8 @@ import { ActivatedRoute } from '@angular/router';
 import { formatDate, getOffreTypeColor, getOffreTypeLabel } from '../../shared/utils/format.utils';
 
 type View            = 'offres' | 'participants' | 'detail';
-type OffreStatut     = 'tout' | 'OUVERTE' | 'BROUILLON' | 'FERMEE';
-type InsStatut       = 'tout' | 'EN_ATTENTE' | 'CONFIRMEE' | 'REJETEE' | 'ANNULEE';
+type OffreStatut     = 'tout' | 'OPEN' | 'DRAFT' | 'CLOSED';
+type InsStatut       = 'tout' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
 
 interface Offre {
   id: number;
@@ -83,9 +83,9 @@ export class ActivitesComponent implements OnInit, OnDestroy {
 
   readonly offreStatuts: { key: OffreStatut; label: string }[] = [
     { key: 'tout',      label: 'Toutes' },
-    { key: 'OUVERTE',   label: 'Ouvertes' },
-    { key: 'BROUILLON', label: 'Brouillons' },
-    { key: 'FERMEE',    label: 'Fermées' },
+    { key: 'OPEN',   label: 'Ouvertes' },
+    { key: 'DRAFT', label: 'Brouillons' },
+    { key: 'CLOSED',    label: 'Fermées' },
   ];
 
   filteredOffres = computed(() => {
@@ -109,10 +109,10 @@ export class ActivitesComponent implements OnInit, OnDestroy {
 
   readonly insStatuts: { key: InsStatut; label: string }[] = [
     { key: 'tout',       label: 'Tous' },
-    { key: 'EN_ATTENTE', label: 'En attente' },
-    { key: 'CONFIRMEE',  label: 'Confirmés' },
-    { key: 'REJETEE',    label: 'Rejetés' },
-    { key: 'ANNULEE',    label: 'Annulés' },
+    { key: 'PENDING', label: 'En attente' },
+    { key: 'APPROVED',  label: 'Confirmés' },
+    { key: 'REJECTED',    label: 'Rejetés' },
+    { key: 'CANCELLED',    label: 'Annulés' },
   ];
 
   filteredIns = computed(() => {
@@ -131,8 +131,8 @@ export class ActivitesComponent implements OnInit, OnDestroy {
     const list = this.inscriptions();
     return {
       total:    list.length,
-      attente:  list.filter(i => i.statut === 'EN_ATTENTE').length,
-      confirmee: list.filter(i => i.statut === 'CONFIRMEE').length,
+      attente:  list.filter(i => i.statut === 'PENDING').length,
+      confirmee: list.filter(i => i.statut === 'APPROVED').length,
     };
   });
 
@@ -223,7 +223,7 @@ export class ActivitesComponent implements OnInit, OnDestroy {
     this.actionLoading.set(id);
     this.http.patch(`/api/inscriptions/confirmer/${id}`, {}).subscribe({
       next: () => {
-        this.updateInsStatut(id, 'CONFIRMEE');
+        this.updateInsStatut(id, 'APPROVED');
         this.actionLoading.set(null);
         this.showToast('Inscription confirmée.', 'success');
       },
@@ -235,7 +235,7 @@ export class ActivitesComponent implements OnInit, OnDestroy {
     this.actionLoading.set(id);
     this.http.patch(`/api/inscriptions/refuser/${id}`, {}).subscribe({
       next: () => {
-        this.updateInsStatut(id, 'REJETEE');
+        this.updateInsStatut(id, 'REJECTED');
         this.actionLoading.set(null);
         this.showToast('Inscription rejetée.', 'success');
       },
@@ -255,10 +255,10 @@ export class ActivitesComponent implements OnInit, OnDestroy {
       next: () => {
         this.selectedIns.update(d => d ? {
           ...d,
-          echeances: d.echeances?.map(e => e.id === echeanceId ? { ...e, statut: 'PAYEE' } : e),
+          echeances: d.echeances?.map(e => e.id === echeanceId ? { ...e, statut: 'PAID' } : e),
         } : d);
         this.inscriptions.update(list =>
-          list.map(i => i.id === insId ? { ...i, statutPaiement: 'PAYEE' } : i)
+          list.map(i => i.id === insId ? { ...i, statutPaiement: 'PAID' } : i)
         );
         this.payLoading.set(null);
         this.showToast('Paiement enregistré.', 'success');

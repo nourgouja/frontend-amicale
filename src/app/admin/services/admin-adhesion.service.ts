@@ -9,7 +9,7 @@ export interface DemandeAdhesionResponse {
   email: string;
   telephone?: string;
   matriculeStar?: string;
-  statut: 'EN_ATTENTE' | 'APPROUVEE' | 'REFUSEE';
+  statut: 'PENDING' | 'APPROUVEE' | 'REFUSEE';
   createdAt: string;
 }
 

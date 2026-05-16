@@ -71,7 +71,7 @@ export class OffreDetailComponent implements OnInit {
       next: ({ offre, inscriptions }) => {
         this.offre.set(offre);
         const existing = inscriptions.find(
-          i => i.offreId === offre.id && i.statut !== 'ANNULEE' && i.statut !== 'REJETEE'
+          i => i.offreId === offre.id && i.statut !== 'CANCELLED' && i.statut !== 'REJECTED'
         );
         this.inscribed.set(!!existing);
         this.inscriptionId.set(existing?.id ?? null);
@@ -88,7 +88,7 @@ export class OffreDetailComponent implements OnInit {
   onInscribed(res: InscriptionResult): void {
     this.inscribed.set(true);
     this.inscriptionId.set(res.id);
-    this.inscriptionStatus.set('EN_ATTENTE');
+    this.inscriptionStatus.set('PENDING');
     this.inscribedGuests.set(res.guests ?? []);
     this.modalOpen.set(false);
   }

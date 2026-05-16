@@ -205,9 +205,9 @@
             <!-- Post-inscription state -->
             @if (inscribed()) {
 
-              <div class="inscribed-msg" [class.inscribed-msg--confirmed]="inscriptionStatus() === 'CONFIRMEE'">
+              <div class="inscribed-msg" [class.inscribed-msg--confirmed]="inscriptionStatus() === 'APPROVED'">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                @if (inscriptionStatus() === 'CONFIRMEE') { Inscription confirmée }
+                @if (inscriptionStatus() === 'APPROVED') { Inscription confirmée }
                 @else { Inscription envoyée – en attente de validation }
               </div>
 
@@ -232,7 +232,7 @@
 
               <button class="btn-cancel-insc" (click)="annuler()" [disabled]="cancelling()">
                 @if (cancelling()) { <span class="btn-spinner"></span> }
-                @if (inscriptionStatus() === 'CONFIRMEE') { Annuler mon inscription } @else { Annuler la demande }
+                @if (inscriptionStatus() === 'APPROVED') { Annuler mon inscription } @else { Annuler la demande }
               </button>
 
               @if (cancelErr()) {
@@ -242,7 +242,7 @@
                 </div>
               }
 
-            } @else if (o.statutOffre !== 'OUVERTE') {
+            } @else if (o.statutOffre !== 'OPEN') {
               <button class="btn-book btn-book--disabled" disabled>Offre fermée</button>
             } @else if (isFull) {
               <button class="btn-book btn-book--disabled" disabled>Complet</button>

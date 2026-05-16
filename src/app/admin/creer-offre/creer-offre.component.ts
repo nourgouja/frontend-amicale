@@ -203,10 +203,10 @@ export class CreerOffreComponent implements OnInit {
     this.router.navigate([returnUrl]);
   }
 
-  saveDraft(): void { this.draftMode.set(true); this.submitWithStatus('BROUILLON'); }
-  submit():    void { this.draftMode.set(false); this.submitWithStatus('OUVERTE'); }
+  saveDraft(): void { this.draftMode.set(true); this.submitWithStatus('DRAFT'); }
+  submit():    void { this.draftMode.set(false); this.submitWithStatus('OPEN'); }
 
-  private submitWithStatus(statut: 'OUVERTE' | 'BROUILLON'): void {
+  private submitWithStatus(statut: 'OPEN' | 'DRAFT'): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.submitting.set(true);
     this.errorMsg.set('');
@@ -228,7 +228,7 @@ export class CreerOffreComponent implements OnInit {
       next: () => {
         this.submitting.set(false);
         // When editing a non-published offer, explicitly publish it
-        if (id && statut === 'OUVERTE' && this.originalStatut() !== 'OUVERTE') {
+        if (id && statut === 'OPEN' && this.originalStatut() !== 'OPEN') {
           this.http.patch(`/api/offres/publier/${id}`, {}).subscribe();
         }
         this.successMsg.set(id ? 'Offre mise à jour avec succès.' : 'Offre créée avec succès.');

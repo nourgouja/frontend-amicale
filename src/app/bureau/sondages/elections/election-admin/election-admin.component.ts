@@ -62,7 +62,7 @@ export class ElectionAdminComponent implements OnInit {
   }
 
   statusLabel(status: string): string {
-    return status === 'DRAFT' ? 'Brouillon' : status === 'ACTIVE' ? 'Active' : 'Clôturée';
+    return status === 'DRAFT' ? 'Brouillon' : status === 'OPEN' ? 'Active' : 'Clôturée';
   }
 
   private showToast(msg: string, type: 'success' | 'error'): void {

@@ -65,30 +65,31 @@ export function getRoleLabel(role: string): string {
 
 export function getStatutOffreLabel(statut: string): string {
   const map: Record<string, string> = {
-    OUVERTE:  'Ouverte',
-    BROUILLON:'Brouillon',
-    FERMEE:   'Fermée',
-    ARCHIVEE: 'Archivée',
-    ANNULEE:  'Annulée',
+    OPEN:     'Ouverte',
+    DRAFT:    'Brouillon',
+    CLOSED:   'Fermée',
+    ARCHIVED: 'Archivée',
+    CANCELLED:'Annulée',
+    FULL:     'Complet',
   };
   return map[statut] ?? statut;
 }
 
 export function getStatutInscriptionLabel(statut: string): string {
   const map: Record<string, string> = {
-    EN_ATTENTE: 'En attente',
-    CONFIRMEE:  'Confirmée',
-    REJETEE:    'Rejetée',
-    ANNULEE:    'Annulée',
+    PENDING:   'En attente',
+    APPROVED:  'Confirmée',
+    REJECTED:  'Rejetée',
+    CANCELLED: 'Annulée',
   };
   return map[statut] ?? statut;
 }
 
 export function getStatutCotisationLabel(statut: string): string {
   const map: Record<string, string> = {
-    PAYEE:     'Payée',
-    EN_ATTENTE:'En attente',
-    EN_RETARD: 'En retard',
+    PAID:    'Payée',
+    PENDING: 'En attente',
+    OVERDUE: 'En retard',
   };
   return map[statut] ?? statut;
 }

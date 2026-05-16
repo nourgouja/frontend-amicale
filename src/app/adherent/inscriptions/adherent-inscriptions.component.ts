@@ -63,10 +63,10 @@ export class AdherentInscriptionsComponent implements OnInit {
 
   readonly statuts = [
     { key: 'all',        label: 'Tous les statuts' },
-    { key: 'EN_ATTENTE', label: 'En attente' },
-    { key: 'CONFIRMEE',  label: 'Confirmée' },
-    { key: 'ANNULEE',    label: 'Annulée' },
-    { key: 'REJETEE',    label: 'Rejetée' },
+    { key: 'PENDING', label: 'En attente' },
+    { key: 'APPROVED',  label: 'Confirmée' },
+    { key: 'CANCELLED',    label: 'Annulée' },
+    { key: 'REJECTED',    label: 'Rejetée' },
   ];
 
   readonly typeColors: Record<string, string> = {
@@ -102,10 +102,10 @@ export class AdherentInscriptionsComponent implements OnInit {
     this.http.patch(`/api/inscriptions/annuler/${ins.id}`, {}).subscribe({
       next: () => {
         this.inscriptions.update(list =>
-          list.map(i => i.id === ins.id ? { ...i, statut: 'ANNULEE' } : i)
+          list.map(i => i.id === ins.id ? { ...i, statut: 'CANCELLED' } : i)
         );
         if (this.drawerIns()?.id === ins.id)
-          this.drawerIns.update(d => d ? { ...d, statut: 'ANNULEE' } : d);
+          this.drawerIns.update(d => d ? { ...d, statut: 'CANCELLED' } : d);
         this.cancelTarget.set(null);
         this.cancelling.set(false);
       },

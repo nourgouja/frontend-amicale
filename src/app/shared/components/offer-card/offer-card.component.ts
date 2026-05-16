@@ -83,7 +83,7 @@ export class OfferCardComponent {
   }
 
   get canRegister(): boolean {
-    return this.offre?.statutOffre === 'OUVERTE' && !this.isComplet;
+    return this.offre?.statutOffre === 'OPEN' && !this.isComplet;
   }
 
   toggleMenu(e: MouseEvent): void {

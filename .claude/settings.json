@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/**)"
+      "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/**)",
+      "Bash(xargs grep -l \"EN_ATTENTE\\\\|CONFIRMEE\\\\|REJETEE\\\\|ANNULEE\\\\|OUVERTE\\\\|FERMEE\\\\|BROUILLON\\\\|ARCHIVEE\\\\|PAYEE\\\\|EN_RETARD\\\\|'ACTIVE'\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\election\\candidate",
@@ -9,7 +10,14 @@
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\election",
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\controller\\election",
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\entity\\election",
-      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\notification"
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\notification",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\entity\\sondage",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\dashboard",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\event",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\sondage",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\dashboard",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\adhesion",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\entity\\user"
     ]
   }
 }

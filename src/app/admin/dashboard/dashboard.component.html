@@ -188,7 +188,7 @@
                   </svg>
                   Modifier
                 </a>
-                @if (offre.statut !== 'ARCHIVEE' && offre.statut !== 'ANNULEE') {
+                @if (offre.statut !== 'ARCHIVED' && offre.statut !== 'CANCELLED') {
                   <button class="btn-action btn-archive" (click)="archiver(offre.id)">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/>
@@ -261,7 +261,7 @@
         </div>
 
         <!-- Info box -->
-        @if (o.statutOffre !== 'BROUILLON') {
+        @if (o.statutOffre !== 'DRAFT') {
           <div class="dp-info-box">
             <div class="dp-row">
               <span class="dp-label">Date:</span>
@@ -279,7 +279,7 @@
               <span class="dp-label">Nb inscrits:</span>
               <span class="dp-value dp-value--bold">{{ inscrits(o) }}</span>
             </div>
-            @if (o.statutOffre === 'OUVERTE') {
+            @if (o.statutOffre === 'OPEN') {
           <a class="dp-participants-btn" routerLink="/admin/activites" [queryParams]="{offreId: o.id}" (click)="closeDetail()">
                 Voir la liste des inscrits
               </a>
@@ -298,7 +298,7 @@
         <a class="dp-btn dp-btn--primary" [routerLink]="['/admin/offres', o.id, 'edit']" (click)="closeDetail()">
           Modifier
         </a>
-        @if (o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'ANNULEE') {
+        @if (o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CANCELLED') {
           <button class="dp-btn dp-btn--danger" (click)="archiver(o.id)">
             Archiver
           </button>

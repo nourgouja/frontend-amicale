@@ -77,10 +77,10 @@ export class BureauInscriptionsComponent implements OnInit, OnDestroy {
 
   readonly statuts = [
     { key: 'all',        label: 'Tous les statuts' },
-    { key: 'EN_ATTENTE', label: 'En attente' },
-    { key: 'CONFIRMEE',  label: 'Confirmée' },
-    { key: 'REJETEE',    label: 'Rejetée' },
-    { key: 'ANNULEE',    label: 'Annulée' },
+    { key: 'PENDING', label: 'En attente' },
+    { key: 'APPROVED',  label: 'Confirmée' },
+    { key: 'REJECTED',    label: 'Rejetée' },
+    { key: 'CANCELLED',    label: 'Annulée' },
   ];
 
   readonly types = [
@@ -91,7 +91,7 @@ export class BureauInscriptionsComponent implements OnInit, OnDestroy {
     { key: 'CONVENTION', label: 'Convention' },
   ];
 
-  pendingCount = computed(() => this.inscriptions().filter(i => i.statut === 'EN_ATTENTE').length);
+  pendingCount = computed(() => this.inscriptions().filter(i => i.statut === 'PENDING').length);
 
   ngOnInit(): void { this.load(); }
 
@@ -140,7 +140,7 @@ export class BureauInscriptionsComponent implements OnInit, OnDestroy {
     this.actionLoading.set(id);
     this.http.patch(`/api/inscriptions/confirmer/${id}`, {}).subscribe({
       next: () => {
-        this.updateStatut(id, 'CONFIRMEE');
+        this.updateStatut(id, 'APPROVED');
         this.actionLoading.set(null);
         this.showToast('Inscription confirmée.', 'success');
       },
@@ -152,7 +152,7 @@ export class BureauInscriptionsComponent implements OnInit, OnDestroy {
     this.actionLoading.set(id);
     this.http.patch(`/api/inscriptions/refuser/${id}`, {}).subscribe({
       next: () => {
-        this.updateStatut(id, 'REJETEE');
+        this.updateStatut(id, 'REJECTED');
         this.actionLoading.set(null);
         this.showToast('Inscription rejetée.', 'success');
       },
@@ -166,10 +166,10 @@ export class BureauInscriptionsComponent implements OnInit, OnDestroy {
       next: () => {
         this.selectedIns.update(d => d ? {
           ...d,
-          echeances: d.echeances?.map(e => e.id === echeanceId ? { ...e, statut: 'PAYEE' } : e),
+          echeances: d.echeances?.map(e => e.id === echeanceId ? { ...e, statut: 'PAID' } : e),
         } : d);
         this.inscriptions.update(list =>
-          list.map(i => i.id === insId ? { ...i, statutPaiement: 'PAYEE' } : i)
+          list.map(i => i.id === insId ? { ...i, statutPaiement: 'PAID' } : i)
         );
         this.payLoading.set(null);
         this.showToast('Paiement enregistré.', 'success');
@@ -193,7 +193,7 @@ export class BureauInscriptionsComponent implements OnInit, OnDestroy {
   }
 
   paidCount(ins: Inscription): number {
-    return ins.echeances?.filter(e => e.statut === 'PAYEE').length ?? 0;
+    return ins.echeances?.filter(e => e.statut === 'PAID').length ?? 0;
   }
 
   sexeLabel(s?: string | null): string {

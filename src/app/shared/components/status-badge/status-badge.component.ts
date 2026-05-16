@@ -39,21 +39,21 @@ export class StatusBadgeComponent {
   get label(): string {
     if (this.type === 'offre') {
       const m: Record<string, string> = {
-        OUVERTE: 'Ouverte', BROUILLON: 'Brouillon', FERMEE: 'Fermée',
-        ARCHIVEE: 'Archivée', ANNULEE: 'Annulée',
+        OPEN: 'Ouverte', DRAFT: 'Brouillon', CLOSED: 'Fermée',
+        ARCHIVED: 'Archivée', CANCELLED: 'Annulée', FULL: 'Complet',
       };
       return m[this.statut] ?? this.statut;
     }
     if (this.type === 'inscription') {
       const m: Record<string, string> = {
-        EN_ATTENTE: 'En attente', CONFIRMEE: 'Confirmée',
-        REJETEE: 'Rejetée', ANNULEE: 'Annulée',
+        PENDING: 'En attente', APPROVED: 'Confirmée',
+        REJECTED: 'Rejetée', CANCELLED: 'Annulée',
       };
       return m[this.statut] ?? this.statut;
     }
     if (this.type === 'cotisation') {
       const m: Record<string, string> = {
-        PAYEE: 'Payée', EN_ATTENTE: 'En attente', EN_RETARD: 'En retard',
+        PAID: 'Payée', PENDING: 'En attente', OVERDUE: 'En retard',
       };
       return m[this.statut] ?? this.statut;
     }
@@ -67,21 +67,21 @@ export class StatusBadgeComponent {
     const s = this.statut;
     if (this.type === 'offre') {
       const m: Record<string, string> = {
-        OUVERTE: 'open', BROUILLON: 'draft', FERMEE: 'closed',
-        ARCHIVEE: 'archived', ANNULEE: 'cancelled',
+        OPEN: 'open', DRAFT: 'draft', CLOSED: 'closed',
+        ARCHIVED: 'archived', CANCELLED: 'cancelled', FULL: 'closed',
       };
       return `badge ${m[s] ?? 'draft'}`;
     }
     if (this.type === 'inscription') {
       const m: Record<string, string> = {
-        EN_ATTENTE: 'pending', CONFIRMEE: 'confirmed',
-        REJETEE: 'rejected', ANNULEE: 'cancelled',
+        PENDING: 'pending', APPROVED: 'confirmed',
+        REJECTED: 'rejected', CANCELLED: 'cancelled',
       };
       return `badge ${m[s] ?? 'pending'}`;
     }
     if (this.type === 'cotisation') {
       const m: Record<string, string> = {
-        PAYEE: 'paid', EN_ATTENTE: 'pending', EN_RETARD: 'overdue',
+        PAID: 'paid', PENDING: 'pending', OVERDUE: 'overdue',
       };
       return `badge ${m[s] ?? 'pending'}`;
     }

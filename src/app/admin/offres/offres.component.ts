@@ -6,7 +6,7 @@ import { OfferCardComponent, Offre } from '../../shared/components/offer-card/of
 import { getOffreTypeColor } from '../../shared/utils/format.utils';
 
 type CategoryFilter = 'tout' | 'VOYAGE' | 'SEJOUR' | 'ACTIVITE' | 'CONVENTION' | 'fermees';
-type StatusFilter   = 'tous' | 'OUVERTE' | 'FERMEE' | 'BROUILLON';
+type StatusFilter   = 'tous' | 'OPEN' | 'CLOSED' | 'DRAFT';
 
 @Component({
   selector: 'app-offres',
@@ -39,9 +39,9 @@ export class OffresComponent implements OnInit {
 
   readonly statusFilters: { key: StatusFilter; label: string }[] = [
     { key: 'tous',      label: 'Tous statuts' },
-    { key: 'OUVERTE',   label: 'Ouvertes' },
-    { key: 'FERMEE',    label: 'Fermées' },
-    { key: 'BROUILLON', label: 'Brouillons' },
+    { key: 'OPEN',   label: 'Ouvertes' },
+    { key: 'CLOSED',    label: 'Fermées' },
+    { key: 'DRAFT', label: 'Brouillons' },
   ];
 
   filteredOffres = computed(() => {
@@ -51,11 +51,11 @@ export class OffresComponent implements OnInit {
     const q   = this.searchTerm().toLowerCase().trim();
 
     if (cat === 'fermees') {
-      data = data.filter(o => o.statutOffre === 'FERMEE');
+      data = data.filter(o => o.statutOffre === 'CLOSED');
     } else if (cat !== 'tout') {
-      data = data.filter(o => o.typeOffre === cat && o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'FERMEE');
+      data = data.filter(o => o.typeOffre === cat && o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CLOSED');
     } else {
-      data = data.filter(o => o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'FERMEE');
+      data = data.filter(o => o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CLOSED');
     }
 
     if (st !== 'tous') data = data.filter(o => o.statutOffre === st);

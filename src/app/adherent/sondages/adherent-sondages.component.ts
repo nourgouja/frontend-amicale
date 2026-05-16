@@ -18,7 +18,7 @@ export class AdherentSondagesComponent implements OnInit {
   toast     = signal<{ msg: string; type: 'success' | 'error' } | null>(null);
   activeTab = signal<'active' | 'closed'>('active');
 
-  activeSondages = computed(() => this.sondages().filter(s => s.statut === 'ACTIVE'));
+  activeSondages = computed(() => this.sondages().filter(s => s.statut === 'OPEN'));
   closedSondages = computed(() => this.sondages().filter(s => s.statut === 'CLOSED'));
 
   currentList = computed(() =>

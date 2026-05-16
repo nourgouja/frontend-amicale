@@ -82,10 +82,10 @@ export class OffreInscriptionsComponent implements OnInit {
 
   readonly statutFilters = [
     { key: 'tous',       label: 'Tous' },
-    { key: 'EN_ATTENTE', label: 'En attente' },
-    { key: 'CONFIRMEE',  label: 'Confirmées' },
-    { key: 'REJETEE',    label: 'Rejetées' },
-    { key: 'ANNULEE',    label: 'Annulées' },
+    { key: 'PENDING', label: 'En attente' },
+    { key: 'APPROVED',  label: 'Confirmées' },
+    { key: 'REJECTED',    label: 'Rejetées' },
+    { key: 'CANCELLED',    label: 'Annulées' },
   ];
 
   filtered = computed(() => {
@@ -102,9 +102,9 @@ export class OffreInscriptionsComponent implements OnInit {
 
   counts = computed(() => ({
     total:     this.inscriptions().length,
-    attente:   this.inscriptions().filter(i => i.statut === 'EN_ATTENTE').length,
-    confirmee: this.inscriptions().filter(i => i.statut === 'CONFIRMEE').length,
-    rejetee:   this.inscriptions().filter(i => i.statut === 'REJETEE').length,
+    attente:   this.inscriptions().filter(i => i.statut === 'PENDING').length,
+    confirmee: this.inscriptions().filter(i => i.statut === 'APPROVED').length,
+    rejetee:   this.inscriptions().filter(i => i.statut === 'REJECTED').length,
   }));
 
   inscrits = computed(() => {
@@ -149,7 +149,7 @@ export class OffreInscriptionsComponent implements OnInit {
     this.actionLoading.set(id);
     this.http.patch(`/api/inscriptions/confirmer/${id}`, {}).subscribe({
       next: () => {
-        this.updateStatut(id, 'CONFIRMEE');
+        this.updateStatut(id, 'APPROVED');
         this.actionLoading.set(null);
         this.showToast('Inscription confirmée.', 'success');
       },
@@ -161,7 +161,7 @@ export class OffreInscriptionsComponent implements OnInit {
     this.actionLoading.set(id);
     this.http.patch(`/api/inscriptions/refuser/${id}`, {}).subscribe({
       next: () => {
-        this.updateStatut(id, 'REJETEE');
+        this.updateStatut(id, 'REJECTED');
         this.actionLoading.set(null);
         this.showToast('Inscription rejetée.', 'success');
       },
@@ -175,7 +175,7 @@ export class OffreInscriptionsComponent implements OnInit {
       next: () => {
         this.selectedIns.update(d => d ? {
           ...d,
-          echeances: d.echeances?.map(e => e.id === echeanceId ? { ...e, statut: 'PAYEE' } : e),
+          echeances: d.echeances?.map(e => e.id === echeanceId ? { ...e, statut: 'PAID' } : e),
         } : d);
         this.payLoading.set(null);
         this.showToast('Paiement enregistré.', 'success');
@@ -270,10 +270,10 @@ export class OffreInscriptionsComponent implements OnInit {
 
   private statutLabel(s: string): string {
     switch (s) {
-      case 'EN_ATTENTE': return 'En attente';
-      case 'CONFIRMEE':  return 'Confirmée';
-      case 'REJETEE':    return 'Rejetée';
-      case 'ANNULEE':    return 'Annulée';
+      case 'PENDING': return 'En attente';
+      case 'APPROVED':  return 'Confirmée';
+      case 'REJECTED':    return 'Rejetée';
+      case 'CANCELLED':    return 'Annulée';
       default:           return s;
     }
   }

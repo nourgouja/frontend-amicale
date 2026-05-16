@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Offre } from '../../../shared/components/offer-card/offer-card.component';
 import { getOffreTypeColor, getOffreTypeLabel } from '../../../shared/utils/format.utils';
 
-type StatusFilter = 'tous' | 'OUVERTE' | 'FERMEE' | 'BROUILLON';
+type StatusFilter = 'tous' | 'OPEN' | 'CLOSED' | 'DRAFT';
 
 @Component({
   selector: 'app-bureau-mon-pole',
@@ -28,9 +28,9 @@ export class BureauMonPoleComponent implements OnInit {
 
   readonly statusFilters: { key: StatusFilter; label: string }[] = [
     { key: 'tous',      label: 'Tous statuts' },
-    { key: 'OUVERTE',   label: 'Ouvertes' },
-    { key: 'FERMEE',    label: 'Fermées' },
-    { key: 'BROUILLON', label: 'Brouillons' },
+    { key: 'OPEN',   label: 'Ouvertes' },
+    { key: 'CLOSED',    label: 'Fermées' },
+    { key: 'DRAFT', label: 'Brouillons' },
   ];
 
   filteredOffres = computed(() => {
@@ -39,7 +39,7 @@ export class BureauMonPoleComponent implements OnInit {
       ? this.offres().filter(o => types.includes(o.typeOffre))
       : this.offres();
 
-    data = data.filter(o => o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'ANNULEE');
+    data = data.filter(o => o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CANCELLED');
 
     const st = this.statusFilter();
     if (st !== 'tous') data = data.filter(o => o.statutOffre === st);

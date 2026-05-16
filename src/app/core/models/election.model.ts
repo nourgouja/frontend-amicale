@@ -1,4 +1,4 @@
-export type ElectionStatus = 'DRAFT' | 'ACTIVE' | 'CLOSED' | 'RESULTS_PUBLISHED';
+export type ElectionStatus = 'DRAFT' | 'OPEN' | 'CLOSED' | 'RESULTS_PUBLISHED';
 export type Position = 'PRESIDENT' | 'VICE_PRESIDENT' | 'SECRETARY' | 'TREASURER' | 'RESPONSABLE_POLE' | 'MEMBER';
 
 export interface Candidate {

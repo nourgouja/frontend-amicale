@@ -94,7 +94,7 @@ export class ElectionListComponent implements OnInit {
   }
 
   statusLabel(status: string): string {
-    return status === 'ACTIVE' ? 'Vote en cours' : 'Clôturée';
+    return status === 'OPEN' ? 'Vote en cours' : 'Clôturée';
   }
 
   totalCandidates(e: Election): number {

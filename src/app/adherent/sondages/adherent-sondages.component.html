@@ -53,7 +53,7 @@
       @for (s of currentList(); track s.id) {
 
         <!-- ── ACTIVE sondage: vote or show results if already voted ── -->
-        @if (s.statut === 'ACTIVE') {
+        @if (s.statut === 'OPEN') {
           <div class="sondage-card">
             <div class="card-badge card-badge--active">En cours</div>
             <h2 class="card-title">{{ s.titre }}</h2>

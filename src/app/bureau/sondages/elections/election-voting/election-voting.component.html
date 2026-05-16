@@ -21,7 +21,7 @@
       <div class="election-title-row">
         <h1 class="election-title">{{ election()!.titre }}</h1>
         <span class="status-badge" [class]="'status-badge--' + election()!.status.toLowerCase()">
-          {{ election()!.status === 'ACTIVE' ? 'Vote en cours' : 'Clôturée' }}
+          {{ election()!.status === 'OPEN' ? 'Vote en cours' : 'Clôturée' }}
         </span>
       </div>
       @if (election()!.description) {

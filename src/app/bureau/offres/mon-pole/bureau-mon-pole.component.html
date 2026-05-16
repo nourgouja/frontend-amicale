@@ -82,13 +82,13 @@
               </td>
               <td>
                 <span class="statut-pill"
-                  [class.statut--open]="offre.statutOffre === 'OUVERTE'"
-                  [class.statut--draft]="offre.statutOffre === 'BROUILLON'"
-                  [class.statut--closed]="offre.statutOffre === 'FERMEE'">
+                  [class.statut--open]="offre.statutOffre === 'OPEN'"
+                  [class.statut--draft]="offre.statutOffre === 'DRAFT'"
+                  [class.statut--closed]="offre.statutOffre === 'CLOSED'">
                   @switch (offre.statutOffre) {
-                    @case ('OUVERTE')   { Ouverte }
-                    @case ('BROUILLON') { Brouillon }
-                    @case ('FERMEE')    { Fermée }
+                    @case ('OPEN')   { Ouverte }
+                    @case ('DRAFT') { Brouillon }
+                    @case ('CLOSED')    { Fermée }
                     @default            { {{ offre.statutOffre }} }
                   }
                 </span>
@@ -97,7 +97,7 @@
               <td class="num-cell">{{ offre.placesRestantes ?? '—' }}</td>
               <td class="actions-cell">
                 <div class="row-actions">
-                  @if (offre.typeOffre !== 'CONVENTION' && (offre.statutOffre === 'OUVERTE' || offre.statutOffre === 'FERMEE')) {
+                  @if (offre.typeOffre !== 'CONVENTION' && (offre.statutOffre === 'OPEN' || offre.statutOffre === 'CLOSED')) {
                     <button class="btn-row-participants" (click)="goToParticipants(offre.id)" title="Participants">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>

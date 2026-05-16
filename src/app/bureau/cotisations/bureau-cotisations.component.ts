@@ -61,7 +61,7 @@ export class BureauCotisationsComponent implements OnInit {
     const map = new Map<number, InscriptionGroup>();
     for (const e of this.echeances()) {
       // Exclude explicitly non-confirmed; pass through if field is absent (backend compat)
-      if (e.inscriptionStatut && e.inscriptionStatut !== 'CONFIRMEE') continue;
+      if (e.inscriptionStatut && e.inscriptionStatut !== 'APPROVED') continue;
       if (!map.has(e.inscriptionId)) {
         map.set(e.inscriptionId, {
           inscriptionId: e.inscriptionId,
@@ -91,32 +91,32 @@ export class BureauCotisationsComponent implements OnInit {
   });
 
   retardCount = computed(() =>
-    this.echeances().filter(e => e.statut === 'EN_RETARD' && e.inscriptionStatut === 'CONFIRMEE').length
+    this.echeances().filter(e => e.statut === 'OVERDUE' && e.inscriptionStatut === 'APPROVED').length
   );
 
   totalImpaye = computed(() =>
     this.echeances()
-      .filter(e => e.statut !== 'PAYEE' && e.inscriptionStatut === 'CONFIRMEE')
+      .filter(e => e.statut !== 'PAID' && e.inscriptionStatut === 'APPROVED')
       .reduce((s, e) => s + e.montant, 0)
   );
 
   totalCollecte = computed(() =>
     this.echeances()
-      .filter(e => e.statut === 'PAYEE' && e.inscriptionStatut === 'CONFIRMEE')
+      .filter(e => e.statut === 'PAID' && e.inscriptionStatut === 'APPROVED')
       .reduce((s, e) => s + e.montant, 0)
   );
 
   groupStatut(g: InscriptionGroup): string {
     const all = g.echeances.length;
-    const paid = g.echeances.filter(e => e.statut === 'PAYEE').length;
-    const late = g.echeances.filter(e => e.statut === 'EN_RETARD').length;
-    if (paid === all) return 'PAYEE';
-    if (late > 0)     return 'EN_RETARD';
-    return 'EN_ATTENTE';
+    const paid = g.echeances.filter(e => e.statut === 'PAID').length;
+    const late = g.echeances.filter(e => e.statut === 'OVERDUE').length;
+    if (paid === all) return 'PAID';
+    if (late > 0)     return 'OVERDUE';
+    return 'PENDING';
   }
 
   trancheLabel(g: InscriptionGroup): string {
-    const paid = g.echeances.filter(e => e.statut === 'PAYEE').length;
+    const paid = g.echeances.filter(e => e.statut === 'PAID').length;
     return `${paid}/${g.echeances.length}`;
   }
 

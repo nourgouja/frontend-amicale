@@ -64,7 +64,7 @@
   } @else {
     <div class="offers-grid">
       @for (o of filtered(); track o.id) {
-        <div class="prop-card" [class.prop-card--fermee]="o.statutOffre !== 'OUVERTE'"
+        <div class="prop-card" [class.prop-card--fermee]="o.statutOffre !== 'OPEN'"
              [routerLink]="['/adherent/offres', o.id]">
 
           <div class="prop-img-wrap">
@@ -76,7 +76,7 @@
               </div>
             }
 
-            @if (o.statutOffre !== 'OUVERTE') {
+            @if (o.statutOffre !== 'OPEN') {
               <div class="fermee-overlay"><span class="fermee-badge">Fermée</span></div>
             }
 

@@ -191,18 +191,18 @@
                       <td class="echeance-montant">{{ e.montant | number:'1.0-2' }} TND</td>
                       <td>
                         <span class="pay-badge"
-                              [class.pay--ok]="e.statut === 'PAYEE'"
-                              [class.pay--late]="e.statut === 'EN_RETARD'"
-                              [class.pay--attente]="e.statut === 'EN_ATTENTE'">
+                              [class.pay--ok]="e.statut === 'PAID'"
+                              [class.pay--late]="e.statut === 'OVERDUE'"
+                              [class.pay--attente]="e.statut === 'PENDING'">
                           @switch (e.statut) {
-                            @case ('PAYEE')      { Payée }
-                            @case ('EN_RETARD')  { En retard }
-                            @case ('EN_ATTENTE') { En attente }
+                            @case ('PAID')      { Payée }
+                            @case ('OVERDUE')  { En retard }
+                            @case ('PENDING') { En attente }
                           }
                         </span>
                       </td>
                       <td>
-                        @if (e.statut !== 'PAYEE') {
+                        @if (e.statut !== 'PAID') {
                           <button class="btn-pay-row" [disabled]="payLoading() === e.id"
                                   (click)="payer(e.id, ins.id)">
                             @if (payLoading() === e.id) { … } @else { Marquer payée }
@@ -236,7 +236,7 @@
 
         <!-- Footer actions -->
         <div class="panel-footer">
-          @if (ins.statut === 'EN_ATTENTE') {
+          @if (ins.statut === 'PENDING') {
             <button class="btn-confirm-main" [disabled]="actionLoading() === ins.id"
                     (click)="confirmer(ins.id)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -250,15 +250,15 @@
           } @else {
             <span class="status-final">
               @switch (ins.statut) {
-                @case ('CONFIRMEE') {
+                @case ('APPROVED') {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
                   Inscription confirmée
                 }
-                @case ('REJETEE') {
+                @case ('REJECTED') {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   Inscription rejetée
                 }
-                @case ('ANNULEE') { Inscription annulée }
+                @case ('CANCELLED') { Inscription annulée }
               }
             </span>
           }

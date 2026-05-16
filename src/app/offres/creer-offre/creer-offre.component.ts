@@ -114,7 +114,7 @@ private autoSetPole(type: string): void {
 
   saveDraft(): void {
     this.draftMode.set(true);
-    this.submitWithStatus('BROUILLON');
+    this.submitWithStatus('DRAFT');
   }
 
   
@@ -123,7 +123,7 @@ private autoSetPole(type: string): void {
     this.submitWithStatus('OUVERT');
   }
 
-  private submitWithStatus(statut: 'OUVERT' | 'BROUILLON'): void {
+  private submitWithStatus(statut: 'OUVERT' | 'DRAFT'): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

@@ -81,8 +81,8 @@ export class AdminDashboardComponent implements OnInit {
   });
 
   totalOffres     = computed(() => this.data()?.offres?.length ?? 0);
-  offresOuvertes  = computed(() => this.data()?.offres?.filter(o => o.statut === 'OUVERTE').length ?? 0);
-  offresBrouillon = computed(() => this.data()?.offres?.filter(o => o.statut === 'BROUILLON').length ?? 0);
+  offresOuvertes  = computed(() => this.data()?.offres?.filter(o => o.statut === 'OPEN').length ?? 0);
+  offresBrouillon = computed(() => this.data()?.offres?.filter(o => o.statut === 'DRAFT').length ?? 0);
   cotisationTotal = computed(() => {
     const d = this.data();
     return (d?.echeancesPayees ?? 0) + (d?.echeancesEnRetard ?? 0) + (d?.echeancesEnAttente ?? 0);
@@ -107,10 +107,10 @@ export class AdminDashboardComponent implements OnInit {
     const d = this.data();
     if (!d || !d.offres.length) return { score: 0, breakdown: [] as { label: string; color: string; count: number; pct: number }[] };
     const total     = d.offres.length;
-    const ouvertes  = d.offres.filter(o => o.statut === 'OUVERTE').length;
-    const brouillon = d.offres.filter(o => o.statut === 'BROUILLON').length;
-    const fermees   = d.offres.filter(o => o.statut === 'FERMEE').length;
-    const archivees = d.offres.filter(o => o.statut === 'ARCHIVEE').length;
+    const ouvertes  = d.offres.filter(o => o.statut === 'OPEN').length;
+    const brouillon = d.offres.filter(o => o.statut === 'DRAFT').length;
+    const fermees   = d.offres.filter(o => o.statut === 'CLOSED').length;
+    const archivees = d.offres.filter(o => o.statut === 'ARCHIVED').length;
     return {
       score: +(ouvertes / total * 10).toFixed(1),
       breakdown: [
@@ -139,7 +139,7 @@ export class AdminDashboardComponent implements OnInit {
 
   calendarOffres = computed<CalendarOffre[]>(() =>
     this.fullOffres()
-      .filter(o => o.statutOffre === 'OUVERTE' && o.dateDebut)
+      .filter(o => o.statutOffre === 'OPEN' && o.dateDebut)
       .map(o => ({
         id:        o.id,
         titre:     o.titre,

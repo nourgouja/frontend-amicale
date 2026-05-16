@@ -40,24 +40,24 @@ export class AdherentCotisationComponent implements OnInit {
 
   // Only CONFIRMEE inscriptions with echeances
   confirmed = computed(() =>
-    this.inscriptions().filter(i => i.statut === 'CONFIRMEE' && i.echeances?.length > 0)
+    this.inscriptions().filter(i => i.statut === 'APPROVED' && i.echeances?.length > 0)
   );
 
   allEcheances = computed(() => this.confirmed().flatMap(i => i.echeances));
 
   prochaines = computed(() =>
     this.allEcheances()
-      .filter(e => e.statut !== 'PAYEE')
+      .filter(e => e.statut !== 'PAID')
       .sort((a, b) => a.dateEcheance.localeCompare(b.dateEcheance))
       .slice(0, 5)
   );
 
   totalPaye = computed(() =>
-    this.allEcheances().filter(e => e.statut === 'PAYEE').reduce((s, e) => s + e.montant, 0)
+    this.allEcheances().filter(e => e.statut === 'PAID').reduce((s, e) => s + e.montant, 0)
   );
 
   totalImpaye = computed(() =>
-    this.allEcheances().filter(e => e.statut !== 'PAYEE').reduce((s, e) => s + e.montant, 0)
+    this.allEcheances().filter(e => e.statut !== 'PAID').reduce((s, e) => s + e.montant, 0)
   );
 
   ngOnInit(): void {
@@ -70,8 +70,8 @@ export class AdherentCotisationComponent implements OnInit {
   formatDate(s: string): string { return s ? formatDate(s) : '—'; }
 
   statusIcon(statut: string): string {
-    if (statut === 'PAYEE')     return '✓';
-    if (statut === 'EN_RETARD') return '!';
+    if (statut === 'PAID')     return '✓';
+    if (statut === 'OVERDUE') return '!';
     return '○';
   }
 }

@@ -116,7 +116,7 @@
       <div class="dp-fields">
         <div class="dp-row">
           <span class="dp-label">Status:</span>
-          <span class="dp-status" [class.open]="o.statutOffre==='OUVERTE'" [class.draft]="o.statutOffre==='BROUILLON'" [class.closed]="o.statutOffre==='FERMEE'">
+          <span class="dp-status" [class.open]="o.statutOffre==='OPEN'" [class.draft]="o.statutOffre==='DRAFT'" [class.closed]="o.statutOffre==='CLOSED'">
             {{ o.statutOffre }}
           </span>
         </div>
@@ -163,7 +163,7 @@
     <div class="dp-footer">
       <button class="dp-btn dp-ghost" (click)="closeDetail()">Fermer</button>
       <a class="dp-btn dp-primary" [routerLink]="['/admin/offres', o.id, 'edit']" (click)="closeDetail()">Modifier</a>
-      @if (o.statutOffre !== 'ARCHIVEE' && o.statutOffre !== 'ANNULEE') {
+      @if (o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CANCELLED') {
         <button class="dp-btn dp-danger" (click)="onArchive(o.id); closeDetail()">Archiver</button>
       }
     </div>
