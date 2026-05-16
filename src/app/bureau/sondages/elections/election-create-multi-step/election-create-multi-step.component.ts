@@ -52,8 +52,11 @@ export class ElectionCreateMultiStepComponent implements OnInit {
 
   candidates = signal<CandidateMap>({
     PRESIDENT:        [],
-    TRESORIER:        [],
+    VICE_PRESIDENT:   [],
+    SECRETARY:        [],
+    TREASURER:        [],
     RESPONSABLE_POLE: [],
+    MEMBER:           [],
   });
 
   addForm = {
@@ -66,10 +69,13 @@ export class ElectionCreateMultiStepComponent implements OnInit {
   readonly positions = POSITIONS;
 
   readonly steps = [
-    { title: 'Informations',                   description: 'Titre et description de l\'élection' },
-    { title: 'Candidats — Président',           description: 'Ajoutez un ou plusieurs candidats pour le poste de Président' },
-    { title: 'Candidats — Trésorier',           description: 'Ajoutez un ou plusieurs candidats pour le poste de Trésorier' },
-    { title: 'Candidats — Responsable de pôle', description: 'Ajoutez un ou plusieurs candidats pour le poste de Responsable de pôle' },
+    { title: 'Informations',                        description: 'Titre et description de l\'élection' },
+    { title: 'Candidats — Président',               description: 'Ajoutez un ou plusieurs candidats pour le poste de Président' },
+    { title: 'Candidats — Vice-Président',          description: 'Ajoutez un ou plusieurs candidats pour le poste de Vice-Président' },
+    { title: 'Candidats — Secrétaire',              description: 'Ajoutez un ou plusieurs candidats pour le poste de Secrétaire' },
+    { title: 'Candidats — Trésorier',               description: 'Ajoutez un ou plusieurs candidats pour le poste de Trésorier' },
+    { title: 'Candidats — Responsable de Pôle',    description: 'Ajoutez un ou plusieurs candidats pour le poste de Responsable de Pôle' },
+    { title: 'Candidats — Membre',                  description: 'Ajoutez un ou plusieurs candidats pour le poste de Membre' },
   ];
 
   stepTitle       = computed(() => this.steps[this.currentStep()]?.title ?? '');

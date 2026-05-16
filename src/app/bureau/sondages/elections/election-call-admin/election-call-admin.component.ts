@@ -27,9 +27,9 @@ export class ElectionCallAdminComponent implements OnInit {
   toast      = signal<{ msg: string; type: 'success' | 'error' } | null>(null);
 
   form = this.fb.group({
-    title:       ['', [Validators.required, Validators.minLength(3)]],
-    description: [''],
-    deadline:    [''],
+    titre:               ['', [Validators.required, Validators.minLength(3)]],
+    description:         [''],
+    dateFinCandidature:  ['', Validators.required],
   });
 
   ngOnInit(): void { this.load(); }
@@ -49,9 +49,12 @@ export class ElectionCallAdminComponent implements OnInit {
     if (this.form.invalid || this.saving()) return;
     this.saving.set(true);
 
-    const { title, description, deadline } = this.form.value;
-    const req: any = { title: title!.trim(), description: description?.trim() || undefined };
-    if (deadline) req.deadline = new Date(deadline).toISOString();
+    const { titre, description, dateFinCandidature } = this.form.value;
+    const req: any = {
+      titre: titre!.trim(),
+      description: description?.trim() || undefined,
+      dateFinCandidature: dateFinCandidature,
+    };
 
     this.callService.createCall(req).subscribe({
       next: call => {
@@ -68,7 +71,7 @@ export class ElectionCallAdminComponent implements OnInit {
   }
 
   closeCall(call: ElectionCall): void {
-    if (!confirm(`Clôturer l'appel "${call.title}" ? Les membres ne pourront plus postuler.`)) return;
+    if (!confirm(`Clôturer l'appel "${call.titre}" ? Les membres ne pourront plus postuler.`)) return;
     this.callService.closeCall(call.id).subscribe({
       next: updated => {
         this.calls.update(list => list.map(c => c.id === updated.id ? updated : c));
@@ -84,7 +87,7 @@ export class ElectionCallAdminComponent implements OnInit {
 
   closeElection(call: ElectionCall): void {
     if (!call.publishedElectionId) return;
-    if (!confirm(`Clôturer le vote pour "${call.title}" ? Les résultats seront disponibles.`)) return;
+    if (!confirm(`Clôturer le vote pour "${call.titre}" ? Les résultats seront disponibles.`)) return;
     this.electionService.closeElection(call.publishedElectionId).subscribe({
       next: () => {
         this.calls.update(list => list.map(c =>
@@ -103,7 +106,7 @@ export class ElectionCallAdminComponent implements OnInit {
 
   deleteCall(call: ElectionCall): void {
     if (this.deletingCall() !== null) return;
-    if (!confirm(`Supprimer l'appel à candidature "${call.title}" ? Cette action est irréversible.`)) return;
+    if (!confirm(`Supprimer l'appel à candidature "${call.titre}" ? Cette action est irréversible.`)) return;
     this.deletingCall.set(call.id);
     this.callService.deleteCall(call.id).subscribe({
       next: () => {

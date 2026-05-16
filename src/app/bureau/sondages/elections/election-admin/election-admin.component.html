@@ -49,8 +49,7 @@
           }
 
           <div class="card-meta">
-            <span>Par {{ e.createdByPrenom }} {{ e.createdByNom }}</span>
-            @if (e.openedAt) { <span>Ouvert le {{ e.openedAt | date:'dd/MM/yyyy' }}</span> }
+            @if (e.dateDebut) { <span>Ouvert le {{ e.dateDebut | date:'dd/MM/yyyy' }}</span> }
             @if (e.closedAt) { <span>Clôturé le {{ e.closedAt | date:'dd/MM/yyyy' }}</span> }
           </div>
 

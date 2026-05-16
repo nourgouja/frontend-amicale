@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { ElectionService } from '../../../../core/services/election.service';
 import { ElectionCallService } from '../../../../core/services/election-call.service';
 import { Election, positionLabel } from '../../../../core/models/election.model';
-import { ElectionCall } from '../../../../core/models/election-call.model';
+import { CandidateApplication, ElectionCall, APPLICATION_STATUS_LABELS } from '../../../../core/models/election-call.model';
 
 @Component({
   selector: 'app-election-list',
@@ -21,10 +21,12 @@ export class ElectionListComponent implements OnInit {
   activeElections = signal<Election[]>([]);
   closedElections = signal<Election[]>([]);
   activeCall      = signal<ElectionCall | null>(null);
+  myApplication   = signal<CandidateApplication | null>(null);
   loading         = signal(true);
   deleting        = signal<number | null>(null);
   toast           = signal<{ msg: string; type: 'success' | 'error' } | null>(null);
-  positionLabel = positionLabel;
+  positionLabel   = positionLabel;
+  appStatusLabels = APPLICATION_STATUS_LABELS;
 
   ngOnInit(): void { this.load(); }
 
@@ -42,7 +44,17 @@ export class ElectionListComponent implements OnInit {
       error: () => check(),
     });
     this.callService.getActiveCall().subscribe({
-      next: call => { this.activeCall.set(call); check(); },
+      next: call => {
+        this.activeCall.set(call);
+        if (call) {
+          this.callService.getMyApplication(call.id).subscribe({
+            next: app => { this.myApplication.set(app); check(); },
+            error: () => check(),
+          });
+        } else {
+          check();
+        }
+      },
       error: () => check(),
     });
   }
@@ -86,7 +98,7 @@ export class ElectionListComponent implements OnInit {
   }
 
   totalCandidates(e: Election): number {
-    return e.candidates?.length ?? 0;
+    return e.totalCandidatesCount ?? e.candidates?.length ?? 0;
   }
 
   private showToast(msg: string, type: 'success' | 'error'): void {

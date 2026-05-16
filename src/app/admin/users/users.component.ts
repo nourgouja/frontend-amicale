@@ -80,9 +80,12 @@ export class AdminUsersComponent implements OnInit {
   ];
 
   readonly postes = [
-    { value: 'PRESIDENT',       label: 'Président' },
-    { value: 'TRESORIER',       label: 'Trésorier' },
+    { value: 'PRESIDENT',        label: 'Président' },
+    { value: 'VICE_PRESIDENT',   label: 'Vice-Président' },
+    { value: 'SECRETARY',        label: 'Secrétaire' },
+    { value: 'TREASURER',        label: 'Trésorier' },
     { value: 'RESPONSABLE_POLE', label: 'Responsable de Pôle' },
+    { value: 'MEMBER',           label: 'Membre' },
   ];
 
   readonly tabs = [
@@ -450,7 +453,7 @@ export class AdminUsersComponent implements OnInit {
   roleLabel(role: string): string { return { ADMIN: 'Admin', MEMBRE_BUREAU: 'Membre Bureau', ADHERENT: 'Adhérent' }[role] ?? role; }
 
   posteLabel(poste: string | undefined): string {
-    const map: Record<string, string> = { PRESIDENT: 'Président', TRESORIER: 'Trésorier', SECRETAIRE: 'Secrétaire', RESPONSABLE_POLE: 'Resp. de Pôle' };
+    const map: Record<string, string> = { PRESIDENT: 'Président', VICE_PRESIDENT: 'Vice-Président', SECRETARY: 'Secrétaire', TREASURER: 'Trésorier', RESPONSABLE_POLE: 'Resp. de Pôle', MEMBER: 'Membre' };
     return poste ? (map[poste] ?? poste) : '—';
   }
 

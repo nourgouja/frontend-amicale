@@ -24,7 +24,7 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const POSTE_ORDER: Record<string, number> = {
-  PRESIDENT: 0, TRESORIER: 1, SECRETAIRE: 2, RESPONSABLE_POLE: 3,
+  PRESIDENT: 0, VICE_PRESIDENT: 1, SECRETARY: 2, TREASURER: 3, RESPONSABLE_POLE: 4, MEMBER: 5,
 };
 
 @Component({
@@ -109,8 +109,9 @@ export class AdherentDashboardComponent implements OnInit {
 
   posteLabel(poste: string | null): string {
     const map: Record<string, string> = {
-      PRESIDENT: 'Président', TRESORIER: 'Trésorier',
-      SECRETAIRE: 'Secrétaire', RESPONSABLE_POLE: 'Responsable de Pôle',
+      PRESIDENT: 'Président', VICE_PRESIDENT: 'Vice-Président',
+      SECRETARY: 'Secrétaire', TREASURER: 'Trésorier',
+      RESPONSABLE_POLE: 'Responsable de Pôle', MEMBER: 'Membre',
     };
     return poste ? (map[poste] ?? poste) : '—';
   }

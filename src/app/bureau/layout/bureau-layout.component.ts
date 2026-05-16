@@ -70,9 +70,11 @@ export class BureauLayoutComponent implements OnInit {
         const poste = p.posteMembre as string | undefined;
         const labels: Record<string, string> = {
           PRESIDENT:        'Président',
-          TRESORIER:        'Trésorier',
-          SECRETAIRE:       'Secrétaire',
+          VICE_PRESIDENT:   'Vice-Président',
+          SECRETARY:        'Secrétaire',
+          TREASURER:        'Trésorier',
           RESPONSABLE_POLE: 'Responsable de Pôle',
+          MEMBER:           'Membre',
         };
         this.posteLabel.set(poste ? (labels[poste] ?? 'Membre Bureau') : 'Membre Bureau');
         this.isResponsablePole.set(poste === 'RESPONSABLE_POLE');

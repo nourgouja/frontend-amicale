@@ -22,14 +22,14 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
       </div>
       <div class="call-banner__text">
-        <h1 class="call-title">{{ call()!.title }}</h1>
+        <h1 class="call-title">{{ call()!.titre }}</h1>
         @if (call()!.description) {
           <p class="call-desc">{{ call()!.description }}</p>
         }
-        @if (call()!.deadline) {
+        @if (call()!.dateFinCandidature) {
           <p class="call-deadline">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Candidatures ouvertes jusqu'au {{ call()!.deadline | date:'dd/MM/yyyy à HH:mm' }}
+            Candidatures ouvertes jusqu'au {{ call()!.dateFinCandidature | date:'dd/MM/yyyy à HH:mm' }}
           </p>
         }
       </div>
@@ -50,8 +50,11 @@
               <span class="app-detail__value">
                 @switch (myApplication()!.position) {
                   @case ('PRESIDENT')        { Président }
-                  @case ('TRESORIER')        { Trésorier }
-                  @case ('RESPONSABLE_POLE') { Responsable de pôle }
+                  @case ('VICE_PRESIDENT')   { Vice-Président }
+                  @case ('SECRETARY')        { Secrétaire }
+                  @case ('TREASURER')        { Trésorier }
+                  @case ('RESPONSABLE_POLE') { Responsable de Pôle }
+                  @case ('MEMBER')           { Membre }
                 }
               </span>
             </div>
@@ -59,7 +62,7 @@
               <span class="app-detail__label">Statut</span>
               <span class="app-status-badge"
                     [class.app-status-badge--pending]="myApplication()!.status === 'PENDING'"
-                    [class.app-status-badge--accepted]="myApplication()!.status === 'ACCEPTED'"
+                    [class.app-status-badge--accepted]="myApplication()!.status === 'APPROVED'"
                     [class.app-status-badge--rejected]="myApplication()!.status === 'REJECTED'">
                 {{ statusLabel(myApplication()!.status) }}
               </span>

@@ -31,8 +31,8 @@ export class SondageService {
     return this.http.patch<void>(`/api/sondages/${id}/fermer`, {});
   }
 
-  vote(id: number, optionId: number): Observable<void> {
-    return this.http.post<void>(`/api/sondages/${id}/voter`, { optionId });
+  vote(id: number, optionId: number): Observable<Sondage> {
+    return this.http.post<Sondage>(`/api/sondages/${id}/voter`, { optionId });
   }
 
   getResults(id: number): Observable<Sondage> {

@@ -1,14 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { ElectionCall, CandidateApplication, CreateCallRequest, ApplyRequest } from '../models/election-call.model';
-import { Election } from '../models/election.model';
 
 @Injectable({ providedIn: 'root' })
 export class ElectionCallService {
   private http = inject(HttpClient);
-  private base = '/api/election-calls';
+  private base = '/api/v1/election-calls';
 
   // ── Admin ──────────────────────────────────────────────────────────────────
 
@@ -17,7 +16,9 @@ export class ElectionCallService {
   }
 
   getAllCalls(): Observable<ElectionCall[]> {
-    return this.http.get<ElectionCall[]>(this.base);
+    return this.http.get<{ content: ElectionCall[] }>(`${this.base}/all`).pipe(
+      map(page => page.content)
+    );
   }
 
   closeCall(id: number): Observable<ElectionCall> {
@@ -25,11 +26,13 @@ export class ElectionCallService {
   }
 
   getApplications(callId: number): Observable<CandidateApplication[]> {
-    return this.http.get<CandidateApplication[]>(`${this.base}/${callId}/applications`);
+    return this.http.get<{ content: CandidateApplication[] }>(`${this.base}/${callId}/applications`).pipe(
+      map(page => page.content)
+    );
   }
 
-  acceptApplication(callId: number, appId: number): Observable<CandidateApplication> {
-    return this.http.post<CandidateApplication>(`${this.base}/${callId}/applications/${appId}/accept`, {});
+  approveApplication(callId: number, appId: number): Observable<CandidateApplication> {
+    return this.http.post<CandidateApplication>(`${this.base}/${callId}/applications/${appId}/approve`, {});
   }
 
   rejectApplication(callId: number, appId: number): Observable<CandidateApplication> {
@@ -40,8 +43,8 @@ export class ElectionCallService {
     return this.http.delete<void>(`${this.base}/${id}`);
   }
 
-  publishElection(callId: number): Observable<Election> {
-    return this.http.post<Election>(`${this.base}/${callId}/publish`, {});
+  publishElection(callId: number): Observable<ElectionCall> {
+    return this.http.post<ElectionCall>(`${this.base}/${callId}/publish`, {});
   }
 
   // ── Member ─────────────────────────────────────────────────────────────────
@@ -54,13 +57,14 @@ export class ElectionCallService {
 
   apply(callId: number, req: ApplyRequest, photo?: File): Observable<CandidateApplication> {
     const fd = new FormData();
-    fd.append('application', new Blob([JSON.stringify(req)], { type: 'application/json' }));
+    fd.append('position', req.position);
+    fd.append('motivation', req.motivation);
     if (photo) fd.append('photo', photo);
     return this.http.post<CandidateApplication>(`${this.base}/${callId}/apply`, fd);
   }
 
   getMyApplication(callId: number): Observable<CandidateApplication | null> {
-    return this.http.get<CandidateApplication | null>(`${this.base}/${callId}/my-application`).pipe(
+    return this.http.get<CandidateApplication>(`${this.base}/${callId}/my-application`).pipe(
       catchError(() => of(null))
     );
   }

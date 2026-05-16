@@ -1,15 +1,14 @@
-export type ElectionStatus = 'DRAFT' | 'ACTIVE' | 'CLOSED';
-export type Position = 'PRESIDENT' | 'TRESORIER' | 'RESPONSABLE_POLE';
+export type ElectionStatus = 'DRAFT' | 'ACTIVE' | 'CLOSED' | 'RESULTS_PUBLISHED';
+export type Position = 'PRESIDENT' | 'VICE_PRESIDENT' | 'SECRETARY' | 'TREASURER' | 'RESPONSABLE_POLE' | 'MEMBER';
 
 export interface Candidate {
   id: number;
-  userId: number;
-  nom: string;
   prenom: string;
-  email: string;
+  nom: string;
+  email?: string;
   position: Position;
-  description?: string;
   pictureUrl?: string;
+  description?: string;
   voteCount: number;
   votePercentage: number;
   winner: boolean;
@@ -21,21 +20,27 @@ export interface Election {
   titre: string;
   description?: string;
   status: ElectionStatus;
-  createdByNom: string;
-  createdByPrenom: string;
+  dateDebut?: string;
+  dateFin?: string;
+  closedAt?: string;
+  callId?: number;
+  parentElectionId?: number;
+  totalVotes: number;
+  totalCandidatesCount: number;
   createdAt: string;
   updatedAt?: string;
-  openedAt?: string;
-  closedAt?: string;
+  resultsPublishedAt?: string;
   candidates: Candidate[];
   candidatesByPosition: Record<Position, Candidate[]>;
   votedPositions: Position[];
+  isResultsPublished: boolean;
   resultsPublished: boolean;
   hasTie: boolean;
   tiedPositions: Position[];
   isExtraRound: boolean;
-  parentElectionId?: number;
   extraRoundElectionId?: number;
+  canVote: boolean;
+  canPublishResults: boolean;
 }
 
 export interface UserSummary {
@@ -59,8 +64,11 @@ export interface AddCandidateRequest {
 
 export const POSITIONS: { value: Position; label: string }[] = [
   { value: 'PRESIDENT',        label: 'Président' },
-  { value: 'TRESORIER',        label: 'Trésorier' },
-  { value: 'RESPONSABLE_POLE', label: 'Responsable de pôle' },
+  { value: 'VICE_PRESIDENT',   label: 'Vice-Président' },
+  { value: 'SECRETARY',        label: 'Secrétaire' },
+  { value: 'TREASURER',        label: 'Trésorier' },
+  { value: 'RESPONSABLE_POLE', label: 'Responsable de Pôle' },
+  { value: 'MEMBER',           label: 'Membre' },
 ];
 
 export function positionLabel(p: Position): string {

@@ -2,10 +2,8 @@ import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
-import { getInitials, formatDate } from '../../shared/utils/format.utils';
+import { getInitials } from '../../shared/utils/format.utils';
 
 interface Profil {
   id?: number;
@@ -21,26 +19,10 @@ interface Profil {
   actif?: boolean;  
 }
 
-interface Inscription {
-  id: number;
-  offreTitre: string;
-  typeOffre: string;
-  dateInscription: string;
-  statut: string;
-}
-
-interface Cotisation {
-  id: number;
-  montant: number;
-  dateEcheance: string;
-  statut: string;
-  anneeCotisation: number;
-}
-
 @Component({
   selector: 'app-adherent-profil',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, StatusBadgeComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './adherent-profil.component.html',
   styleUrl: './adherent-profil.component.scss',
 })
@@ -49,15 +31,12 @@ export class AdherentProfilComponent implements OnInit {
   private fb          = inject(FormBuilder);
   private authService = inject(AuthService);
 
-  profil       = signal<Profil | null>(null);
-  inscriptions = signal<Inscription[]>([]);
-  cotisation   = signal<Cotisation | null>(null);
-  loading      = signal(true);
-  saving       = signal(false);
-  saveSuccess  = signal(false);
-  saveError    = signal('');
-  editMode     = signal(false);
-  activeTab    = signal<'inscriptions' | 'cotisations'>('inscriptions');
+  profil      = signal<Profil | null>(null);
+  loading     = signal(true);
+  saving      = signal(false);
+  saveSuccess = signal(false);
+  saveError   = signal('');
+  editMode    = signal(false);
 
   showPhotoModal  = signal(false);
   photoFile       = signal<File | null>(null);
@@ -83,9 +62,6 @@ export class AdherentProfilComponent implements OnInit {
     return `data:${p.photoType};base64,${p.photoBase64}`;
   });
 
-  inscriptionsConfirmees = computed(() => this.inscriptions().filter(i => i.statut === 'CONFIRMEE').length);
-  inscriptionsAttente    = computed(() => this.inscriptions().filter(i => i.statut === 'EN_ATTENTE').length);
-
   ngOnInit(): void {
     this.http.get<Profil>('/api/utilisateurs/profil').subscribe({
       next: p => {
@@ -99,26 +75,6 @@ export class AdherentProfilComponent implements OnInit {
       error: () => this.loading.set(false),
     });
 
-    this.http.get<Inscription[]>('/api/inscriptions/mesinscriptions').subscribe({
-      next: list => this.inscriptions.set(list),
-      error: ()  => {},
-    });
-
-    this.http.get<any>('/api/adherent/dashboard').subscribe({
-      next: data => {
-        const next = data.prochainesEcheances?.[0];
-        if (next) {
-          this.cotisation.set({
-            id:              next.echeanceId,
-            montant:         next.montant,
-            dateEcheance:    next.dateEcheance,
-            statut:          next.statut,
-            anneeCotisation: new Date(next.dateEcheance).getFullYear(),
-          });
-        }
-      },
-      error: () => {},
-    });
   }
 
   enterEdit(): void {
@@ -184,15 +140,6 @@ export class AdherentProfilComponent implements OnInit {
         this.photoError.set(err?.error?.message ?? 'Une erreur est survenue lors de l\'upload.');
       },
     });
-  }
-
-  formatDate(s: string): string { return formatDate(s); }
-
-  cotisationColor(): string {
-    const s = this.cotisation()?.statut;
-    if (s === 'PAYEE') return '#10b981';
-    if (s === 'EN_RETARD') return '#ef4444';
-    return '#f59e0b';
   }
 
   private patchForm(p: Profil): void {

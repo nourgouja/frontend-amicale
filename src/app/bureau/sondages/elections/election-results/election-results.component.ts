@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ElectionService } from '../../../../core/services/election.service';
-import { Election, POSITIONS, positionLabel, positionLabel as posLabel } from '../../../../core/models/election.model';
+import { Election, Position, POSITIONS, positionLabel, positionLabel as posLabel } from '../../../../core/models/election.model';
 
 @Component({
   selector: 'app-election-results',
@@ -91,14 +91,15 @@ export class ElectionResultsComponent implements OnInit {
 
   createExtraRound(): void {
     const id = this.election()?.id;
-    if (!id || this.extraRound()) return;
+    const tiedPositions = this.election()?.tiedPositions ?? [];
+    if (!id || this.extraRound() || tiedPositions.length === 0) return;
     if (!confirm('Lancer un tour supplémentaire pour les postes à égalité ? Les membres recevront une notification.')) return;
     this.extraRound.set(true);
-    this.electionService.createExtraRound(id).subscribe({
+    const position = tiedPositions[0] as Position;
+    this.electionService.createExtraRound(id, position).subscribe({
       next: newElection => {
         this.extraRound.set(false);
         this.showToast('Tour supplémentaire créé ! Les membres peuvent voter.', 'success');
-        // Navigate to the extra round results page after a short delay
         setTimeout(() => this.router.navigate(['/admin/elections', newElection.id, 'resultats']), 1800);
       },
       error: err => { this.extraRound.set(false); this.showToast(err?.error?.message ?? 'Erreur', 'error'); },

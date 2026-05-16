@@ -124,7 +124,7 @@
                 } @else {
                   <button class="btn-vote"
                           [disabled]="voting() !== null"
-                          (click)="vote(election()!.id, c.id)"
+                          (click)="vote(election()!.id, c.id, c.position)"
                           [class.btn-vote--loading]="voting() === c.id">
                     @if (voting() === c.id) { Vote en cours… }
                     @else { Voter pour {{ c.prenom }} }

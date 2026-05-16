@@ -26,19 +26,16 @@
           </div>
           <div class="call-banner__text">
             <p class="call-banner__label">Appel à candidature ouvert</p>
-            <p class="call-banner__title">{{ activeCall()!.title }}</p>
-            @if (activeCall()!.deadline) {
-              <p class="call-banner__deadline">Candidatures jusqu'au {{ activeCall()!.deadline | date:'dd/MM/yyyy' }}</p>
+            <p class="call-banner__title">{{ activeCall()!.titre }}</p>
+            @if (activeCall()!.dateFinCandidature) {
+              <p class="call-banner__deadline">Candidatures jusqu'au {{ activeCall()!.dateFinCandidature | date:'dd/MM/yyyy' }}</p>
             }
           </div>
         </div>
-        @if (activeCall()!.myApplication) {
-          <div class="call-banner__status">
-            <span class="applied-badge">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Candidature soumise
-            </span>
-            <button class="btn-view-app" (click)="goApply()">Voir ma candidature</button>
+        @if (myApplication()) {
+          <div class="my-app-status" [class]="'my-app-status--' + myApplication()!.status.toLowerCase()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Candidature déposée &mdash; {{ appStatusLabels[myApplication()!.status] }}
           </div>
         } @else {
           <button class="btn-apply" (click)="goApply()">

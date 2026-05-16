@@ -26,10 +26,12 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const POSTE_LABELS: Record<string, string> = {
-  PRESIDENT: 'Président',
-  TRESORIER: 'Trésorier',
-  SECRETAIRE: 'Secrétaire',
+  PRESIDENT:        'Président',
+  VICE_PRESIDENT:   'Vice-Président',
+  SECRETARY:        'Secrétaire',
+  TREASURER:        'Trésorier',
   RESPONSABLE_POLE: 'Responsable de Pôle',
+  MEMBER:           'Membre',
 };
 
 @Component({

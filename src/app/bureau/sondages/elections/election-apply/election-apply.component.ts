@@ -52,10 +52,10 @@ export class ElectionApplyComponent implements OnInit {
           return;
         }
         this.call.set(activeCall);
-        if (activeCall.myApplication) {
-          this.myApplication.set(activeCall.myApplication);
-        }
-        this.loading.set(false);
+        this.callService.getMyApplication(this.callId).subscribe({
+          next: app => { this.myApplication.set(app); this.loading.set(false); },
+          error: () => this.loading.set(false),
+        });
       },
       error: () => { this.loading.set(false); this.back(); },
     });
@@ -120,7 +120,7 @@ export class ElectionApplyComponent implements OnInit {
   }
 
   statusLabel(s: string): string {
-    return s === 'PENDING' ? 'En attente de révision' : s === 'ACCEPTED' ? 'Acceptée' : 'Refusée';
+    return s === 'PENDING' ? 'En attente de révision' : s === 'APPROVED' ? 'Acceptée' : 'Refusée';
   }
 
   private showToast(msg: string, type: 'success' | 'error'): void {

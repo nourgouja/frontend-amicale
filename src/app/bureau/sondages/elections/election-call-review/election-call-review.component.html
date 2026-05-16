@@ -13,7 +13,7 @@
     </button>
     @if (call()) {
       <div class="page-header__info">
-        <h1 class="page-title">{{ call()!.title }}</h1>
+        <h1 class="page-title">{{ call()!.titre }}</h1>
         <span class="status-badge" [class.status-badge--open]="call()!.status === 'OPEN'" [class.status-badge--closed]="call()!.status === 'CLOSED'">
           {{ call()!.status === 'OPEN' ? 'Ouvert' : 'Clôturé' }}
         </span>
@@ -56,19 +56,19 @@
         } @else {
           <div class="apps-grid">
             @for (app of group.apps; track app.id) {
-              <div class="app-card" [class.app-card--accepted]="app.status === 'ACCEPTED'" [class.app-card--rejected]="app.status === 'REJECTED'">
+              <div class="app-card" [class.app-card--accepted]="app.status === 'APPROVED'" [class.app-card--rejected]="app.status === 'REJECTED'">
 
                 <div class="app-photo">
-                  @if (app.pictureUrl) {
-                    <img [src]="app.pictureUrl" [alt]="app.prenom + ' ' + app.nom" />
+                  @if (app.photo) {
+                    <img [src]="'data:image/jpeg;base64,' + app.photo" [alt]="app.user.firstName + ' ' + app.user.lastName" />
                   } @else {
-                    <div class="app-avatar">{{ app.prenom[0] }}{{ app.nom[0] }}</div>
+                    <div class="app-avatar">{{ app.user.firstName[0] }}{{ app.user.lastName[0] }}</div>
                   }
                 </div>
 
                 <div class="app-info">
-                  <p class="app-name">{{ app.prenom }} {{ app.nom }}</p>
-                  <p class="app-email">{{ app.email }}</p>
+                  <p class="app-name">{{ app.user.firstName }} {{ app.user.lastName }}</p>
+                  <p class="app-email">{{ app.user.email }}</p>
                   <p class="app-motivation">{{ app.motivation }}</p>
                 </div>
 
@@ -86,9 +86,9 @@
                     </div>
                   } @else {
                     <span class="app-status-badge"
-                          [class.app-status-badge--accepted]="app.status === 'ACCEPTED'"
+                          [class.app-status-badge--accepted]="app.status === 'APPROVED'"
                           [class.app-status-badge--rejected]="app.status === 'REJECTED'">
-                      {{ app.status === 'ACCEPTED' ? 'Acceptée' : 'Refusée' }}
+                      {{ app.status === 'APPROVED' ? 'Acceptée' : 'Refusée' }}
                     </span>
                   }
                 </div>

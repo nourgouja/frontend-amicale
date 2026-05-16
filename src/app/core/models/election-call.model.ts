@@ -1,45 +1,54 @@
 import { Position } from './election.model';
 
 export type CallStatus = 'OPEN' | 'CLOSED';
-export type ApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
+export type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface UserSummaryForApplication {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+}
 
 export interface ElectionCall {
   id: number;
-  title: string;
+  titre: string;
   description?: string;
   status: CallStatus;
-  deadline?: string;
-  createdByNom: string;
-  createdByPrenom: string;
+  dateFinCandidature?: string;
+  dateDebut?: string;
+  dateFin?: string;
   createdAt: string;
-  applicationCount: number;
-  pendingCount: number;
-  acceptedCount: number;
-  rejectedCount: number;
+  updatedAt?: string;
+  totalApplicationsCount: number;
+  approvedCandidatesCount: number;
   publishedElectionId?: number;
   publishedElectionStatus?: 'ACTIVE' | 'CLOSED' | null;
-  applications?: CandidateApplication[];
-  myApplication?: CandidateApplication | null;
+  canApply: boolean;
+  canPublish: boolean;
 }
 
 export interface CandidateApplication {
   id: number;
+  user: UserSummaryForApplication;
   callId: number;
-  userId: number;
-  nom: string;
-  prenom: string;
-  email: string;
   position: Position;
   motivation: string;
-  pictureUrl?: string;
+  photo?: string;
   status: ApplicationStatus;
   createdAt: string;
+  reviewedAt?: string;
+  rejectionReason?: string;
+  canApply: boolean;
 }
 
 export interface CreateCallRequest {
-  title: string;
+  titre: string;
   description?: string;
-  deadline?: string;
+  dateFinCandidature: string;
+  dateDebut: string;
+  dateFin: string;
 }
 
 export interface ApplyRequest {
@@ -49,6 +58,6 @@ export interface ApplyRequest {
 
 export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   PENDING:  'En attente',
-  ACCEPTED: 'Acceptée',
+  APPROVED: 'Acceptée',
   REJECTED: 'Refusée',
 };

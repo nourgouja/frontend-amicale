@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/**)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\election\\candidate",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\election\\election",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\election",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\controller\\election",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\entity\\election",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\notification"
+    ]
+  }
+}

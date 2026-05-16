@@ -80,11 +80,11 @@ export class ElectionVotingComponent implements OnInit {
     });
   }
 
-  vote(electionId: number, candidateId: number): void {
+  vote(electionId: number, candidateId: number, position: Position): void {
     if (this.voting() !== null) return;
     this.voting.set(candidateId);
 
-    this.electionService.vote(electionId, candidateId).subscribe({
+    this.electionService.vote(electionId, candidateId, position).subscribe({
       next: updated => {
         this.election.set(updated);
         this.voting.set(null);

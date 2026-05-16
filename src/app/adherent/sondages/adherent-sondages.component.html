@@ -59,14 +59,14 @@
             <h2 class="card-title">{{ s.titre }}</h2>
             @if (s.description) { <p class="card-desc">{{ s.description }}</p> }
 
-            @if (!hasVoted(s.id)) {
+            @if (!s.hasVoted) {
               <!-- Vote UI -->
               <p class="vote-prompt">Choisissez une option pour voter :</p>
               <div class="options-grid">
                 @for (opt of s.options; track opt.id) {
                   <button class="option-vote-card" (click)="vote(s.id, opt.id)">
-                    @if (opt.imageUrl) {
-                      <img [src]="opt.imageUrl" [alt]="opt.titre" class="option-img" />
+                    @if (opt.imageBase64) {
+                      <img [src]="'data:' + opt.imageType + ';base64,' + opt.imageBase64" [alt]="opt.titre" class="option-img" />
                     } @else {
                       <div class="option-img-placeholder">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -109,9 +109,9 @@
 
             <div class="results-list">
               @for (opt of s.options; track opt.id) {
-                <div class="result-item" [class.result-item--voted]="votedOptionId(s.id) === opt.id">
-                  @if (opt.imageUrl) {
-                    <img [src]="opt.imageUrl" [alt]="opt.titre" class="result-opt-img" />
+                <div class="result-item" [class.result-item--voted]="s.votedOptionId === opt.id">
+                  @if (opt.imageBase64) {
+                    <img [src]="'data:' + opt.imageType + ';base64,' + opt.imageBase64" [alt]="opt.titre" class="result-opt-img" />
                   } @else {
                     <div class="result-opt-placeholder">
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -123,7 +123,7 @@
                     <div class="result-header">
                       <span class="result-name">
                         {{ opt.titre }}
-                        @if (votedOptionId(s.id) === opt.id) {
+                        @if (s.votedOptionId === opt.id) {
                           <span class="your-vote">votre choix</span>
                         }
                       </span>

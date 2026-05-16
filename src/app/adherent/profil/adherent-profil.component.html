@@ -147,120 +147,64 @@
         </button>
       </div>
 
-      <div class="info-card">
-        <div class="info-item">
-          <span class="info-label">Email</span>
-          <span class="info-value">{{ profil()?.email }}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Numéro</span>
-          <span class="info-value">{{ profil()?.telephone || '—' }}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Matricule STAR</span>
-          <span class="info-value">{{ profil()?.matriculeStar || '—' }}</span>
-        </div>
-        @if (profil()?.cin) {
-          <div class="info-item">
-            <span class="info-label">CIN</span>
-            <span class="info-value">{{ profil()?.cin }}</span>
-          </div>
-        }
-      </div>
 
     </div>
 
+    <!-- Right column -->
     <div class="profil-right">
-    <!-- Right column 
 
-      <div class="stats-row">
-        <div class="stat-card">
-          <span class="stat-num">{{ inscriptions().length }}</span>
-          <span class="stat-label">Inscriptions</span>
+      @if (saveSuccess()) {
+        <div class="alert-success">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" fill="#10b981"/>
+            <polyline points="9 12 11 14 15 10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Profil mis à jour avec succès.
         </div>
-        <div class="stat-card stat-card--green">
-          <span class="stat-num">{{ inscriptionsConfirmees() }}</span>
-          <span class="stat-label">Confirmées</span>
-        </div>
-        <div class="stat-card stat-card--orange">
-          <span class="stat-num">{{ inscriptionsAttente() }}</span>
-          <span class="stat-label">En attente</span>
-        </div>
-        @if (cotisation()) {
-          <div class="stat-card" [style.border-top]="'3px solid ' + cotisationColor()">
-            <span class="stat-num" [style.color]="cotisationColor()">{{ cotisation()!.montant }} DT</span>
-            <span class="stat-label">Cotisation {{ cotisation()!.anneeCotisation }}</span>
+      }
+
+      <div class="info-section">
+        <h3 class="section-title">Informations du compte</h3>
+        <div class="detail-card">
+          <div class="detail-row">
+            <span class="detail-label">Nom complet</span>
+            <span class="detail-value">{{ profil()?.prenom }} {{ profil()?.nom }}</span>
           </div>
-        }
-      </div>
-      -->
-
-      <!-- Tabs panel -->
-      <div class="tabs-panel">
-        <div class="tabs-nav">
-          <button class="tab-btn" [class.active]="activeTab() === 'inscriptions'" (click)="activeTab.set('inscriptions')">
-            Inscriptions
-          </button>
-          <button class="tab-btn" [class.active]="activeTab() === 'cotisations'" (click)="activeTab.set('cotisations')">
-            Cotisations
-          </button>
+          <div class="detail-row">
+            <span class="detail-label">Adresse email</span>
+            <span class="detail-value">{{ profil()?.email }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Téléphone</span>
+            <span class="detail-value">{{ profil()?.telephone || '—' }}</span>
+          </div>
+          @if (profil()?.matriculeStar) {
+            <div class="detail-row">
+              <span class="detail-label">Matricule STAR</span>
+              <span class="detail-value">{{ profil()?.matriculeStar }}</span>
+            </div>
+          }
+          @if (profil()?.cin) {
+            <div class="detail-row">
+              <span class="detail-label">CIN</span>
+              <span class="detail-value">{{ profil()?.cin }}</span>
+            </div>
+          }
+          <div class="detail-row">
+            <span class="detail-label">Rôle</span>
+            <span class="detail-value">Adhérent</span>
+          </div>
         </div>
+      </div>
 
-        @if (activeTab() === 'inscriptions') {
-          @if (inscriptions().length === 0) {
-            <div class="tab-empty">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-              </svg>
-              <p>Aucune inscription</p>
-              <a routerLink="/adherent/offres" class="tab-empty-link">Découvrir les offres →</a>
-            </div>
-          } @else {
-            <ul class="item-list">
-              @for (ins of inscriptions(); track ins.id) {
-                <li class="item-row">
-                  <div class="item-date">
-                    <span class="item-date-day">{{ formatDate(ins.dateInscription).slice(0, 2) }}</span>
-                    <span class="item-date-month">{{ formatDate(ins.dateInscription).slice(3, 6) }}</span>
-                  </div>
-                  <div class="item-info">
-                    <span class="item-name">{{ ins.offreTitre }}</span>
-                    <span class="item-sub">{{ ins.typeOffre }}</span>
-                  </div>
-                  <app-status-badge [statut]="ins.statut" type="inscription" />
-                </li>
-              }
-            </ul>
-          }
-        } @else {
-          @if (!cotisation()) {
-            <div class="tab-empty">
-              <p>Aucune cotisation enregistrée</p>
-            </div>
-          } @else {
-            <div class="cotisation-detail">
-              <div class="cot-row">
-                <span class="cot-label">Année</span>
-                <span class="cot-value">{{ cotisation()!.anneeCotisation }}</span>
-              </div>
-              <div class="cot-row">
-                <span class="cot-label">Montant</span>
-                <span class="cot-value cot-value--bold">{{ cotisation()!.montant }} DT</span>
-              </div>
-              <div class="cot-row">
-                <span class="cot-label">Échéance</span>
-                <span class="cot-value">{{ formatDate(cotisation()!.dateEcheance) }}</span>
-              </div>
-              <div class="cot-row">
-                <span class="cot-label">Statut</span>
-                <app-status-badge [statut]="cotisation()!.statut" type="cotisation" />
-              </div>
-              @if (cotisation()!.statut === 'EN_RETARD') {
-                <a routerLink="/adherent/cotisation" class="cot-action-btn">Régulariser →</a>
-              }
-            </div>
-          }
-        }
+      <div class="info-section">
+        <h3 class="section-title">Sécurité</h3>
+        <div class="detail-card">
+          <div class="detail-row">
+            <span class="detail-label">Mot de passe</span>
+            <span class="detail-value detail-value--muted">••••••••</span>
+          </div>
+        </div>
       </div>
 
     </div>

@@ -32,23 +32,10 @@ export class AdherentSondagesComponent implements OnInit {
     });
   }
 
-  hasVoted(sondageId: number): boolean {
-    return localStorage.getItem(`sondage_voted_${sondageId}`) !== null;
-  }
-
-  votedOptionId(sondageId: number): number | null {
-    const v = localStorage.getItem(`sondage_voted_${sondageId}`);
-    return v !== null ? +v : null;
-  }
-
   vote(sondageId: number, optionId: number): void {
-    if (this.hasVoted(sondageId)) return;
     this.sondageService.vote(sondageId, optionId).subscribe({
-      next: () => {
-        localStorage.setItem(`sondage_voted_${sondageId}`, String(optionId));
-        this.sondageService.getSondageById(sondageId).subscribe({
-          next: updated => this.sondages.update(list => list.map(s => s.id === sondageId ? updated : s)),
-        });
+      next: updated => {
+        this.sondages.update(list => list.map(s => s.id === sondageId ? updated : s));
         this.showToast('Vote enregistré avec succès !', 'success');
       },
       error: err => this.showToast(err?.error?.message ?? 'Impossible de voter.', 'error'),

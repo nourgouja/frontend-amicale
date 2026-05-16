@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ElectionCallService } from '../../../../core/services/election-call.service';
 import { CandidateApplication, ElectionCall } from '../../../../core/models/election-call.model';
@@ -8,7 +8,7 @@ import { POSITIONS, positionLabel, Position } from '../../../../core/models/elec
 @Component({
   selector: 'app-election-call-review',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule],
   templateUrl: './election-call-review.component.html',
   styleUrl: './election-call-review.component.scss',
 })
@@ -38,8 +38,8 @@ export class ElectionCallReviewComponent implements OnInit {
 
   canPublish = computed(() => {
     const apps = this.applications();
-    const accepted = apps.filter(a => a.status === 'ACCEPTED');
-    const positions = new Set(accepted.map(a => a.position));
+    const approved = apps.filter(a => a.status === 'APPROVED');
+    const positions = new Set(approved.map(a => a.position));
     return positions.size === 3 && this.call()?.publishedElectionId == null;
   });
 
@@ -60,7 +60,7 @@ export class ElectionCallReviewComponent implements OnInit {
   accept(app: CandidateApplication): void {
     if (this.isProcessing(app.id)) return;
     this.setProcessing(app.id, true);
-    this.callService.acceptApplication(app.callId, app.id).subscribe({
+    this.callService.approveApplication(app.callId, app.id).subscribe({
       next: updated => {
         this.applications.update(list => list.map(a => a.id === updated.id ? updated : a));
         this.setProcessing(app.id, false);
