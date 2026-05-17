@@ -42,7 +42,7 @@ export class CreerOffreComponent implements OnInit {
     { value: 'SEJOUR',     label: 'Séjour',     color: '#10b981' },
     { value: 'ACTIVITE',   label: 'Activité',   color: '#f59e0b' },
     { value: 'CONVENTION', label: 'Convention', color: '#8b5cf6' },
-    { value: 'ANNONCE',    label: 'Annonce',    color: '#ec4899' },
+    { value: 'EVENEMENT',    label: 'Événement',    color: '#ec4899' },
   ] as const;
 
   userPoleTypesOffre = signal<string[]>([]);
@@ -59,19 +59,19 @@ export class CreerOffreComponent implements OnInit {
     return this.isBureauMode && allowed.length > 0 && !allowed.includes(type);
   }
 
-  readonly paymentModes = [
-    { value: 'FULL',       label: 'Comptant — paiement intégral' },
-    { value: 'SEMESTRIEL', label: 'Semestriel — 2 versements' },
-    { value: 'TIERS',      label: 'Tiers — 3 versements' },
-  ];
 
   form!: FormGroup;
 
   get typeCtrl(): AbstractControl { return this.form.get('typeOffre')!; }
-  get showDateFin(): boolean { const t = this.typeCtrl.value; return t === 'VOYAGE' || t === 'SEJOUR'; }
-  get showModePaiement(): boolean { const t = this.typeCtrl.value; return t === 'VOYAGE' || t === 'SEJOUR'; }
-  get isConvention(): boolean { const t = this.typeCtrl.value; return t === 'CONVENTION' || t === 'ANNONCE'; }
-  get canAddExtra(): boolean { return this.extraFiles().length < 5; }
+
+  private get t(): string { return this.typeCtrl.value; }
+
+  get isConvention():       boolean { return this.t === 'CONVENTION'; }
+  get showDatesSection():   boolean { return this.t !== 'CONVENTION' && !!this.t; }
+  get showDateFin():        boolean { return this.t === 'VOYAGE' || this.t === 'SEJOUR'; }
+  get showCapaciteTarif():  boolean { return this.t !== 'CONVENTION' && !!this.t; }
+  get showAvantages():      boolean { return this.t !== 'CONVENTION' && !!this.t; }
+  get canAddExtra():        boolean { return this.extraFiles().length < 5; }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -111,7 +111,7 @@ export class CreerOffreComponent implements OnInit {
     this.form.get('typeOffre')!.valueChanges.subscribe(type => {
       this.autoSetPole(type);
       const dateCtrl = this.form.get('dateDebut')!;
-      if (type === 'CONVENTION' || type === 'ANNONCE') {
+      if (type === 'CONVENTION') {
         dateCtrl.removeValidators(Validators.required);
       } else {
         dateCtrl.addValidators(Validators.required);
@@ -153,6 +153,17 @@ export class CreerOffreComponent implements OnInit {
 
   selectedTypeName(): string {
     return this.offreTypes().find(t => t.value === this.typeCtrl.value)?.label ?? '';
+  }
+
+  poleNameForType(): string {
+    switch (this.t) {
+      case 'VOYAGE':
+      case 'SEJOUR':     return 'Pôle Voyage & Séjours';
+      case 'ACTIVITE':   return 'Pôle Activités et Loisirs';
+      case 'CONVENTION':
+      case 'EVENEMENT':  return 'Pôle Convention et Événement';
+      default:           return '';
+    }
   }
 
   readonly MAX_IMAGE_SIZE = 1_000_000;
@@ -217,8 +228,8 @@ export class CreerOffreComponent implements OnInit {
     this.extraFiles().forEach(f => fd.append('images', f));
 
     const payload = { ...this.form.value, statut };
-    if (!this.showDateFin)      delete payload.dateFin;
-    if (!this.showModePaiement) delete payload.modePaiement;
+    if (!this.showDateFin) delete payload.dateFin;
+    delete payload.modePaiement;
     fd.append('req', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
 
     const id = this.route.snapshot.paramMap.get('id');

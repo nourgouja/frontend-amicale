@@ -4,14 +4,14 @@ import { DatePipe, LowerCasePipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, LayoutGrid, ClipboardList, Megaphone, CreditCard, CalendarDays, Bell, ChartPie, Award } from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, LayoutGrid, ClipboardList, Megaphone, CreditCard, CalendarDays, Bell, ChartPie } from 'lucide-angular';
 
 @Component({
   selector: 'app-adherent-layout',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LowerCasePipe, ProfileCardComponent, LucideAngularModule],
   providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, LayoutGrid, ClipboardList, Megaphone, CreditCard, CalendarDays, Bell, ChartPie, Award }) },
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, LayoutGrid, ClipboardList, Megaphone, CreditCard, CalendarDays, Bell, ChartPie }) },
   ],
   templateUrl: './adherent-layout.component.html',
   styleUrl: './adherent-layout.component.scss',
@@ -32,7 +32,6 @@ export class AdherentLayoutComponent implements OnInit {
     { label: 'Mes Paiements',    route: '/adherent/cotisation',   icon: 'CreditCard'      },
     { label: 'Annonces',         route: '/adherent/annonces',     icon: 'Megaphone'       },
     { label: 'Calendrier',       route: '/adherent/calendrier',   icon: 'CalendarDays'    },
-    { label: 'Élections',        route: '/adherent/elections',    icon: 'Award'           },
   ];
 
   displayName = computed(() => {

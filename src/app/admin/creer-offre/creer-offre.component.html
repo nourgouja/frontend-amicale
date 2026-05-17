@@ -88,11 +88,10 @@
                       <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
                   }
-                  @case ('ANNONCE') {
+                  @case ('EVENEMENT') {
                     <svg class="type-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                      <line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/>
                     </svg>
                   }
                 }
@@ -103,10 +102,10 @@
           @if (isInvalid('typeOffre')) { <span class="field-error">Veuillez choisir un type.</span> }
         </div>
 
-        @if (typeCtrl.value && selectedTypeName()) {
+        @if (typeCtrl.value && poleNameForType()) {
           <div class="pole-chip">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Pôle assigné automatiquement pour les offres de type <strong>{{ selectedTypeName() }}</strong>
+            Type assigné au <strong>{{ poleNameForType() }}</strong>
           </div>
         }
 
@@ -135,73 +134,64 @@
       </div>
 
       <!-- Dates -->
-      <div class="form-section">
-        <h2 class="section-title">Dates</h2>
+      @if (showDatesSection) {
+        <div class="form-section">
+          <h2 class="section-title">Dates</h2>
 
-        <div class="field-row">
-          <div class="field">
-            <label class="label" for="dateDebut">
-              Date de début @if (!isConvention) { <span class="req">*</span> }
-            </label>
-            <input id="dateDebut" class="input" type="date" formControlName="dateDebut"
-              [class.is-invalid]="isInvalid('dateDebut')" />
-            @if (isInvalid('dateDebut')) { <span class="field-error">La date de début est requise.</span> }
-          </div>
-          @if (showDateFin) {
+          <div class="field-row">
             <div class="field">
-              <label class="label" for="dateFin">Date de fin</label>
-              <input id="dateFin" class="input" type="date" formControlName="dateFin" />
+              <label class="label" for="dateDebut">Date de début <span class="req">*</span></label>
+              <input id="dateDebut" class="input" type="date" formControlName="dateDebut"
+                [class.is-invalid]="isInvalid('dateDebut')" />
+              @if (isInvalid('dateDebut')) { <span class="field-error">La date de début est requise.</span> }
             </div>
-          }
+            @if (showDateFin) {
+              <div class="field">
+                <label class="label" for="dateFin">Date de fin</label>
+                <input id="dateFin" class="input" type="date" formControlName="dateFin" />
+              </div>
+            }
+          </div>
         </div>
-      </div>
+      }
 
       <!-- Capacité et tarif -->
-      <div class="form-section">
-        <h2 class="section-title">Capacité et tarif</h2>
+      @if (showCapaciteTarif) {
+        <div class="form-section">
+          <h2 class="section-title">Capacité et tarif</h2>
 
-        <div class="field-row">
-          <div class="field">
-            <label class="label" for="cap">Capacité maximale</label>
-            <div class="number-ctrl">
-              <button type="button" class="num-btn" (click)="form.get('capaciteMax')!.setValue((form.get('capaciteMax')!.value || 0) - 1)">−</button>
-              <input id="cap" class="input input--num" type="number" min="1" formControlName="capaciteMax" placeholder="—" />
-              <button type="button" class="num-btn" (click)="form.get('capaciteMax')!.setValue((form.get('capaciteMax')!.value || 0) + 1)">+</button>
+          <div class="field-row">
+            <div class="field">
+              <label class="label" for="cap">Capacité maximale</label>
+              <div class="number-ctrl">
+                <button type="button" class="num-btn" (click)="form.get('capaciteMax')!.setValue((form.get('capaciteMax')!.value || 0) - 1)">−</button>
+                <input id="cap" class="input input--num" type="number" min="1" formControlName="capaciteMax" placeholder="—" />
+                <button type="button" class="num-btn" (click)="form.get('capaciteMax')!.setValue((form.get('capaciteMax')!.value || 0) + 1)">+</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="prix">Prix par personne</label>
+              <div class="input-icon-wrap input-suffix-wrap">
+                <input id="prix" class="input input--suffix" type="number" min="0" formControlName="prixParPersonne" placeholder="0" />
+                <span class="input-suffix">DT</span>
+              </div>
             </div>
           </div>
-          <div class="field">
-            <label class="label" for="prix">Prix par personne</label>
-            <div class="input-icon-wrap input-suffix-wrap">
-              <input id="prix" class="input input--suffix" type="number" min="0" formControlName="prixParPersonne" placeholder="0" />
-              <span class="input-suffix">DT</span>
-            </div>
-          </div>
+
         </div>
-
-        @if (showModePaiement) {
-          <div class="field">
-            <label class="label">Mode de paiement</label>
-            <div class="radio-group" role="radiogroup">
-              @for (m of paymentModes; track m.value) {
-                <label class="radio-label">
-                  <input type="radio" [value]="m.value" formControlName="modePaiement" />
-                  <span>{{ m.label }}</span>
-                </label>
-              }
-            </div>
-          </div>
-        }
-      </div>
+      }
 
       <!-- Avantages -->
-      <div class="form-section">
-        <h2 class="section-title">Avantages inclus</h2>
-        <div class="field">
-          <label class="label" for="avantages">Ce qui est inclus dans l'offre</label>
-          <textarea id="avantages" class="input" formControlName="avantages" rows="6"
-            placeholder="Un avantage par ligne&#10;Ex: Transport inclus&#10;Hébergement 5 étoiles&#10;Repas du soir"></textarea>
+      @if (showAvantages) {
+        <div class="form-section">
+          <h2 class="section-title">Avantages inclus</h2>
+          <div class="field">
+            <label class="label" for="avantages">Ce qui est inclus dans l'offre</label>
+            <textarea id="avantages" class="input" formControlName="avantages" rows="6"
+              placeholder="Un avantage par ligne&#10;Ex: Transport inclus&#10;Hébergement 5 étoiles&#10;Repas du soir"></textarea>
+          </div>
         </div>
-      </div>
+      }
 
     </div>
 

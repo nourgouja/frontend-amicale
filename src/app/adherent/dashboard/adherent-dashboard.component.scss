@@ -40,6 +40,102 @@
   font-weight: 500;
 }
 
+// ─── Election call banner ─────────────────────────────────────────────────────
+.election-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-4;
+  background: $color-primary-light;
+  border: 1px solid rgba($color-primary, 0.15);
+  border-left: 4px solid $color-primary;
+  border-radius: $radius-xl;
+  padding: $space-4 $space-5;
+  margin-bottom: $space-5;
+  flex-wrap: wrap;
+}
+
+.election-banner__left {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex: 1;
+  min-width: 0;
+}
+
+.election-banner__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba($color-primary, 0.12);
+  color: $color-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.election-banner__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.election-banner__label {
+  font-size: $font-size-xs;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: $color-primary;
+}
+
+.election-banner__title {
+  font-size: $font-size-base;
+  font-weight: 700;
+  color: $color-text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.election-banner__deadline {
+  font-size: $font-size-xs;
+  color: $color-text-muted;
+}
+
+.election-banner__action { flex-shrink: 0; }
+
+.election-banner__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 22px;
+  border-radius: $radius-full;
+  background: $color-primary;
+  color: #fff;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background $transition-fast;
+  white-space: nowrap;
+  &:hover { background: $color-primary-dark; }
+  @include reduced-motion { transition: none; }
+}
+
+.election-banner__applied {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: $radius-full;
+  background: #d1fae5;
+  color: #065f46;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 // ─── Home sections ────────────────────────────────────────────────────────────
 .home-section {
   margin-bottom: $space-8;

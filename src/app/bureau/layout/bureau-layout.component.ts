@@ -8,14 +8,14 @@ import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
 import { getDisplayName, getInitials } from '../../shared/utils/format.utils';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie, Award } from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie } from 'lucide-angular';
 
 @Component({
   selector: 'app-bureau-layout',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LowerCasePipe, ProfileCardComponent, LucideAngularModule],
   providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie, Award }) },
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie }) },
   ],
   templateUrl: './bureau-layout.component.html',
   styleUrl: './bureau-layout.component.scss',
@@ -46,7 +46,7 @@ export class BureauLayoutComponent implements OnInit {
   navItems = computed(() => {
     const items: { label: string; route: string; icon: string }[] = [
       { label: 'Tableau de bord', route: '/bureau/dashboard',    icon: 'LayoutDashboard' },
-      { label: 'Mes Offres',      route: '/bureau/offres',       icon: 'Tag'             },
+      { label: 'Catalogue',      route: '/bureau/offres',       icon: 'Tag'             },
     ];
     if (this.isResponsablePole()) {
       items.push({ label: 'Mon Pôle', route: '/bureau/offres/mon-pole', icon: 'Building2' });
@@ -56,12 +56,11 @@ export class BureauLayoutComponent implements OnInit {
       { label: 'Inscriptions', route: '/bureau/inscriptions', icon: 'ClipboardList' },
       { label: 'Cotisations',  route: '/bureau/cotisations',  icon: 'DollarSign'    },
       { label: 'Calendrier',   route: '/bureau/calendrier',   icon: 'CalendarDays'  },
-      { label: 'Élections',    route: '/bureau/elections',    icon: 'Award'         },
     );
     return items;
   });
 
-  readonly icons = { LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie, Award };
+  readonly icons = { LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie };
 
   ngOnInit(): void {
     this.notifService.init();
@@ -70,11 +69,9 @@ export class BureauLayoutComponent implements OnInit {
         const poste = p.posteMembre as string | undefined;
         const labels: Record<string, string> = {
           PRESIDENT:        'Président',
-          VICE_PRESIDENT:   'Vice-Président',
           SECRETARY:        'Secrétaire',
-          TREASURER:        'Trésorier',
-          RESPONSABLE_POLE: 'Responsable de Pôle',
-          MEMBER:           'Membre',
+          TRESORIER:        'Trésorier',
+          RESPONSABLE_POLE: 'Membre de Pôle',
         };
         this.posteLabel.set(poste ? (labels[poste] ?? 'Membre Bureau') : 'Membre Bureau');
         this.isResponsablePole.set(poste === 'RESPONSABLE_POLE');

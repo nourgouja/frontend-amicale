@@ -1,11 +1,13 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap, of } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { getDisplayName } from '../../shared/utils/format.utils';
+import { ElectionCallService } from '../../core/services/election-call.service';
+import { ElectionCall, CandidateApplication } from '../../core/models/election-call.model';
 
 interface Offre {
   id: number; titre: string; description: string; typeOffre: string;
@@ -30,18 +32,21 @@ const POSTE_ORDER: Record<string, number> = {
 @Component({
   selector: 'app-adherent-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, DatePipe],
   templateUrl: './adherent-dashboard.component.html',
   styleUrl: './adherent-dashboard.component.scss',
 })
 export class AdherentDashboardComponent implements OnInit {
-  private http        = inject(HttpClient);
-  private authService = inject(AuthService);
+  private http              = inject(HttpClient);
+  private authService       = inject(AuthService);
+  private electionCallService = inject(ElectionCallService);
 
-  offres       = signal<Offre[]>([]);
-  membres      = signal<MembreBureau[]>([]);
-  activeFilter = signal('');
-  loading      = signal(true);
+  offres        = signal<Offre[]>([]);
+  membres       = signal<MembreBureau[]>([]);
+  activeFilter  = signal('');
+  loading       = signal(true);
+  activeCall    = signal<ElectionCall | null>(null);
+  myApplication = signal<CandidateApplication | null>(null);
 
   displayName = computed(() => {
     const u = this.authService.currentUser();
@@ -85,8 +90,19 @@ export class AdherentDashboardComponent implements OnInit {
       next: list => { this.offres.set(list); this.loading.set(false); },
       error: ()  => this.loading.set(false),
     });
+
     this.http.get<MembreBureau[]>('/api/utilisateurs/membres-bureau').subscribe({
       next: list => this.membres.set(list),
+      error: ()  => {},
+    });
+
+    this.electionCallService.getActiveCall().pipe(
+      switchMap(call => {
+        this.activeCall.set(call);
+        return call ? this.electionCallService.getMyApplication(call.id) : of(null);
+      })
+    ).subscribe({
+      next: app => this.myApplication.set(app),
       error: ()  => {},
     });
   }

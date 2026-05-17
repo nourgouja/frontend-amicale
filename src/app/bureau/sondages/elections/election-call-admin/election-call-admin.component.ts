@@ -30,6 +30,8 @@ export class ElectionCallAdminComponent implements OnInit {
     titre:               ['', [Validators.required, Validators.minLength(3)]],
     description:         [''],
     dateFinCandidature:  ['', Validators.required],
+    dateDebut:           ['', Validators.required],
+    dateFin:             ['', Validators.required],
   });
 
   ngOnInit(): void { this.load(); }
@@ -49,11 +51,13 @@ export class ElectionCallAdminComponent implements OnInit {
     if (this.form.invalid || this.saving()) return;
     this.saving.set(true);
 
-    const { titre, description, dateFinCandidature } = this.form.value;
+    const { titre, description, dateFinCandidature, dateDebut, dateFin } = this.form.value;
     const req: any = {
       titre: titre!.trim(),
       description: description?.trim() || undefined,
       dateFinCandidature: dateFinCandidature,
+      dateDebut: dateDebut,
+      dateFin: dateFin,
     };
 
     this.callService.createCall(req).subscribe({
