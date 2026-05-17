@@ -112,14 +112,31 @@
 
         <div class="field">
           <label class="label" for="description">Description</label>
-          <textarea id="description" class="input" formControlName="description" rows="8"
+          <textarea id="description" class="input" formControlName="description" rows="6"
             placeholder="Décrivez l'offre — programme, ambiance, points forts..."></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="lieu">Lieu</label>
+            <div class="input-icon-wrap">
+              <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <input id="lieu" class="input input--icon" formControlName="lieu" placeholder="Ville, pays ou adresse" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="lienExterne">Lien externe <span class="opt">— facultatif</span></label>
+            <div class="input-icon-wrap">
+              <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <input id="lienExterne" class="input input--icon" type="url" formControlName="lienExterne" placeholder="https://..." />
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Dates et lieu -->
+      <!-- Dates -->
       <div class="form-section">
-        <h2 class="section-title">Dates et lieu</h2>
+        <h2 class="section-title">Dates</h2>
 
         <div class="field-row">
           <div class="field">
@@ -136,22 +153,6 @@
               <input id="dateFin" class="input" type="date" formControlName="dateFin" />
             </div>
           }
-        </div>
-
-        <div class="field">
-          <label class="label" for="lieu">Lieu</label>
-          <div class="input-icon-wrap">
-            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <input id="lieu" class="input input--icon" formControlName="lieu" placeholder="Ville, pays ou adresse" />
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label" for="lienExterne">Lien externe <span class="opt">— facultatif</span></label>
-          <div class="input-icon-wrap">
-            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            <input id="lienExterne" class="input input--icon" type="url" formControlName="lienExterne" placeholder="https://..." />
-          </div>
         </div>
       </div>
 

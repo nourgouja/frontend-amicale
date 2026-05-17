@@ -103,7 +103,7 @@ textarea.input { resize: vertical; min-height: 80px; }
 
 /* ── Type cards ── */
 .type-cards {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: $space-3;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: $space-3;
   @include mobile { grid-template-columns: repeat(2, 1fr); }
 }
 
