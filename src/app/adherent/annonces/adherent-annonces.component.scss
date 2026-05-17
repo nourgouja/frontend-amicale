@@ -6,6 +6,23 @@
 .page-title { font-size: $font-size-xl; font-weight: 700; color: $color-text; margin-bottom: 5px; }
 .page-sub   { font-size: $font-size-sm; color: $color-text-muted; }
 
+// ── Loading skeletons ─────────────────────────────────────────────────────────
+.loading-row { display: flex; flex-direction: column; gap: $space-4; }
+
+.skeleton {
+  height: 200px; border-radius: $radius-xl;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  @include reduced-motion { animation: none; background: #f0f0f0; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
 .empty-state {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: $space-3; text-align: center;
@@ -15,4 +32,179 @@
 
   h3 { font-size: $font-size-md; font-weight: 600; color: $color-text-muted; }
   p  { font-size: $font-size-sm; color: $color-text-muted; max-width: 320px; line-height: 1.55; }
+}
+
+// ── Feed ──────────────────────────────────────────────────────────────────────
+.feed { display: flex; flex-direction: column; gap: $space-5; }
+
+// ── Result card ───────────────────────────────────────────────────────────────
+.result-card {
+  background: $color-surface;
+  border: 1.5px solid $color-border;
+  border-radius: $radius-xl;
+  padding: $space-5 $space-6;
+  box-shadow: $shadow-card;
+}
+
+.rc-header {
+  display: flex; align-items: center; gap: $space-3;
+  margin-bottom: $space-3;
+}
+
+.rc-icon {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(2,102,84,0.10); color: $color-primary;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.rc-meta {
+  display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0;
+}
+
+.rc-label {
+  font-size: $font-size-xs; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.4px; color: $color-primary;
+}
+
+.rc-date { font-size: $font-size-xs; color: $color-text-muted; }
+
+.rc-badge {
+  font-size: 11px; font-weight: 600; padding: 3px 10px;
+  border-radius: $radius-full; background: #f3f4f6; color: $color-text-muted;
+  flex-shrink: 0;
+}
+
+.rc-title {
+  font-size: $font-size-lg; font-weight: 700; color: $color-text;
+  margin-bottom: $space-4; line-height: 1.35;
+}
+
+// ── Results bars ──────────────────────────────────────────────────────────────
+.rc-results { display: flex; flex-direction: column; gap: $space-3; }
+
+.rc-row {
+  padding: $space-3 $space-4; border-radius: $radius-md;
+  background: $color-bg; border: 1px solid $color-border;
+  &--winner { border-color: $color-primary; background: rgba(2,102,84,0.04); }
+}
+
+.rc-row-top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: $space-2; margin-bottom: $space-2;
+}
+
+.rc-opt-name {
+  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
+  font-size: $font-size-sm; font-weight: 600; color: $color-text;
+}
+
+.rc-opt-img {
+  width: 36px; height: 36px; object-fit: cover;
+  border-radius: $radius-sm; flex-shrink: 0;
+}
+
+.rc-pct {
+  font-size: $font-size-sm; font-weight: 700; color: $color-text; flex-shrink: 0;
+}
+
+.rc-track {
+  height: 6px; border-radius: 99px;
+  background: $color-border; overflow: hidden; margin-bottom: 5px;
+}
+
+.rc-fill {
+  height: 100%; border-radius: 99px; background: $color-text-muted;
+  transition: width 0.5s ease;
+  &--winner { background: $color-primary; }
+  @include reduced-motion { transition: none; }
+}
+
+.rc-votes { font-size: 11px; color: $color-text-muted; }
+
+.rc-winner-badge {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  background: $color-primary; color: #fff; padding: 2px 7px;
+  border-radius: $radius-full; flex-shrink: 0;
+}
+
+.rc-your-vote {
+  font-size: 10px; font-weight: 600; color: $color-primary;
+  background: rgba(2,102,84,0.10); padding: 2px 7px;
+  border-radius: $radius-full; flex-shrink: 0;
+}
+
+.rc-total {
+  font-size: $font-size-xs; color: $color-text-muted;
+  text-align: right; margin-top: $space-3; margin-bottom: 0;
+  &--top { text-align: left; margin-top: 0; margin-bottom: $space-4; }
+}
+
+// ── Election result card overrides ────────────────────────────────────────────
+.result-card--election {
+  border-color: rgba(#d97706, 0.25);
+  border-left: 4px solid #d97706;
+}
+
+.rc-icon--election { background: rgba(#d97706, .1); color: #d97706; }
+
+.rc-label--election { color: #92400e; }
+
+.rc-badge--election {
+  background: #fef3c7; color: #92400e;
+}
+
+// ── Election positions & candidates ───────────────────────────────────────────
+.ec-position {
+  margin-bottom: $space-5;
+  &:last-child { margin-bottom: 0; }
+}
+
+.ec-position__title {
+  font-size: $font-size-sm; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.4px; color: $color-text-muted;
+  margin-bottom: $space-3; padding-bottom: $space-2;
+  border-bottom: 1px solid $color-border;
+}
+
+.ec-candidates { display: flex; flex-direction: column; gap: $space-2; }
+
+.ec-candidate {
+  display: flex; align-items: center; gap: $space-3;
+  padding: $space-3 $space-4; border-radius: $radius-md;
+  background: $color-bg; border: 1px solid $color-border;
+
+  &--winner {
+    border-color: #d97706;
+    background: #fffbeb;
+  }
+}
+
+.ec-candidate__photo {
+  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+  overflow: hidden; background: $color-border;
+  display: flex; align-items: center; justify-content: center;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+.ec-candidate__initials {
+  font-size: $font-size-sm; font-weight: 700; color: $color-text-muted;
+  text-transform: uppercase;
+}
+
+.ec-candidate__info { flex: 1; min-width: 0; }
+
+.ec-candidate__name-row {
+  display: flex; align-items: center; gap: $space-2; margin-bottom: $space-2;
+}
+
+.ec-candidate__name {
+  font-size: $font-size-sm; font-weight: 600; color: $color-text;
+}
+
+.ec-winner-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  background: #d97706; color: #fff; padding: 2px 8px;
+  border-radius: $radius-full; flex-shrink: 0;
 }

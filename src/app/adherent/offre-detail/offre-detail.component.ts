@@ -138,7 +138,7 @@ export class OffreDetailComponent implements OnInit {
 
   selectImage(index: number): void { this.activeImageIndex.set(index); }
 
-  get isFull(): boolean       { return this.offre()?.placesRestantes === 0; }
+  get isFull(): boolean       { const p = this.offre()?.placesRestantes; return p !== null && p !== undefined && p === 0; }
   get isConvention(): boolean { return this.offre()?.typeOffre === 'CONVENTION'; }
 
   sexeLabel(s?: string | null): string {

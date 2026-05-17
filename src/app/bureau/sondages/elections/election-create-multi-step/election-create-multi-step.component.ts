@@ -51,12 +51,12 @@ export class ElectionCreateMultiStepComponent implements OnInit {
   );
 
   candidates = signal<CandidateMap>({
-    PRESIDENT:        [],
-    VICE_PRESIDENT:   [],
-    SECRETARY:        [],
-    TREASURER:        [],
-    RESPONSABLE_POLE: [],
-    MEMBER:           [],
+    PRESIDENT:                              [],
+    SECRETARY:                              [],
+    TREASURER:                              [],
+    RESPONSABLE_POLE_VOYAGE_SEJOURS:        [],
+    RESPONSABLE_POLE_ACTIVITES_LOISIRS:     [],
+    RESPONSABLE_POLE_EVENEMENTS_CONVENTIONS: [],
   });
 
   addForm = {
@@ -69,13 +69,13 @@ export class ElectionCreateMultiStepComponent implements OnInit {
   readonly positions = POSITIONS;
 
   readonly steps = [
-    { title: 'Informations',                        description: 'Titre et description de l\'élection' },
-    { title: 'Candidats — Président',               description: 'Ajoutez un ou plusieurs candidats pour le poste de Président' },
-    { title: 'Candidats — Vice-Président',          description: 'Ajoutez un ou plusieurs candidats pour le poste de Vice-Président' },
-    { title: 'Candidats — Secrétaire',              description: 'Ajoutez un ou plusieurs candidats pour le poste de Secrétaire' },
-    { title: 'Candidats — Trésorier',               description: 'Ajoutez un ou plusieurs candidats pour le poste de Trésorier' },
-    { title: 'Candidats — Responsable de Pôle',    description: 'Ajoutez un ou plusieurs candidats pour le poste de Responsable de Pôle' },
-    { title: 'Candidats — Membre',                  description: 'Ajoutez un ou plusieurs candidats pour le poste de Membre' },
+    { title: 'Informations',                                          description: 'Titre et description de l\'élection' },
+    { title: 'Candidats — Président',                                 description: 'Ajoutez un ou plusieurs candidats pour le poste de Président' },
+    { title: 'Candidats — Secrétaire',                                description: 'Ajoutez un ou plusieurs candidats pour le poste de Secrétaire' },
+    { title: 'Candidats — Trésorier',                                 description: 'Ajoutez un ou plusieurs candidats pour le poste de Trésorier' },
+    { title: 'Candidats — Resp. Pôle Voyage & Séjours',              description: 'Ajoutez un ou plusieurs candidats pour le Responsable Pôle Voyage & Séjours' },
+    { title: 'Candidats — Resp. Pôle Activités & Loisirs',           description: 'Ajoutez un ou plusieurs candidats pour le Responsable Pôle Activités & Loisirs' },
+    { title: 'Candidats — Resp. Pôle Événements & Conventions',      description: 'Ajoutez un ou plusieurs candidats pour le Responsable Pôle Événements & Conventions' },
   ];
 
   stepTitle       = computed(() => this.steps[this.currentStep()]?.title ?? '');
@@ -103,7 +103,7 @@ export class ElectionCreateMultiStepComponent implements OnInit {
       this.electionForm.markAllAsTouched();
       return;
     }
-    if (this.currentStep() < 3) this.currentStep.update(s => s + 1);
+    if (this.currentStep() < this.positions.length) this.currentStep.update(s => s + 1);
   }
 
   previousStep(): void {

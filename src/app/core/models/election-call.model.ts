@@ -24,7 +24,7 @@ export interface ElectionCall {
   totalApplicationsCount: number;
   approvedCandidatesCount: number;
   publishedElectionId?: number;
-  publishedElectionStatus?: 'OPEN' | 'CLOSED' | null;
+  publishedElectionStatus?: 'OPEN' | 'CLOSED' | 'RESULTS_PUBLISHED' | null;
   canApply: boolean;
   canPublish: boolean;
 }
@@ -34,6 +34,7 @@ export interface CandidateApplication {
   user: UserSummaryForApplication;
   callId: number;
   position: Position;
+  poleNom?: string;
   motivation: string;
   photo?: string;
   status: ApplicationStatus;
@@ -53,6 +54,7 @@ export interface CreateCallRequest {
 
 export interface ApplyRequest {
   position: Position;
+  poleNom?: string;
   motivation: string;
 }
 

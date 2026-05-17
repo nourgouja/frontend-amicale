@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormArray, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -9,6 +9,10 @@ export interface InscriptionResult {
   statut: string;
   guests?: { nom: string; prenom?: string; age: number; sexe: string }[];
   totalPeople?: number;
+  periodePaiement?: string;
+  montant?: number | null;
+  echeances?: unknown[];
+  nombreAccompagnants?: number;
 }
 
 type PeriodKey = 'COMPTANT' | 'MENSUEL' | 'TRIMESTRIEL' | 'SEMESTRIEL';
@@ -20,12 +24,18 @@ type PeriodKey = 'COMPTANT' | 'MENSUEL' | 'TRIMESTRIEL' | 'SEMESTRIEL';
   templateUrl: './inscription-modal.component.html',
   styleUrl: './inscription-modal.component.scss',
 })
-export class InscriptionModalComponent {
+export class InscriptionModalComponent implements OnInit {
   @Input() offreId!: number;
   @Input() offreTitre = '';
   @Input() prixParPersonne: number | null = null;
   @Input() placesRestantes: number | null = null;
   @Input() typeOffre = '';
+
+  // edit mode
+  @Input() editMode = false;
+  @Input() editInscriptionId: number | null = null;
+  @Input() initialGuests: { nom: string; prenom?: string; age?: number | null; sexe?: string | null }[] = [];
+  @Input() initialPeriod: string = 'COMPTANT';
 
   @Output() submitted = new EventEmitter<InscriptionResult>();
   @Output() closed = new EventEmitter<void>();
@@ -73,6 +83,23 @@ export class InscriptionModalComponent {
 
   selectPeriod(key: PeriodKey): void { this.selectedPeriod.set(key); }
 
+  ngOnInit(): void {
+    if (this.editMode && this.initialGuests?.length) {
+      for (const g of this.initialGuests) {
+        this.guests.push(this.fb.group({
+          nom:    [g.nom ?? '', Validators.required],
+          prenom: [g.prenom ?? ''],
+          age:    [g.age ?? null, [Validators.required, Validators.min(0), Validators.max(120)]],
+          sexe:   [g.sexe ?? 'M', Validators.required],
+        }));
+      }
+    }
+    if (this.editMode && this.initialPeriod) {
+      const p = this.initialPeriod as PeriodKey;
+      if (this.periodOptions.some(o => o.key === p)) this.selectedPeriod.set(p);
+    }
+  }
+
   form = this.fb.group({ guests: this.fb.array([]) });
 
   get guests(): FormArray { return this.form.get('guests') as FormArray; }
@@ -105,19 +132,20 @@ export class InscriptionModalComponent {
     this.submitting.set(true);
     this.error.set(null);
 
-    const body: Record<string, unknown> = { guests: this.guests.value };
-    if (this.supportsPaymentChoice) {
-      body['paymentPeriod'] = this.selectedPeriod();
-    }
+    const body: Record<string, unknown> = {
+      guests: this.guests.value,
+      paymentPeriod: this.selectedPeriod(),
+    };
 
-    this.http.post<InscriptionResult>(
-      `/api/inscriptions/inscrire/${this.offreId}`,
-      body
-    ).subscribe({
+    const req$ = this.editMode
+      ? this.http.patch<InscriptionResult>(`/api/inscriptions/${this.editInscriptionId}/modifier`, body)
+      : this.http.post<InscriptionResult>(`/api/inscriptions/inscrire/${this.offreId}`, body);
+
+    req$.subscribe({
       next: res => { this.submitting.set(false); this.submitted.emit(res); },
       error: err => {
         this.submitting.set(false);
-        const msg = err?.error?.message ?? err?.error ?? "L'inscription a échoué. Réessayez.";
+        const msg = err?.error?.message ?? err?.error ?? (this.editMode ? "La modification a échoué." : "L'inscription a échoué. Réessayez.");
         this.error.set(typeof msg === 'string' ? msg : JSON.stringify(msg));
       },
     });

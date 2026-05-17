@@ -7,6 +7,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 import { MiniCalendarComponent, CalendarOffre } from '../../shared/components/mini-calendar/mini-calendar.component';
 import { Offre } from '../../shared/components/offer-card/offer-card.component';
 import { AuthService } from '../../core/services/auth.service';
+import { Sondage } from '../../core/models/sondage.model';
 import { getDisplayName, getOffreTypeColor, getOffreTypeLabel, formatDate } from '../../shared/utils/format.utils';
 import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, Tag, ClipboardList, DollarSign, CalendarDays } from 'lucide-angular';
 
@@ -76,6 +77,7 @@ export class BureauDashboardComponent implements OnInit {
 
   showDetail    = signal(false);
   selectedOffre = signal<Offre | null>(null);
+  sondages      = signal<Sondage[]>([]);
 
   displayName = computed(() => {
     const u = this.authService.currentUser();
@@ -84,7 +86,9 @@ export class BureauDashboardComponent implements OnInit {
   });
 
   recentOffres = computed(() =>
-    this.fullOffres().filter(o => o.statutOffre !== 'ARCHIVED')
+    [...this.fullOffres()]
+      .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
+      .slice(0, 6)
   );
 
   calendarOffres = computed<CalendarOffre[]>(() =>
@@ -160,6 +164,25 @@ export class BureauDashboardComponent implements OnInit {
     };
   });
 
+  sondageStats = computed(() => {
+    const all = this.sondages();
+    const open   = all.filter(s => s.statut === 'OPEN').length;
+    const closed = all.filter(s => s.statut === 'CLOSED').length;
+    const totalVotes = all.reduce((sum, s) =>
+      sum + (s.options?.reduce((os, o) => os + (o.voteCount ?? 0), 0) ?? 0), 0);
+    const recent = [...all]
+      .sort((a, b) => new Date(b.closedAt ?? b.updatedAt ?? '').getTime()
+                    - new Date(a.closedAt ?? a.updatedAt ?? '').getTime())
+      .slice(0, 4)
+      .map(s => ({
+        titre:  s.titre,
+        statut: s.statut,
+        votes:  s.options?.reduce((sum, o) => sum + (o.voteCount ?? 0), 0) ?? 0,
+      }));
+    const maxVotes = Math.max(...recent.map(s => s.votes), 1);
+    return { total: all.length, open, closed, totalVotes, recent, maxVotes };
+  });
+
   typeStats = computed(() => {
     const all   = this.fullOffres().filter(o => o.statutOffre !== 'ARCHIVED');
     const total = all.length;
@@ -186,6 +209,10 @@ export class BureauDashboardComponent implements OnInit {
     this.http.get<SimpleInscription[]>('/api/inscriptions').subscribe({
       next: res => this.allInscriptions.set(res),
       error: () => {},
+    });
+    this.http.get<Sondage[]>('/api/sondages').subscribe({
+      next: list => this.sondages.set(list),
+      error: ()   => {},
     });
   }
 

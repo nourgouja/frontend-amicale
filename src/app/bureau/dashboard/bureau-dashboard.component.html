@@ -5,10 +5,16 @@
     <h1 class="greeting-title">Bonjour, {{ displayName() }}</h1>
   </div>
 
+  <div class="kpi-grid">
+    <app-kpi-card label="Offres actives"          [value]="offresActives()"       icon="tag"            color="primary" />
+    <app-kpi-card label="Inscriptions en attente" [value]="inscriptionsPending()" icon="clipboard-list" [color]="inscriptionsPending() > 0 ? 'orange' : 'primary'" />
+    <app-kpi-card label="Cotisations en retard"   [value]="cotisationsImpayees()" icon="dollar-sign"    [color]="cotisationsImpayees() > 0 ? 'red' : 'green'" />
+    <app-kpi-card label="Total offres"            [value]="recentOffres().length" icon="calendar-days"  color="blue" />
+  </div>
+
   <!-- ─── Offres récentes avec panneau de détails ─── -->
   <div class="offres-section" [class.has-panel]="showDetail()">
 
-    <!-- Table des offres -->
     <div class="offres-table-wrap">
       <div class="offres-toolbar">
         <span class="toolbar-title">Offres récentes</span>
@@ -24,14 +30,8 @@
               <th>Titre</th>
               <th>Type</th>
               <th>Statut</th>
-              <th>
-                Inscrits
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-              </th>
-              <th>
-                Places rest.
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-              </th>
+              <th>Inscrits <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></th>
+              <th>Places rest. <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></th>
               <th></th>
             </tr>
           </thead>
@@ -48,11 +48,7 @@
                     <span class="offre-titre">{{ offre.titre }}</span>
                   </div>
                 </td>
-                <td>
-                  <span class="type-pill" [style.background]="typeColor(offre.typeOffre)">
-                    {{ typeLabel(offre.typeOffre) }}
-                  </span>
-                </td>
+                <td><span class="type-pill" [style.background]="typeColor(offre.typeOffre)">{{ typeLabel(offre.typeOffre) }}</span></td>
                 <td>
                   <span class="statut-pill"
                     [class.statut--open]="offre.statutOffre === 'OPEN'"
@@ -60,11 +56,11 @@
                     [class.statut--closed]="offre.statutOffre === 'CLOSED'"
                     [class.statut--archived]="offre.statutOffre === 'ARCHIVED'">
                     @switch (offre.statutOffre) {
-                      @case ('OPEN')   { Ouverte }
-                      @case ('DRAFT') { Brouillon }
-                      @case ('CLOSED')    { Fermée }
-                      @case ('ARCHIVED')  { Archivée }
-                      @default            { {{ offre.statutOffre }} }
+                      @case ('OPEN')     { Ouverte }
+                      @case ('DRAFT')    { Brouillon }
+                      @case ('CLOSED')   { Fermée }
+                      @case ('ARCHIVED') { Archivée }
+                      @default           { {{ offre.statutOffre }} }
                     }
                   </span>
                 </td>
@@ -73,16 +69,11 @@
                 <td class="td-actions" (click)="$event.stopPropagation()">
                   <div class="row-actions">
                     <a class="btn-row-edit" [routerLink]="['/bureau/offres', offre.id, 'edit']" title="Modifier">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                      </svg>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </a>
                     @if (offre.statutOffre !== 'ARCHIVED' && offre.statutOffre !== 'CANCELLED') {
                       <button class="btn-row-archive" (click)="archiver(offre.id)" title="Archiver">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
-                        </svg>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
                       </button>
                     }
                   </div>
@@ -93,98 +84,46 @@
             }
           </tbody>
         </table>
-
         <div class="table-footer">
           <span class="footer-count">{{ recentOffres().length }} offre(s)</span>
         </div>
       }
     </div>
 
-    <!-- Panneau de détails de l'offre -->
     @if (showDetail() && selectedOffre(); as o) {
       <div class="detail-panel">
         <div class="dp-header">
           <span class="dp-header-label">Détails de l'offre</span>
           <button class="dp-close" (click)="closeDetail()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
-
         <div class="dp-body">
           <h2 class="dp-title">{{ o.titre }}</h2>
-          
-
           <div class="dp-sep"></div>
-
           <div class="dp-fields">
-            <div class="dp-row">
-              <span class="dp-label">Status:</span>
-              <app-status-badge [statut]="o.statutOffre" type="offre" />
-            </div>
+            <div class="dp-row"><span class="dp-label">Status:</span><app-status-badge [statut]="o.statutOffre" type="offre" /></div>
             @if (o.typeOffre) {
-              <div class="dp-row">
-                <span class="dp-label">Type:</span>
-                <span class="dp-value">
-                  <span class="type-chip" [style.background]="typeColor(o.typeOffre) + '18'" [style.color]="typeColor(o.typeOffre)">
-                    {{ typeLabel(o.typeOffre) }}
-                  </span>
-                </span>
-              </div>
+              <div class="dp-row"><span class="dp-label">Type:</span><span class="dp-value"><span class="type-chip" [style.background]="typeColor(o.typeOffre) + '18'" [style.color]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span></span></div>
             }
-            @if (o.lieu) {
-              <div class="dp-row">
-                <span class="dp-label">Lieu:</span>
-                <span class="dp-value">{{ o.lieu }}</span>
-              </div>
-            }
-            @if (o.prixParPersonne != null) {
-              <div class="dp-row">
-                <span class="dp-label">Prix:</span>
-                <span class="dp-value">{{ o.prixParPersonne }} DT / pers.</span>
-              </div>
-            }
-            @if (o.poleNom) {
-              <div class="dp-row">
-                <span class="dp-label">Pôle:</span>
-                <span class="dp-value">{{ o.poleNom }}</span>
-              </div>
-            }
+            @if (o.lieu) { <div class="dp-row"><span class="dp-label">Lieu:</span><span class="dp-value">{{ o.lieu }}</span></div> }
+            @if (o.prixParPersonne != null) { <div class="dp-row"><span class="dp-label">Prix:</span><span class="dp-value">{{ o.prixParPersonne }} DT / pers.</span></div> }
+            @if (o.poleNom) { <div class="dp-row"><span class="dp-label">Pôle:</span><span class="dp-value">{{ o.poleNom }}</span></div> }
           </div>
-
           <div class="dp-info-box">
             @if (o.dateDebut) {
-              <div class="dp-row">
-                <span class="dp-label">Date:</span>
-                <span class="dp-value dp-value--bold">
-                  {{ formatDate(o.dateDebut) }}@if (o.dateFin) { – {{ formatDate(o.dateFin) }} }
-                </span>
-              </div>
+              <div class="dp-row"><span class="dp-label">Date:</span><span class="dp-value dp-value--bold">{{ formatDate(o.dateDebut) }}@if (o.dateFin) { – {{ formatDate(o.dateFin) }} }</span></div>
             }
-            @if (o.capaciteMax != null) {
-              <div class="dp-row">
-                <span class="dp-label">Capacité:</span>
-                <span class="dp-value dp-value--bold">{{ o.capaciteMax }} places</span>
-              </div>
-            }
-            <div class="dp-row">
-              <span class="dp-label">Nb Participants:</span>
-              <span class="dp-value dp-value--bold">{{ inscrits(o) }} inscrits</span>
-            </div>
+            @if (o.capaciteMax != null) { <div class="dp-row"><span class="dp-label">Capacité:</span><span class="dp-value dp-value--bold">{{ o.capaciteMax }} places</span></div> }
+            <div class="dp-row"><span class="dp-label">Participants:</span><span class="dp-value dp-value--bold">{{ inscrits(o) }} inscrits</span></div>
             @if (o.statutOffre === 'OPEN') {
-              <a class="dp-participants-btn" [routerLink]="['/bureau/offres', o.id, 'inscriptions']" (click)="closeDetail()">
-                Voir la liste des inscrits
-              </a>
+              <a class="dp-participants-btn" [routerLink]="['/bureau/offres', o.id, 'inscriptions']" (click)="closeDetail()">Voir la liste des inscrits</a>
             }
           </div>
         </div>
-
         <div class="dp-footer">
           <button class="dp-btn dp-btn--ghost" (click)="closeDetail()">Fermer</button>
-          <a class="dp-btn dp-btn--primary" [routerLink]="['/bureau/offres', o.id, 'edit']" (click)="closeDetail()">
-            Modifier
-          </a>
+          <a class="dp-btn dp-btn--primary" [routerLink]="['/bureau/offres', o.id, 'edit']" (click)="closeDetail()">Modifier</a>
           @if (o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CANCELLED') {
             <button class="dp-btn dp-btn--danger" (click)="archiver(o.id)">Archiver</button>
           }
@@ -193,14 +132,7 @@
     }
   </div>
 
-  <div class="kpi-grid">
-    <app-kpi-card label="Offres actives"          [value]="offresActives()"       icon="tag"            color="primary" />
-    <app-kpi-card label="Inscriptions en attente" [value]="inscriptionsPending()" icon="clipboard-list" [color]="inscriptionsPending() > 0 ? 'orange' : 'primary'" />
-    <app-kpi-card label="Cotisations en retard"   [value]="cotisationsImpayees()" icon="dollar-sign"    [color]="cotisationsImpayees() > 0 ? 'red' : 'green'" />
-    <app-kpi-card label="Total offres"            [value]="recentOffres().length" icon="calendar-days"  color="blue" />
-  </div>
-
-  <!-- ─── Mid row : Calendrier + État des inscriptions ─── -->
+  <!-- ─── Mid row : Calendrier + État des inscriptions + Sondages ─── -->
   <div class="mid-row">
 
     <!-- Calendrier -->
@@ -257,9 +189,65 @@
       </div>
     </div>
 
+    <!-- Sondages & Participation -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3 class="panel-title">Sondages & Participation</h3>
+        <a class="panel-link" routerLink="/bureau/sondages">Voir tout →</a>
+      </div>
+      <div class="panel-body">
+        @if (sondageStats().total === 0) {
+          <div class="panel-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
+            </svg>
+            <p>Aucun sondage pour le moment</p>
+          </div>
+        } @else {
+          <div class="sd-kpi-row">
+            <div class="sd-kpi">
+              <span class="sd-kpi__val">{{ sondageStats().total }}</span>
+              <span class="sd-kpi__label">Total</span>
+            </div>
+            <div class="sd-kpi">
+              <span class="sd-kpi__val sd-kpi__val--open">{{ sondageStats().open }}</span>
+              <span class="sd-kpi__label">En cours</span>
+            </div>
+            <div class="sd-kpi">
+              <span class="sd-kpi__val">{{ sondageStats().closed }}</span>
+              <span class="sd-kpi__label">Clôturés</span>
+            </div>
+            <div class="sd-kpi">
+              <span class="sd-kpi__val sd-kpi__val--votes">{{ sondageStats().totalVotes }}</span>
+              <span class="sd-kpi__label">Votes</span>
+            </div>
+          </div>
+          <div class="sd-sep"></div>
+          <div class="sd-list">
+            @for (s of sondageStats().recent; track s.titre) {
+              <div class="sd-item">
+                <div class="sd-item__top">
+                  <span class="sd-item__titre">{{ s.titre }}</span>
+                  <div class="sd-item__right">
+                    <span class="sd-item__votes">{{ s.votes }}</span>
+                    <span class="sd-status-dot"
+                          [class.sd-status-dot--open]="s.statut === 'OPEN'"
+                          [class.sd-status-dot--closed]="s.statut === 'CLOSED'"></span>
+                  </div>
+                </div>
+                <div class="sd-bar-track">
+                  <div class="sd-bar-fill"
+                       [class.sd-bar-fill--open]="s.statut === 'OPEN'"
+                       [style.width.%]="sondageStats().maxVotes > 0 ? (s.votes / sondageStats().maxVotes * 100) : 0"></div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
   </div>
-
-
 
   <!-- ─── Statistiques ─── -->
   <div class="section-head">

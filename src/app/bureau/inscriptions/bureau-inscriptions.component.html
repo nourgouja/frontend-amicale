@@ -202,7 +202,7 @@
                         </span>
                       </td>
                       <td>
-                        @if (e.statut !== 'PAID') {
+                        @if (e.statut !== 'PAID' && ins.statut !== 'CANCELLED' && ins.statut !== 'REJECTED' && ins.statut !== 'PENDING') {
                           <button class="btn-pay-row" [disabled]="payLoading() === e.id"
                                   (click)="payer(e.id, ins.id)">
                             @if (payLoading() === e.id) { … } @else { Marquer payée }

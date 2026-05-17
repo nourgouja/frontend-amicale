@@ -59,6 +59,7 @@ export class ElectionCallService {
     const fd = new FormData();
     fd.append('position', req.position);
     fd.append('motivation', req.motivation);
+    if (req.poleNom) fd.append('poleNom', req.poleNom);
     if (photo) fd.append('photo', photo);
     return this.http.post<CandidateApplication>(`${this.base}/${callId}/apply`, fd);
   }

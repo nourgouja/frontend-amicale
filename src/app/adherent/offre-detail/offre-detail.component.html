@@ -189,17 +189,19 @@
                   <span class="booking-field-val">{{ formatDate(o.dateFin) }}</span>
                 </div>
               }
-              @if (o.placesRestantes !== undefined && o.placesRestantes !== null) {
-                <div class="booking-field">
-                  <span class="booking-field-label">Places restantes</span>
+              <div class="booking-field">
+                <span class="booking-field-label">Places restantes</span>
+                @if (!o.capaciteMax) {
+                  <span class="booking-field-val booking-field-val--free">Accès libre</span>
+                } @else if (o.placesRestantes === 0) {
+                  <span class="booking-field-val booking-field-val--full">Complet</span>
+                } @else {
                   <span class="booking-field-val"
-                        [class.booking-field-val--low]="o.placesRestantes <= 3 && o.placesRestantes > 0"
-                        [class.booking-field-val--full]="o.placesRestantes === 0">
-                    @if (o.placesRestantes === 0) { Complet }
-                    @else { {{ o.placesRestantes }}@if (o.capaciteMax) { / {{ o.capaciteMax }} } }
+                        [class.booking-field-val--low]="(o.placesRestantes ?? 0) <= 3">
+                    {{ o.placesRestantes }} / {{ o.capaciteMax }}
                   </span>
-                </div>
-              }
+                }
+              </div>
             </div>
 
             <!-- Post-inscription state -->

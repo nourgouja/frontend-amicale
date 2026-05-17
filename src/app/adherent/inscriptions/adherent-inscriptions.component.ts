@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
+import { InscriptionModalComponent, InscriptionResult } from '../inscription-modal/inscription-modal.component';
 import { formatDate } from '../../shared/utils/format.utils';
 import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, Search, CircleX } from 'lucide-angular';
 
@@ -36,6 +37,9 @@ interface Inscription {
   totalPeople?: number;
   adherentNom?: string;
   adherentPrenom?: string;
+  periodePaiement?: string;
+  prixParPersonne?: number | null;
+  placesRestantes?: number | null;
   echeances?: Echeance[];
   guests?: Guest[];
 }
@@ -43,7 +47,7 @@ interface Inscription {
 @Component({
   selector: 'app-adherent-inscriptions',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, ConfirmModalComponent, LucideAngularModule],
+  imports: [CommonModule, FormsModule, StatusBadgeComponent, ConfirmModalComponent, InscriptionModalComponent, LucideAngularModule],
   providers: [
     { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ Search, CircleX }) },
   ],
@@ -59,14 +63,15 @@ export class AdherentInscriptionsComponent implements OnInit {
   statutFilter = signal('all');
   cancelTarget = signal<Inscription | null>(null);
   cancelling   = signal(false);
-  drawerIns    = signal<Inscription | null>(null);
+  selectedIns  = signal<Inscription | null>(null);
+  editTarget   = signal<Inscription | null>(null);
 
   readonly statuts = [
-    { key: 'all',        label: 'Tous les statuts' },
-    { key: 'PENDING', label: 'En attente' },
-    { key: 'APPROVED',  label: 'Confirmée' },
-    { key: 'CANCELLED',    label: 'Annulée' },
-    { key: 'REJECTED',    label: 'Rejetée' },
+    { key: 'all',       label: 'Tous les statuts' },
+    { key: 'PENDING',   label: 'En attente'        },
+    { key: 'APPROVED',  label: 'Confirmée'         },
+    { key: 'CANCELLED', label: 'Annulée'           },
+    { key: 'REJECTED',  label: 'Rejetée'           },
   ];
 
   readonly typeColors: Record<string, string> = {
@@ -74,23 +79,43 @@ export class AdherentInscriptionsComponent implements OnInit {
   };
 
   filtered = computed(() => {
-    let list = this.inscriptions();
+    let list = [...this.inscriptions()];
     const q  = this.searchQuery().toLowerCase().trim();
     const s  = this.statutFilter();
     if (s !== 'all') list = list.filter(i => i.statut === s);
     if (q)           list = list.filter(i => i.offreTitre.toLowerCase().includes(q));
+    // most recent first
+    list.sort((a, b) => (b.dateInscription ?? '').localeCompare(a.dateInscription ?? ''));
     return list;
   });
+
+  totalRestant = computed(() =>
+    this.inscriptions()
+      .filter(i => i.statut !== 'CANCELLED' && i.statut !== 'REJECTED')
+      .flatMap(i => i.echeances ?? [])
+      .filter(e => e.statut === 'PENDING' || e.statut === 'OVERDUE')
+      .reduce((sum, e) => sum + (e.montant ?? 0), 0)
+  );
+
+  prochainesEcheancesCount = computed(() =>
+    this.inscriptions()
+      .filter(i => i.statut !== 'CANCELLED' && i.statut !== 'REJECTED')
+      .flatMap(i => i.echeances ?? [])
+      .filter(e => e.statut === 'PENDING' || e.statut === 'OVERDUE')
+      .length
+  );
 
   ngOnInit(): void { this.load(); }
 
   private load(): void {
     this.loading.set(true);
     this.http.get<Inscription[]>('/api/inscriptions/mesinscriptions').subscribe({
-      next:  list => { this.inscriptions.set(list); this.loading.set(false); },
-      error: ()   => this.loading.set(false),
+      next: list => { this.inscriptions.set(list); this.loading.set(false); },
+      error: ()  => this.loading.set(false),
     });
   }
+
+  selectIns(ins: Inscription | null): void { this.selectedIns.set(ins); }
 
   openCancel(ins: Inscription): void { this.cancelTarget.set(ins); }
   closeCancel(): void { this.cancelTarget.set(null); }
@@ -104,8 +129,8 @@ export class AdherentInscriptionsComponent implements OnInit {
         this.inscriptions.update(list =>
           list.map(i => i.id === ins.id ? { ...i, statut: 'CANCELLED' } : i)
         );
-        if (this.drawerIns()?.id === ins.id)
-          this.drawerIns.update(d => d ? { ...d, statut: 'CANCELLED' } : d);
+        if (this.selectedIns()?.id === ins.id)
+          this.selectedIns.update(d => d ? { ...d, statut: 'CANCELLED' } : d);
         this.cancelTarget.set(null);
         this.cancelling.set(false);
       },
@@ -113,8 +138,20 @@ export class AdherentInscriptionsComponent implements OnInit {
     });
   }
 
-  openDrawer(ins: Inscription): void { this.drawerIns.set(ins); }
-  closeDrawer(): void { this.drawerIns.set(null); }
+  // ── Edit ──────────────────────────────────────────────────────────────────
+  openEdit(ins: Inscription): void { this.editTarget.set(ins); }
+  closeEdit(): void { this.editTarget.set(null); }
+
+  onEditSubmitted(updated: InscriptionResult): void {
+    const u = updated as unknown as Inscription;
+    this.inscriptions.update(list => list.map(i => i.id === u.id ? { ...i, ...u } : i));
+    if (this.selectedIns()?.id === u.id) this.selectedIns.update(d => d ? { ...d, ...u } : d);
+    this.editTarget.set(null);
+  }
+
+  paidCount(ins: Inscription): number {
+    return ins.echeances?.filter(e => e.statut === 'PAID').length ?? 0;
+  }
 
   formatDate(s: string): string { return s ? formatDate(s) : '—'; }
   typeColor(type: string): string { return this.typeColors[type] ?? '#9ca3af'; }

@@ -2,16 +2,135 @@
 
   <div class="page-head">
     <h1 class="page-title">Actualités & Annonces</h1>
-    <p class="page-sub">Sondages, élections du bureau et annonces de l'amicale</p>
+    <p class="page-sub">Résultats des sondages et élections de l'amicale</p>
   </div>
 
-  <div class="empty-state">
-    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#c8ccd4" stroke-width="1.4"
-         stroke-linecap="round" stroke-linejoin="round">
-      <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-    </svg>
-    <h3>Aucune annonce pour le moment</h3>
-    <p>Les actualités et sondages de l'amicale apparaîtront ici.</p>
-  </div>
+  @if (loading()) {
+    <div class="loading-row">
+      @for (i of [1,2]; track i) { <div class="skeleton"></div> }
+    </div>
+  } @else if (!hasContent()) {
+    <div class="empty-state">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#c8ccd4" stroke-width="1.4"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+      </svg>
+      <h3>Aucune annonce pour le moment</h3>
+      <p>Les résultats des sondages et élections de l'amicale apparaîtront ici.</p>
+    </div>
+  } @else {
+    <div class="feed">
+
+      <!-- ── Election results card ── -->
+      @if (publishedElection(); as election) {
+        <div class="result-card result-card--election">
+
+          <div class="rc-header">
+            <div class="rc-icon rc-icon--election">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="rc-meta">
+              <span class="rc-label rc-label--election">Résultats de l'élection</span>
+              <span class="rc-date">{{ election.resultsPublishedAt | date:'dd MMM yyyy' }}</span>
+            </div>
+            <span class="rc-badge rc-badge--election">Résultats publiés</span>
+          </div>
+
+          <h2 class="rc-title">{{ election.titre }}</h2>
+          <p class="rc-total rc-total--top">{{ totalElectionVotes(election) }} vote(s) au total</p>
+
+          <!-- One section per position -->
+          @for (pos of electionPositions(election); track pos) {
+            <div class="ec-position">
+              <h3 class="ec-position__title">{{ positionLabel($any(pos)) }}</h3>
+              <div class="ec-candidates">
+                @for (c of candidatesForPosition(election, pos); track c.id) {
+                  <div class="ec-candidate" [class.ec-candidate--winner]="c.winner">
+                    <div class="ec-candidate__photo">
+                      @if (candidatePhoto(c)) {
+                        <img [src]="candidatePhoto(c)!" [alt]="c.prenom + ' ' + c.nom" />
+                      } @else {
+                        <span class="ec-candidate__initials">{{ c.prenom[0] }}{{ c.nom[0] }}</span>
+                      }
+                    </div>
+                    <div class="ec-candidate__info">
+                      <div class="ec-candidate__name-row">
+                        <span class="ec-candidate__name">{{ c.prenom }} {{ c.nom }}</span>
+                        @if (c.winner) {
+                          <span class="ec-winner-badge">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            Élu(e)
+                          </span>
+                        }
+                      </div>
+                      <div class="rc-track">
+                        <div class="rc-fill" [class.rc-fill--winner]="c.winner"
+                             [style.width.%]="candidatePct(c, election)"></div>
+                      </div>
+                      <span class="rc-votes">{{ c.voteCount }} vote(s) · {{ candidatePct(c, election) }}%</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+
+      <!-- ── Sondage result cards ── -->
+      @for (s of closedSondages(); track s.id) {
+        <div class="result-card">
+
+          <div class="rc-header">
+            <div class="rc-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            </div>
+            <div class="rc-meta">
+              <span class="rc-label">Résultats du sondage</span>
+              <span class="rc-date">{{ s.closedAt | date:'dd MMM yyyy' }}</span>
+            </div>
+            <span class="rc-badge">Clôturé</span>
+          </div>
+
+          <h2 class="rc-title">{{ s.titre }}</h2>
+
+          <div class="rc-results">
+            @for (opt of s.options; track opt.id) {
+              <div class="rc-row" [class.rc-row--winner]="isWinner(opt, s)">
+                <div class="rc-row-top">
+                  <div class="rc-opt-name">
+                    @if (optionImageUrl(opt); as src) {
+                      <img [src]="src" [alt]="opt.titre" class="rc-opt-img" />
+                    }
+                    <span>{{ opt.titre }}</span>
+                    @if (s.votedOptionId === opt.id) {
+                      <span class="rc-your-vote">votre choix</span>
+                    }
+                    @if (isWinner(opt, s)) {
+                      <span class="rc-winner-badge">Gagnant</span>
+                    }
+                  </div>
+                  <span class="rc-pct">{{ optionPercent(opt.voteCount, totalVotes(s)) }}%</span>
+                </div>
+                <div class="rc-track">
+                  <div class="rc-fill"
+                       [class.rc-fill--winner]="isWinner(opt, s)"
+                       [style.width.%]="optionPercent(opt.voteCount, totalVotes(s))"></div>
+                </div>
+                <span class="rc-votes">{{ opt.voteCount }} vote(s)</span>
+              </div>
+            }
+          </div>
+
+          <p class="rc-total">{{ totalVotes(s) }} vote(s) au total</p>
+
+        </div>
+      }
+
+    </div>
+  }
 
 </div>

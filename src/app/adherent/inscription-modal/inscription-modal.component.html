@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="modal-hd">
       <div class="modal-hd-text">
-        <h2 class="modal-title">Inscription</h2>
+        <h2 class="modal-title">{{ editMode ? 'Modifier l\'inscription' : 'Inscription' }}</h2>
         <p class="modal-sub">{{ offreTitre }}</p>
       </div>
       <button class="modal-close" (click)="close()" [disabled]="submitting()" aria-label="Fermer">
@@ -143,6 +143,7 @@
         <button class="btn-cancel" (click)="close()" [disabled]="submitting()">Annuler</button>
         <button class="btn-confirm" (click)="submit()" [disabled]="submitting() || form.invalid">
           @if (submitting()) { <span class="btn-spinner"></span> En cours… }
+          @else if (editMode) { Enregistrer les modifications }
           @else { Confirmer l'inscription }
         </button>
       </div>

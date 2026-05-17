@@ -21,6 +21,7 @@ export interface Offre {
   imageType?: string | null;
   poleNom?: string | null;
   avantages?: string | null;
+  createdAt?: string | null;
 }
 
 @Component({

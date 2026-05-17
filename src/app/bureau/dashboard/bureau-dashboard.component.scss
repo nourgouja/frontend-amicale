@@ -23,7 +23,8 @@
 
 /* ── Mid row ── */
 .mid-row {
-  display: grid; grid-template-columns: 1fr 1fr; gap: $space-4;
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: $space-4;
+  @include tablet { grid-template-columns: 1fr 1fr; }
   @include mobile { grid-template-columns: 1fr; }
 }
 
@@ -372,3 +373,69 @@
 .stat-count { font-size: $font-size-xs; color: $color-text-muted; min-width: 36px; text-align: right; }
 
 .stat-empty { font-size: $font-size-sm; color: $color-text-muted; margin: 0; text-align: center; padding: $space-4 0; }
+
+/* ════════════════════════════════════════
+   SONDAGE PANEL
+   ════════════════════════════════════════ */
+.sd-kpi-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: $space-2; margin-bottom: $space-4;
+}
+
+.sd-kpi {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: $color-bg; border-radius: $radius-md;
+  padding: $space-3 $space-2; text-align: center;
+}
+
+.sd-kpi__val {
+  font-size: $font-size-lg; font-weight: 800; color: $color-text; line-height: 1;
+  &--open  { color: $color-primary; }
+  &--votes { color: #3b82f6; }
+}
+
+.sd-kpi__label {
+  font-size: 10px; font-weight: 600; color: $color-text-muted;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+
+.sd-sep { height: 1px; background: $color-border; margin-bottom: $space-3; }
+
+.sd-list { display: flex; flex-direction: column; gap: $space-3; }
+
+.sd-item { display: flex; flex-direction: column; gap: 5px; }
+
+.sd-item__top {
+  display: flex; align-items: center; justify-content: space-between; gap: $space-2;
+}
+
+.sd-item__titre {
+  font-size: $font-size-sm; font-weight: 600; color: $color-text;
+  flex: 1; min-width: 0; @include truncate;
+}
+
+.sd-item__right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+.sd-item__votes {
+  font-size: $font-size-xs; font-weight: 700; color: $color-text-muted;
+}
+
+.sd-status-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: $color-border;
+  &--open   { background: $color-primary; box-shadow: 0 0 0 2px rgba(2,102,84,0.2); }
+  &--closed { background: $color-text-muted; }
+}
+
+.sd-bar-track {
+  height: 5px; border-radius: 99px;
+  background: $color-border; overflow: hidden;
+}
+
+.sd-bar-fill {
+  height: 100%; border-radius: 99px;
+  background: $color-text-muted;
+  transition: width 0.5s ease;
+  &--open { background: $color-primary; }
+  @include reduced-motion { transition: none; }
+}

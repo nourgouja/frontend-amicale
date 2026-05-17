@@ -206,7 +206,7 @@ export const routes: Routes = [
       },
       {
         path: 'calendrier',
-        loadComponent: () => import('./admin/calendrier/calendrier.component').then(m => m.CalendrierComponent),
+        loadComponent: () => import('./adherent/calendrier/adherent-calendrier.component').then(m => m.AdherentCalendrierComponent),
       },
       {
         path: 'sondages',

@@ -37,10 +37,10 @@ export class ElectionCallReviewComponent implements OnInit {
   });
 
   canPublish = computed(() => {
-    const apps = this.applications();
-    const approved = apps.filter(a => a.status === 'APPROVED');
-    const positions = new Set(approved.map(a => a.position));
-    return positions.size === 3 && this.call()?.publishedElectionId == null;
+    const approved = this.applications().filter(a => a.status === 'APPROVED');
+    const covered  = new Set(approved.map(a => a.position));
+    const coreOk   = covered.has('PRESIDENT') && covered.has('SECRETARY') && covered.has('TREASURER');
+    return coreOk && this.call()?.publishedElectionId == null;
   });
 
   ngOnInit(): void {

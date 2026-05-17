@@ -1,52 +1,227 @@
 <!-- ══════════════════════════════════════════════
-     QUOTE BANNER
+     BANNER ROW: quote + sondage alert
 ══════════════════════════════════════════════ -->
-<div class="quote-banner">
-  <svg class="quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="rgba(255,255,255,0.25)" stroke="none">
-    <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
-    <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/>
-  </svg>
-  <blockquote class="quote-text">
-    Ensemble, nous pouvons accomplir beaucoup plus que seuls.
-  </blockquote>
-  <p class="quote-author">— Amicale STAR</p>
+<div class="banner-row" [class.banner-row--split]="activeSondage()">
+
+  <div class="quote-banner">
+    <svg class="quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="rgba(255,255,255,0.25)" stroke="none">
+      <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
+      <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/>
+    </svg>
+    <blockquote class="quote-text">
+      Ensemble, nous pouvons accomplir beaucoup plus que seuls.
+    </blockquote>
+    <p class="quote-author">— Amicale STAR</p>
+  </div>
+
+  @if (activeSondage(); as s) {
+    <div class="sondage-card" [class.sondage-card--open]="sondagePanelOpen()">
+
+      <!-- ── Alert header (always visible) ── -->
+      <div class="sondage-card__hd" (click)="toggleSondageDropdown()">
+        <div class="sondage-alert__icon"
+             [class.sondage-alert__icon--done]="s.hasVoted || s.statut === 'CLOSED'"
+             [class.sondage-alert__icon--new]="!s.hasVoted && s.statut === 'OPEN'">
+          @if (s.statut === 'CLOSED') {
+            <!-- pie chart icon -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          } @else if (s.hasVoted) {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          } @else {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          }
+        </div>
+        <div class="sondage-alert__body">
+          <span class="sondage-alert__label">
+            @if (s.statut === 'CLOSED') { Résultats du sondage }
+            @else if (s.hasVoted)      { Vote enregistré }
+            @else                      { Sondage en cours }
+          </span>
+          <span class="sondage-alert__title">{{ s.titre }}</span>
+          <span class="sondage-alert__cta">
+            @if (!sondagePanelOpen()) {
+              @if (s.statut === 'CLOSED') { Voir les résultats → }
+              @else if (!s.hasVoted)      { Participer → }
+            } @else {
+              Réduire ↑
+            }
+          </span>
+        </div>
+        <div class="sondage-card__chevron" [class.sondage-card__chevron--up]="sondagePanelOpen()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <button class="sondage-card__dismiss" (click)="dismissSondage(s.id, $event)"
+                title="Fermer définitivement" aria-label="Fermer">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- ── Dropdown body ── -->
+      @if (sondagePanelOpen()) {
+        <div class="sondage-card__body">
+
+          @if (s.statut === 'CLOSED') {
+            <!-- Final results -->
+            <div class="sd-results">
+              @for (opt of s.options; track opt.id) {
+                <div class="sd-result-item" [class.sd-result-item--winner]="isWinner(opt, s)">
+                  @if (opt.imageBase64) {
+                    <img [src]="'data:' + opt.imageType + ';base64,' + opt.imageBase64" [alt]="opt.titre" class="sd-result-img" />
+                  }
+                  <div class="sd-result-content">
+                    <div class="sd-result-header">
+                      <span class="sd-result-name">
+                        {{ opt.titre }}
+                        @if (s.votedOptionId === opt.id) { <span class="sd-your-vote">votre choix</span> }
+                        @if (isWinner(opt, s)) { <span class="sd-winner-badge">Gagnant</span> }
+                      </span>
+                      <span class="sd-result-pct">{{ optionPercent(opt.voteCount, totalVotes(s)) }}%</span>
+                    </div>
+                    <div class="sd-progress-track">
+                      <div class="sd-progress-fill"
+                           [class.sd-progress-fill--winner]="isWinner(opt, s)"
+                           [style.width.%]="optionPercent(opt.voteCount, totalVotes(s))"></div>
+                    </div>
+                    <span class="sd-result-votes">{{ opt.voteCount }} vote(s)</span>
+                  </div>
+                </div>
+              }
+              <p class="sd-total-votes">{{ totalVotes(s) }} vote(s) au total</p>
+            </div>
+
+          } @else if (!s.hasVoted) {
+            <!-- Vote options -->
+            <div class="sd-options">
+              @for (opt of s.options; track opt.id) {
+                <button class="sd-option" (click)="vote(s.id, opt.id)" type="button">
+                  @if (opt.imageBase64) {
+                    <img [src]="'data:' + opt.imageType + ';base64,' + opt.imageBase64" [alt]="opt.titre" class="sd-option__img" />
+                  } @else {
+                    <div class="sd-option__img-placeholder">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                    </div>
+                  }
+                  <span class="sd-option__titre">{{ opt.titre }}</span>
+                  <svg class="sd-option__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              }
+            </div>
+
+          } @else {
+            <!-- Already voted, waiting for results -->
+            <div class="sd-voted">
+              <div class="sd-voted__icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <p class="sd-voted__text">Les résultats seront publiés par le bureau après clôture du sondage.</p>
+            </div>
+          }
+
+          @if (sondageToast()) {
+            <div class="sd-toast">{{ sondageToast() }}</div>
+          }
+
+          @if (s.statut !== 'CLOSED') {
+            <button class="sd-discard" (click)="closeSondagePanel()" type="button">Masquer</button>
+          }
+        </div>
+      }
+
+    </div>
+  }
+
 </div>
 
 <!-- ══════════════════════════════════════════════
-     ELECTION CALL BANNER
+     ELECTION CALL BANNER (adherents only)
 ══════════════════════════════════════════════ -->
-@if (activeCall()) {
-  <div class="election-banner">
-    <div class="election-banner__left">
-      <div class="election-banner__avatar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-        </svg>
+@if (!isBureau() && activeCall()) {
+
+  @if (activeCall()!.publishedElectionId && activeCall()!.publishedElectionStatus === 'RESULTS_PUBLISHED') {
+    <!-- ── Résultats publiés ── -->
+    <div class="election-banner election-banner--results">
+      <div class="election-banner__left">
+        <div class="election-banner__avatar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="election-banner__body">
+          <span class="election-banner__label election-banner__label--results">Résultats publiés</span>
+          <span class="election-banner__title">{{ activeCall()!.titre }}</span>
+          <span class="election-banner__deadline">Les résultats de l'élection sont disponibles</span>
+        </div>
       </div>
-      <div class="election-banner__body">
-        <span class="election-banner__label">Appel à candidature ouvert</span>
-        <span class="election-banner__title">{{ activeCall()!.titre }}</span>
-        @if (activeCall()!.dateFinCandidature) {
-          <span class="election-banner__deadline">
-            Candidatures jusqu'au {{ activeCall()!.dateFinCandidature | date:'dd/MM/yyyy' }}
+      <div class="election-banner__action">
+        <a class="election-banner__btn election-banner__btn--results"
+           routerLink="/adherent/annonces">
+          Voir les résultats
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+
+  } @else if (activeCall()!.publishedElectionId && activeCall()!.publishedElectionStatus === 'OPEN') {
+    <!-- ── Vote en cours ── -->
+    <div class="election-banner">
+      <div class="election-banner__left">
+        <div class="election-banner__avatar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/>
+          </svg>
+        </div>
+        <div class="election-banner__body">
+          <span class="election-banner__label election-banner__label--vote">
+            <span class="election-banner__dot"></span>
+            Vote en cours
           </span>
+          <span class="election-banner__title">{{ activeCall()!.titre }}</span>
+          <span class="election-banner__deadline">{{ activeCall()!.approvedCandidatesCount }} candidat(s)</span>
+        </div>
+      </div>
+      <div class="election-banner__action">
+        <a class="election-banner__btn" [routerLink]="['/adherent/elections', activeCall()!.publishedElectionId]">
+          Voter maintenant
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+
+  } @else {
+    <!-- ── Appel à candidature ── -->
+    <div class="election-banner">
+      <div class="election-banner__left">
+        <div class="election-banner__avatar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="election-banner__body">
+          <span class="election-banner__label">Appel à candidature ouvert</span>
+          <span class="election-banner__title">{{ activeCall()!.titre }}</span>
+          @if (activeCall()!.dateFinCandidature) {
+            <span class="election-banner__deadline">
+              Candidatures jusqu'au {{ activeCall()!.dateFinCandidature | date:'dd/MM/yyyy' }}
+            </span>
+          }
+        </div>
+      </div>
+      <div class="election-banner__action">
+        @if (myApplication()) {
+          <span class="election-banner__applied">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Candidature déposée — {{ myApplication()!.status === 'APPROVED' ? 'Acceptée' : myApplication()!.status === 'REJECTED' ? 'Refusée' : 'En attente' }}
+          </span>
+        } @else if (activeCall()!.canApply) {
+          <a class="election-banner__btn" [routerLink]="['/adherent/elections/apply', activeCall()!.id]">
+            Postuler maintenant
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
         }
       </div>
     </div>
-    <div class="election-banner__action">
-      @if (myApplication()) {
-        <span class="election-banner__applied">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Candidature soumise
-        </span>
-      } @else if (activeCall()!.canApply) {
-        <a class="election-banner__btn" [routerLink]="['/adherent/elections/apply', activeCall()!.id]">
-          Postuler maintenant
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
-      }
-    </div>
-  </div>
+  }
+
 }
 
 <!-- ══════════════════════════════════════════════
@@ -150,8 +325,7 @@
         <span class="section-sub">Avantages partenaires accessibles à tous les adhérents</span>
       </div>
       <a class="view-all-link" routerLink="/adherent/offres" [queryParams]="{type: 'CONVENTION'}">
-        Voir toutes
-        @if (allConventions().length > 4) { ({{ allConventions().length }}) }
+        Voir toutes ({{ allConventions().length }})
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </a>
     </div>
@@ -235,3 +409,4 @@
     </div>
   }
 </section>
+

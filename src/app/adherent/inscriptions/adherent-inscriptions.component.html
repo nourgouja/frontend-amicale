@@ -1,8 +1,23 @@
 <div class="adherent-inscriptions">
 
+  <!-- Page header -->
   <div class="page-head">
-    <h1 class="page-title">My activities</h1>
-    <p class="page-sub">Historique de vos inscriptions aux offres</p>
+    <div class="page-head-left">
+      <h1 class="page-title">My activities</h1>
+      <p class="page-sub">Historique de vos inscriptions aux offres</p>
+    </div>
+    @if (!loading() && inscriptions().length > 0) {
+      <div class="stats-row">
+        <div class="stat-chip">
+          <span class="stat-value">{{ totalRestant() | number:'1.0-2' }} DT</span>
+          <span class="stat-label">Total restant</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-value">{{ prochainesEcheancesCount() }}</span>
+          <span class="stat-label">Prochaines échéances</span>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- Filters -->
@@ -32,38 +47,164 @@
       <p>Aucune inscription trouvée</p>
     </div>
   } @else {
-    <div class="cards-list">
-      @for (ins of filtered(); track ins.id) {
-        <div class="ins-card" (click)="openDrawer(ins)">
-          <div class="ins-type-bar" [style.background]="typeColor(ins.typeOffre)"></div>
-          <div class="ins-body">
-            <div class="ins-main">
-              <div class="ins-info">
-                <h3 class="ins-title">{{ ins.offreTitre }}</h3>
-                <p class="ins-meta">
-                  Inscrit le {{ formatDate(ins.dateInscription) }}
-                  @if (ins.lieuOffre) { · {{ ins.lieuOffre }} }
-                  @if (ins.dateDebutOffre) { · Début: {{ formatDate(ins.dateDebutOffre) }} }
-                  @if (ins.totalPeople && ins.totalPeople > 1) { · {{ ins.totalPeople }} personnes }
-                </p>
+
+    <div class="two-col" [class.two-col--split]="selectedIns()">
+
+      <!-- ── Left: inscription list ── -->
+      <div class="list-col">
+        @for (ins of filtered(); track ins.id) {
+          <div class="ins-card"
+               [class.ins-card--active]="selectedIns()?.id === ins.id"
+               [class.ins-card--cancelled]="ins.statut === 'CANCELLED' || ins.statut === 'REJECTED'"
+               (click)="selectIns(ins)">
+            <div class="ins-type-bar" [style.background]="typeColor(ins.typeOffre)"></div>
+            <div class="ins-body">
+              <div class="ins-main">
+                <div class="ins-info">
+                  <h3 class="ins-title">{{ ins.offreTitre }}</h3>
+                  <p class="ins-meta">
+                    Inscrit le {{ formatDate(ins.dateInscription) }}
+                    @if (ins.totalPeople && ins.totalPeople > 1) { · {{ ins.totalPeople }} personnes }
+                  </p>
+                </div>
+                <div class="ins-right">
+                  @if (ins.montant != null) {
+                    <span class="ins-amount">{{ ins.montant | number:'1.0-2' }} DT</span>
+                  }
+                  <app-status-badge [statut]="ins.statut" type="inscription" />
+                  @if (ins.statut === 'PENDING') {
+                    <button class="btn-edit" (click)="openEdit(ins); $event.stopPropagation()" aria-label="Modifier">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      Modifier
+                    </button>
+                    <button class="btn-cancel" (click)="openCancel(ins); $event.stopPropagation()" aria-label="Annuler">
+                      <lucide-icon name="circle-x" [size]="14"></lucide-icon>
+                      Annuler
+                    </button>
+                  }
+                </div>
               </div>
-              <div class="ins-right">
-                <app-status-badge [statut]="ins.statut" type="inscription" />
-                @if (ins.statut === 'PENDING' || ins.statut === 'APPROVED') {
-                  <button class="btn-cancel" (click)="openCancel(ins); $event.stopPropagation()" aria-label="Annuler">
-                    <lucide-icon name="circle-x" [size]="14"></lucide-icon>
-                    Annuler
-                  </button>
+
+              <!-- Echeances mini-bar -->
+              @if (ins.echeances && ins.echeances.length > 0 && ins.statut !== 'CANCELLED' && ins.statut !== 'REJECTED') {
+                <div class="ins-pay-bar">
+                  <div class="pay-dots">
+                    @for (e of ins.echeances; track e.id) {
+                      <span class="pay-dot"
+                            [class.pay-dot--paid]="e.statut === 'PAID'"
+                            [class.pay-dot--late]="e.statut === 'OVERDUE'"
+                            [title]="e.statut"></span>
+                    }
+                  </div>
+                  <span class="pay-summary">
+                    {{ paidCount(ins) }}/{{ ins.echeances.length }} versement(s)
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- ── Right: payment detail ── -->
+      @if (selectedIns(); as ins) {
+        <div class="detail-col">
+          <div class="detail-panel">
+
+            <div class="detail-hd">
+              <div class="detail-hd-info">
+                <div class="detail-type-dot" [style.background]="typeColor(ins.typeOffre)"></div>
+                <div>
+                  <h2 class="detail-title">{{ ins.offreTitre }}</h2>
+                  <p class="detail-sub">
+                    @if (ins.montant != null) { {{ ins.montant | number:'1.0-2' }} DT · }
+                    @if (ins.echeances && ins.echeances.length > 0) {
+                      {{ ins.echeances.length }} versement(s)
+                    } @else {
+                      Comptant
+                    }
+                  </p>
+                </div>
+              </div>
+              <button class="detail-close" (click)="selectIns(null)" aria-label="Fermer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+
+            <!-- Versements -->
+            @if (ins.echeances && ins.echeances.length > 0) {
+              <div class="versements-list">
+                @for (e of ins.echeances; track e.id) {
+                  <div class="versement-row" [class.versement-row--paid]="e.statut === 'PAID'">
+                    <div class="versement-icon">
+                      @if (e.statut === 'PAID') {
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#026654" stroke="none"><circle cx="12" cy="12" r="12"/><polyline points="7 12 10 15 17 9" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      } @else {
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                      }
+                    </div>
+                    <div class="versement-info">
+                      <span class="versement-label">Versement n°{{ e.numero }}</span>
+                      <span class="versement-date">Échéance : {{ formatDate(e.dateEcheance) }}</span>
+                    </div>
+                    <span class="versement-amount">{{ e.montant | number:'1.0-2' }} DT</span>
+                    <div class="versement-statut">
+                      <span class="vstatut"
+                            [class.vstatut--paid]="e.statut === 'PAID'"
+                            [class.vstatut--late]="e.statut === 'OVERDUE'"
+                            [class.vstatut--pending]="e.statut === 'PENDING'">
+                        @switch (e.statut) {
+                          @case ('PAID')    { Payée }
+                          @case ('OVERDUE') { En retard }
+                          @default          { En attente }
+                        }
+                      </span>
+                    </div>
+                  </div>
                 }
               </div>
+            } @else {
+              <div class="no-echeances">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                @if (ins.montant != null) {
+                  <p>Paiement comptant — {{ ins.montant | number:'1.0-2' }} DT</p>
+                } @else {
+                  <p>Aucune échéance de paiement</p>
+                }
+              </div>
+            }
+
+            <!-- Participants -->
+            <div class="detail-participants">
+              <span class="detail-section-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                {{ ins.totalPeople ?? 1 }} participant(s)
+              </span>
             </div>
+
           </div>
         </div>
       }
+
     </div>
   }
 
 </div>
+
+<!-- ── Edit modal ── -->
+@if (editTarget(); as ins) {
+  <app-inscription-modal
+    [editMode]="true"
+    [editInscriptionId]="ins.id"
+    [offreTitre]="ins.offreTitre"
+    [typeOffre]="ins.typeOffre"
+    [prixParPersonne]="ins.prixParPersonne ?? null"
+    [placesRestantes]="ins.placesRestantes ?? null"
+    [initialGuests]="ins.guests ?? []"
+    [initialPeriod]="ins.periodePaiement ?? 'COMPTANT'"
+    (submitted)="onEditSubmitted($event)"
+    (closed)="closeEdit()" />
+}
 
 <!-- ── Cancel modal ── -->
 @if (cancelTarget(); as ins) {
@@ -75,104 +216,4 @@
     [loading]="cancelling()"
     (confirmed)="confirmCancel()"
     (cancelled)="closeCancel()" />
-}
-
-<!-- ── Detail drawer ── -->
-@if (drawerIns(); as ins) {
-  <div class="drawer-backdrop" (click)="closeDrawer()">
-    <div class="drawer-panel" (click)="$event.stopPropagation()" role="dialog">
-
-      <!-- Header -->
-      <div class="drawer-hd">
-        <div class="drawer-hd-left">
-          <div class="drawer-type-dot" [style.background]="typeColor(ins.typeOffre)"></div>
-          <div>
-            <h2 class="drawer-title">{{ ins.offreTitre }}</h2>
-            <p class="drawer-sub">Inscrit le {{ formatDate(ins.dateInscription) }}</p>
-          </div>
-        </div>
-        <button class="drawer-close" (click)="closeDrawer()" aria-label="Fermer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-
-      <!-- Body -->
-      <div class="drawer-body">
-
-        <!-- Status row -->
-        <div class="drawer-status-row">
-          <div class="dkv">
-            <span class="dkv-label">Statut</span>
-            <app-status-badge [statut]="ins.statut" type="inscription" />
-          </div>
-          @if (ins.statutPaiement) {
-            <div class="dkv">
-              <span class="dkv-label">Paiement</span>
-              <app-status-badge [statut]="ins.statutPaiement" type="cotisation" />
-            </div>
-          }
-          @if (ins.montant != null) {
-            <div class="dkv">
-              <span class="dkv-label">Montant</span>
-              <span class="dkv-val dkv-val--price">{{ ins.montant | number:'1.0-2' }} TND</span>
-            </div>
-          }
-        </div>
-
-        <!-- Guests section (read-only) -->
-        <div class="drawer-section">
-          <h3 class="section-title">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            Participants : {{ ins.totalPeople ?? 1 }} personne(s)
-          </h3>
-
-          <table class="guest-table">
-            <thead>
-              <tr><th>Nom</th><th>Prénom</th><th>Âge</th><th>Sexe</th></tr>
-            </thead>
-            <tbody>
-              <tr class="row-adherent">
-                <td>{{ ins.adherentNom ?? '—' }}</td>
-                <td>{{ ins.adherentPrenom ?? '—' }} <span class="you-badge">vous</span></td>
-                <td class="muted">—</td>
-                <td class="muted">—</td>
-              </tr>
-              @for (g of ins.guests; track $index) {
-                <tr>
-                  <td>{{ g.nom }}</td>
-                  <td>{{ g.prenom ?? '—' }}</td>
-                  <td class="muted">{{ g.age ?? '—' }}</td>
-                  <td class="muted">{{ sexeLabel(g.sexe) || '—' }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Payment schedule -->
-        @if (ins.echeances && ins.echeances.length > 0) {
-          <div class="drawer-section">
-            <h3 class="section-title">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              Échéancier de paiement
-            </h3>
-            <table class="guest-table">
-              <thead><tr><th>Nº</th><th>Échéance</th><th>Montant</th><th>Statut</th></tr></thead>
-              <tbody>
-                @for (e of ins.echeances; track e.id) {
-                  <tr>
-                    <td class="muted">{{ e.numero }}</td>
-                    <td>{{ formatDate(e.dateEcheance) }}</td>
-                    <td>{{ e.montant | number:'1.0-2' }} TND</td>
-                    <td><app-status-badge [statut]="e.statut" type="cotisation" /></td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        }
-
-      </div>
-    </div>
-  </div>
 }

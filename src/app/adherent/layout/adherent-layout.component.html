@@ -62,7 +62,7 @@
               <div class="notif-dropdown-header">
                 <span>Notifications</span>
                 @if (notifService.unreadCount() > 0) {
-                  <button class="notif-read-all" (click)="notifService.markAllRead()">Tout lire</button>
+                  <button class="notif-read-all" (click)="notifService.markAllRead()">Tout effacer</button>
                 }
               </div>
               @if (notifService.notifications().length === 0) {

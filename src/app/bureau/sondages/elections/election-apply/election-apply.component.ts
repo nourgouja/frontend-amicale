@@ -1,7 +1,8 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { ElectionCallService } from '../../../../core/services/election-call.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CandidateApplication, ElectionCall } from '../../../../core/models/election-call.model';
@@ -20,21 +21,26 @@ export class ElectionApplyComponent implements OnInit {
   private route        = inject(ActivatedRoute);
   private router       = inject(Router);
   private fb           = inject(FormBuilder);
+  private http         = inject(HttpClient);
 
-  call         = signal<ElectionCall | null>(null);
+  call          = signal<ElectionCall | null>(null);
   myApplication = signal<CandidateApplication | null>(null);
-  loading      = signal(true);
-  submitting   = signal(false);
-  toast        = signal<{ msg: string; type: 'success' | 'error' } | null>(null);
+  loading       = signal(true);
+  submitting    = signal(false);
+  toast         = signal<{ msg: string; type: 'success' | 'error' } | null>(null);
+  poles         = signal<{ id: number; nom: string }[]>([]);
 
-  photoFile     = signal<File | null>(null);
-  photoPreview  = signal<string | null>(null);
-  photoError    = signal('');
+  photoFile    = signal<File | null>(null);
+  photoPreview = signal<string | null>(null);
+  photoError   = signal('');
 
   readonly positions = POSITIONS;
 
+  isResponsablePole = computed(() => false);
+
   form = this.fb.group({
     position:   ['', Validators.required],
+    poleNom:    [''],
     motivation: ['', [Validators.required, Validators.minLength(20)]],
   });
 
@@ -45,6 +51,11 @@ export class ElectionApplyComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.http.get<{ id: number; nom: string }[]>('/api/poles').subscribe({
+      next: list => this.poles.set(list),
+      error: ()   => {},
+    });
+
     this.callService.getActiveCall().subscribe({
       next: activeCall => {
         if (!activeCall || activeCall.id !== this.callId) {
@@ -85,6 +96,10 @@ export class ElectionApplyComponent implements OnInit {
 
   submit(): void {
     if (this.form.invalid || this.submitting()) return;
+    if (this.isResponsablePole() && !this.form.value.poleNom) {
+      this.showToast('Veuillez sélectionner un pôle', 'error');
+      return;
+    }
     if (!this.photoFile()) {
       this.photoError.set('La photo est obligatoire');
       return;
@@ -93,6 +108,7 @@ export class ElectionApplyComponent implements OnInit {
     this.submitting.set(true);
     const req = {
       position:   this.form.value.position as any,
+      poleNom:    this.isResponsablePole() ? (this.form.value.poleNom ?? undefined) : undefined,
       motivation: this.form.value.motivation!.trim(),
     };
 

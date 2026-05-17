@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Read(//c/Users/nourg/IdeaProjects/BACKEND_STAR/**)",
-      "Bash(xargs grep -l \"EN_ATTENTE\\\\|CONFIRMEE\\\\|REJETEE\\\\|ANNULEE\\\\|OUVERTE\\\\|FERMEE\\\\|BROUILLON\\\\|ARCHIVEE\\\\|PAYEE\\\\|EN_RETARD\\\\|'ACTIVE'\")"
+      "Bash(xargs grep -l \"EN_ATTENTE\\\\|CONFIRMEE\\\\|REJETEE\\\\|ANNULEE\\\\|OUVERTE\\\\|FERMEE\\\\|BROUILLON\\\\|ARCHIVEE\\\\|PAYEE\\\\|EN_RETARD\\\\|'ACTIVE'\")",
+      "Bash(Get-Content \"c:\\\\Users\\\\nourg\\\\amicale-star\\\\src\\\\app\\\\adherent\\\\dashboard\\\\adherent-dashboard.component.scss\")",
+      "Bash(Measure-Object -Line)",
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\nourg\\\\amicale-star\\\\src\\\\app\\\\adherent\\\\dashboard\\\\adherent-dashboard.component.scss\"\\).Count)"
     ],
     "additionalDirectories": [
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\election\\candidate",

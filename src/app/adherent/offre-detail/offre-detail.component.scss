@@ -274,6 +274,7 @@
   color: $color-text;
   &--low  { color: #d97706; font-weight: 700; }
   &--full { color: $color-error; font-weight: 700; }
+  &--free { color: $color-primary; font-weight: 700; }
 }
 
 // ─── Inscription status ───────────────────────────────────────────────────────

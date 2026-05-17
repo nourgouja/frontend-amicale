@@ -1,7 +1,46 @@
 @use '../../../styles/variables' as *;
 
+// ─── Banner row ───────────────────────────────────────────────────────────────
+.banner-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $space-4;
+  margin-bottom: $space-2;
+
+  &--split {
+    grid-template-columns: 1fr 320px;
+    @media (max-width: 860px) { grid-template-columns: 1fr; }
+  }
+}
+
+// ─── Sondage alert card ───────────────────────────────────────────────────────
+.sondage-alert {
+  display: flex; align-items: flex-start; gap: $space-3;
+  padding: $space-4 $space-5;
+  border: 1.5px solid $color-border; border-radius: $radius-xl;
+  background: $color-surface;
+  cursor: pointer; text-align: left; width: 100%;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+  &:hover { border-color: $color-primary; box-shadow: 0 4px 16px rgba(2,102,84,0.10); }
+  @include reduced-motion { transition: none; }
+}
+
+.sondage-alert__icon {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  &--new  { background: rgba(2,102,84,0.10); color: $color-primary; }
+  &--done { background: rgba(2,102,84,0.10); color: $color-primary; }
+}
+
+.sondage-alert__body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.sondage-alert__label { font-size: $font-size-xs; font-weight: 700; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.4px; }
+.sondage-alert__title { font-size: $font-size-sm; font-weight: 600; color: $color-text; @include truncate; }
+.sondage-alert__sub   { font-size: $font-size-xs; color: $color-text-muted; line-height: 1.4; }
+.sondage-alert__cta   { font-size: $font-size-xs; font-weight: 700; color: $color-primary; margin-top: 2px; }
+
 // ─── Quote banner ─────────────────────────────────────────────────────────────
 .quote-banner {
+  margin-bottom: 0;
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
@@ -82,12 +121,38 @@
   min-width: 0;
 }
 
+.election-banner--results {
+  background: #fffbeb;
+  border-color: rgba(#d97706, 0.2);
+  border-left-color: #d97706;
+  .election-banner__avatar { background: rgba(#d97706, .1); color: #d97706; }
+}
+
 .election-banner__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: $font-size-xs;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: $color-primary;
+
+  &--vote    { color: #15803d; }
+  &--results { color: #92400e; }
+}
+
+.election-banner__btn--results {
+  background: #d97706;
+  &:hover { background: #b45309; }
+}
+
+.election-banner__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
 }
 
 .election-banner__title {
@@ -325,16 +390,25 @@
   100% { background-position: -200% 0; }
 }
 
-// ─── Conventions grid ─────────────────────────────────────────────────────────
+// ─── Conventions scroll row ───────────────────────────────────────────────────
 .conventions-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: $space-4;
-  @include mobile { grid-template-columns: 1fr; }
+  display: flex;
+  flex-direction: row;
+  gap: $space-3;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: $space-2;
+  // hide scrollbar visually but keep it functional
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 }
 
 .convention-card {
-  display: flex; flex-direction: column;
+  flex: 0 0 280px;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: row;
   border-radius: $radius-xl;
   overflow: hidden;
   border: 1px solid $color-border;
@@ -347,7 +421,11 @@
 }
 
 .convention-img {
-  position: relative; height: 130px; overflow: hidden; background: $color-primary;
+  position: relative;
+  flex: 0 0 100px;
+  width: 100px;
+  overflow: hidden;
+  background: $color-primary;
 }
 
 .convention-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -359,31 +437,39 @@
 }
 
 .convention-pill {
-  position: absolute; top: $space-2; left: $space-2;
+  position: absolute; top: $space-1; left: $space-1;
   background: rgba(255,255,255,0.9); color: $color-primary;
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
-  padding: 3px 10px; border-radius: $radius-full; backdrop-filter: blur(4px);
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  padding: 2px 6px; border-radius: $radius-full; backdrop-filter: blur(4px);
 }
 
-.convention-info { padding: $space-3 $space-4; display: flex; flex-direction: column; gap: $space-1; flex: 1; }
+.convention-info {
+  padding: $space-2 $space-3;
+  display: flex; flex-direction: column; gap: 2px;
+  flex: 1; min-width: 0; justify-content: center;
+}
 
-.convention-name { font-size: $font-size-sm; font-weight: 700; color: $color-text; margin: 0; }
+.convention-name {
+  font-size: $font-size-xs; font-weight: 700; color: $color-text; margin: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
 .convention-desc {
-  font-size: $font-size-xs; color: $color-text-muted; line-height: 1.5; margin: 0;
+  font-size: 11px; color: $color-text-muted; line-height: 1.4; margin: 0;
   display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 
 .convention-footer {
-  display: flex; align-items: center; justify-content: space-between; margin-top: $space-2;
+  display: flex; align-items: center; justify-content: space-between; margin-top: $space-1;
 }
 
 .convention-lieu {
-  display: flex; align-items: center; gap: 4px;
-  font-size: $font-size-xs; color: $color-text-muted;
+  display: flex; align-items: center; gap: 3px;
+  font-size: 11px; color: $color-text-muted;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-.convention-cta { font-size: $font-size-xs; font-weight: 600; color: $color-primary; }
+.convention-cta { font-size: 11px; font-weight: 600; color: $color-primary; white-space: nowrap; }
 
 // ─── Members grid ─────────────────────────────────────────────────────────────
 .members-grid {
@@ -431,4 +517,161 @@
   display: flex; flex-direction: column; align-items: center; gap: $space-3;
   padding: $space-8 $space-4; color: $color-text-muted;
   p { font-size: $font-size-sm; }
+}
+
+// ─── Sondage dropdown card ────────────────────────────────────────────────────
+.sondage-card {
+  border: 1.5px solid $color-border; border-radius: $radius-xl;
+  background: $color-surface; overflow: hidden;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+  &--open { border-color: $color-primary; box-shadow: 0 4px 20px rgba(2,102,84,0.10); }
+  @include reduced-motion { transition: none; }
+}
+
+.sondage-card__hd {
+  display: flex; align-items: center; gap: $space-3;
+  padding: $space-3 $space-4; cursor: pointer;
+  &:hover .sondage-card__chevron { color: $color-primary; }
+  &:hover { background: rgba(2,102,84,0.02); }
+  // push chevron + dismiss to the right
+  .sondage-alert__body { flex: 1; min-width: 0; }
+}
+
+.sondage-card__chevron {
+  flex-shrink: 0; color: $color-text-muted;
+  transition: transform 0.2s ease, color $transition-fast;
+  &--up { transform: rotate(180deg); color: $color-primary; }
+  @include reduced-motion { transition: none; }
+}
+
+.sondage-card__dismiss {
+  flex-shrink: 0; margin-left: $space-2;
+  width: 24px; height: 24px; border-radius: 50%;
+  border: none; background: none; cursor: pointer;
+  color: $color-text-muted; display: flex; align-items: center; justify-content: center;
+  transition: background $transition-fast, color $transition-fast;
+  &:hover { background: rgba(239,68,68,0.08); color: #ef4444; }
+  @include reduced-motion { transition: none; }
+}
+
+.sondage-card__body {
+  border-top: 1px solid $color-border;
+  padding: $space-4; display: flex; flex-direction: column; gap: $space-3;
+  animation: sd-expand 0.18s ease;
+  @include reduced-motion { animation: none; }
+}
+@keyframes sd-expand {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// vote option rows
+.sd-options { display: flex; flex-direction: column; gap: $space-2; }
+
+.sd-option {
+  display: flex; align-items: center; gap: $space-3;
+  padding: $space-2 $space-3; border: 1.5px solid $color-border; border-radius: $radius-md;
+  background: $color-bg; cursor: pointer; text-align: left; width: 100%;
+  transition: border-color $transition-fast, background $transition-fast;
+  &:hover { border-color: $color-primary; background: rgba(2,102,84,0.04); }
+  @include reduced-motion { transition: none; }
+}
+.sd-option__img {
+  width: 52px; height: 52px; object-fit: cover; border-radius: $radius-sm; flex-shrink: 0;
+}
+.sd-option__img-placeholder {
+  width: 52px; height: 52px; border-radius: $radius-sm; flex-shrink: 0;
+  background: $color-border; display: flex; align-items: center; justify-content: center;
+}
+.sd-option__titre { flex: 1; font-size: $font-size-sm; font-weight: 600; color: $color-text; text-align: left; }
+.sd-option__arrow { color: $color-text-muted; flex-shrink: 0; }
+
+// voted confirmation
+.sd-voted {
+  display: flex; align-items: flex-start; gap: $space-3;
+  padding: $space-3; border-radius: $radius-md;
+  background: rgba(2,102,84,0.06); border: 1px solid rgba(2,102,84,0.15);
+}
+.sd-voted__icon {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: $color-primary; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.sd-voted__text { font-size: $font-size-xs; color: $color-text-muted; line-height: 1.5; padding-top: 4px; }
+
+// toast
+.sd-toast {
+  padding: $space-2 $space-3; border-radius: $radius-sm;
+  background: $color-primary; color: #fff;
+  font-size: $font-size-xs; font-weight: 600; text-align: center;
+}
+
+// discard link
+.sd-discard {
+  align-self: flex-end; background: none; border: none; cursor: pointer;
+  font-size: $font-size-xs; color: $color-text-muted; padding: 0;
+  font-family: $font-base;
+  &:hover { color: $color-text; text-decoration: underline; }
+}
+
+// results (CLOSED state)
+.sd-results { display: flex; flex-direction: column; gap: 8px; }
+
+.sd-result-item {
+  padding: 8px 10px; border-radius: $radius-sm;
+  background: $color-bg; border: 1px solid $color-border;
+  &--winner { border-color: $color-primary; background: rgba(2,102,84,0.04); }
+}
+
+// hide option images in compact results view
+.sd-result-img { display: none; }
+
+.sd-result-content { display: flex; flex-direction: column; gap: 4px; }
+
+.sd-result-header {
+  display: flex; align-items: center; justify-content: space-between; gap: $space-2;
+}
+
+.sd-result-name {
+  font-size: $font-size-xs; font-weight: 600; color: $color-text;
+  display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.sd-result-pct {
+  font-size: $font-size-xs; font-weight: 700; color: $color-text; flex-shrink: 0;
+}
+
+.sd-progress-track {
+  height: 5px; border-radius: 99px; background: $color-border; overflow: hidden;
+}
+
+.sd-progress-fill {
+  height: 100%; border-radius: 99px; background: $color-text-muted;
+  transition: width 0.4s ease;
+  &--winner { background: $color-primary; }
+  @include reduced-motion { transition: none; }
+}
+
+.sd-result-votes { font-size: 10px; color: $color-text-muted; }
+
+.sd-winner-badge {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  background: $color-primary; color: #fff; padding: 1px 6px; border-radius: $radius-full;
+  flex-shrink: 0;
+}
+
+.sd-your-vote {
+  font-size: 9px; font-weight: 600; color: $color-primary;
+  background: rgba(2,102,84,0.10); padding: 1px 5px; border-radius: $radius-full;
+  flex-shrink: 0;
+}
+
+.sd-total-votes {
+  font-size: 10px; color: $color-text-muted; text-align: right; margin: 0; padding-top: 2px;
+}
+
+// constrain dropdown so it never overflows the card column
+.sondage-card__body {
+  max-height: 340px; overflow-y: auto;
 }

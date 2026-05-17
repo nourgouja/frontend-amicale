@@ -1,5 +1,11 @@
 export type ElectionStatus = 'DRAFT' | 'OPEN' | 'CLOSED' | 'RESULTS_PUBLISHED';
-export type Position = 'PRESIDENT' | 'VICE_PRESIDENT' | 'SECRETARY' | 'TREASURER' | 'RESPONSABLE_POLE' | 'MEMBER';
+export type Position =
+  | 'PRESIDENT'
+  | 'SECRETARY'
+  | 'TREASURER'
+  | 'RESPONSABLE_POLE_VOYAGE_SEJOURS'
+  | 'RESPONSABLE_POLE_ACTIVITES_LOISIRS'
+  | 'RESPONSABLE_POLE_EVENEMENTS_CONVENTIONS';
 
 export interface Candidate {
   id: number;
@@ -63,12 +69,12 @@ export interface AddCandidateRequest {
 }
 
 export const POSITIONS: { value: Position; label: string }[] = [
-  { value: 'PRESIDENT',        label: 'Président' },
-  { value: 'VICE_PRESIDENT',   label: 'Vice-Président' },
-  { value: 'SECRETARY',        label: 'Secrétaire' },
-  { value: 'TREASURER',        label: 'Trésorier' },
-  { value: 'RESPONSABLE_POLE', label: 'Responsable de Pôle' },
-  { value: 'MEMBER',           label: 'Membre' },
+  { value: 'PRESIDENT',                             label: 'Président' },
+  { value: 'SECRETARY',                             label: 'Secrétaire' },
+  { value: 'TREASURER',                             label: 'Trésorier' },
+  { value: 'RESPONSABLE_POLE_VOYAGE_SEJOURS',        label: 'Responsable Pôle Voyage & Séjours' },
+  { value: 'RESPONSABLE_POLE_ACTIVITES_LOISIRS',     label: 'Responsable Pôle Activités & Loisirs' },
+  { value: 'RESPONSABLE_POLE_EVENEMENTS_CONVENTIONS', label: 'Responsable Pôle Événements & Conventions' },
 ];
 
 export function positionLabel(p: Position): string {

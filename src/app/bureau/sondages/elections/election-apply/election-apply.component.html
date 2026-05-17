@@ -49,12 +49,12 @@
               <span class="app-detail__label">Poste</span>
               <span class="app-detail__value">
                 @switch (myApplication()!.position) {
-                  @case ('PRESIDENT')        { Président }
-                  @case ('VICE_PRESIDENT')   { Vice-Président }
-                  @case ('SECRETARY')        { Secrétaire }
-                  @case ('TREASURER')        { Trésorier }
-                  @case ('RESPONSABLE_POLE') { Responsable de Pôle }
-                  @case ('MEMBER')           { Membre }
+                  @case ('PRESIDENT')                              { Président }
+                  @case ('SECRETARY')                              { Secrétaire }
+                  @case ('TREASURER')                              { Trésorier }
+                  @case ('RESPONSABLE_POLE_VOYAGE_SEJOURS')        { Resp. Pôle Voyage & Séjours }
+                  @case ('RESPONSABLE_POLE_ACTIVITES_LOISIRS')     { Resp. Pôle Activités & Loisirs }
+                  @case ('RESPONSABLE_POLE_EVENEMENTS_CONVENTIONS') { Resp. Pôle Événements & Conventions }
                 }
               </span>
             </div>
@@ -104,6 +104,19 @@
               <span class="form-error">Veuillez sélectionner un poste</span>
             }
           </div>
+
+          <!-- Pole selector (only for RESPONSABLE_POLE) -->
+          @if (isResponsablePole()) {
+            <div class="form-group">
+              <label class="form-label">Pôle concerné <span class="req">*</span></label>
+              <select class="form-input form-select" formControlName="poleNom">
+                <option value="" disabled>Choisissez un pôle…</option>
+                @for (p of poles(); track p.id) {
+                  <option [value]="p.nom">{{ p.nom }}</option>
+                }
+              </select>
+            </div>
+          }
 
           <!-- Motivation -->
           <div class="form-group" [class.form-group--error]="isInvalid('motivation')">

@@ -1,0 +1,374 @@
+@use '../../../styles/variables' as *;
+
+.cal-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cal-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: $color-text;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-btn {
+  height: 36px;
+  padding: 0 14px;
+  border: 1.5px solid $color-border;
+  background: $color-surface;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $color-text;
+  cursor: pointer;
+  font-family: $font-base;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, color 0.15s;
+  &:hover { border-color: $color-primary; color: $color-primary; }
+}
+
+.today-btn {
+  background: $color-primary;
+  border-color: $color-primary;
+  color: #fff;
+  &:hover { opacity: 0.88; color: #fff; }
+}
+
+.month-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: $color-text;
+  min-width: 160px;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+// ── Grid ──────────────────────────────────────────────────────────────────────
+.cal-grid-wrap {
+  background: $color-surface;
+  border-radius: 16px;
+  border: 1px solid $color-border;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.cal-weekday {
+  padding: 10px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-text-muted;
+  background: $color-bg;
+  border-bottom: 1px solid $color-border;
+  letter-spacing: 0.04em;
+}
+
+.cal-cell {
+  min-height: 100px;
+  padding: 8px;
+  border-right: 1px solid $color-border;
+  border-bottom: 1px solid $color-border;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: background 0.1s;
+
+  &:hover { background: $color-bg; }
+  &:nth-child(7n) { border-right: none; }
+
+  &.today {
+    background: rgba(2, 102, 84, 0.04);
+    .day-number {
+      background: $color-primary;
+      color: #fff;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &.other-month {
+    background: #fafafa;
+    .day-number { color: #c9cdd4; }
+  }
+}
+
+.day-number {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $color-text;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.event-pill {
+  width: 100%;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: none;
+  font-size: 11px;
+  font-weight: 500;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: $font-base;
+  transition: opacity 0.15s;
+  &:hover { opacity: 0.80; }
+}
+
+// ── Legend ────────────────────────────────────────────────────────────────────
+.legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: $color-text-muted;
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+.cal-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px;
+  color: $color-text-muted;
+  font-size: 13px;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid $color-border;
+  border-top-color: $color-primary;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Preview panel ─────────────────────────────────────────────────────────────
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 800;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.preview-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 360px;
+  max-width: 100vw;
+  height: 100vh;
+  background: $color-surface;
+  box-shadow: -6px 0 32px rgba(0,0,0,0.14);
+  z-index: 801;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn 0.22s ease;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.pp-cover {
+  position: relative;
+  height: 180px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.pp-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pp-cover-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pp-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: rgba(0,0,0,0.55); }
+}
+
+.pp-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  scrollbar-width: thin;
+}
+
+.pp-type-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  width: fit-content;
+}
+
+.pp-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $color-text;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.pp-desc {
+  font-size: 12.5px;
+  color: $color-text-muted;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pp-sep {
+  height: 1px;
+  background: $color-border;
+  margin: 14px 0;
+}
+
+.pp-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.pp-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $color-text-muted;
+}
+
+.pp-value {
+  font-size: 13px;
+  color: $color-text;
+  &--bold { font-weight: 600; }
+}
+
+.pp-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: $color-primary;
+}
+
+.pp-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: $radius-full;
+  border: none;
+  background: $color-primary;
+  color: #fff;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  font-family: $font-base;
+  cursor: pointer;
+  margin-top: auto;
+  transition: background 0.15s;
+  &:hover { background: $color-primary-dark; }
+}

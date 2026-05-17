@@ -54,8 +54,9 @@ export class AdherentOffresComponent implements OnInit {
     const statut = this.activeStatut();
     const q      = this.searchQuery().toLowerCase().trim();
     return this.offres().filter(o => {
-      const matchType   = !type   || o.typeOffre   === type;
-      const matchStatut = !statut || o.statutOffre === statut;
+      // "Tout" (type='') shows everything except conventions; conventions need explicit filter
+      const matchType   = type ? o.typeOffre === type : o.typeOffre !== 'CONVENTION';
+      const matchStatut = o.typeOffre === 'CONVENTION' || !statut || o.statutOffre === statut;
       const matchQuery  = !q || o.titre.toLowerCase().includes(q)
                              || (o.lieu ?? '').toLowerCase().includes(q);
       return matchType && matchStatut && matchQuery;
