@@ -12,6 +12,125 @@
     <app-kpi-card label="Total offres"            [value]="recentOffres().length" icon="calendar-days"  color="blue" />
   </div>
 
+  
+
+  <!-- ─── Mid row : Calendrier + État des inscriptions + Sondages ─── -->
+  <div class="mid-row">
+
+    <!-- Calendrier -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3 class="panel-title">Calendrier</h3>
+        <a class="panel-link" routerLink="/bureau/offres">Voir Plus</a>
+      </div>
+      <div class="calendar-body">
+        <app-mini-calendar [offres]="calendarOffres()" />
+      </div>
+    </div>
+
+    <!-- État des inscriptions -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3 class="panel-title">État des inscriptions</h3>
+        <a class="panel-link" routerLink="/bureau/inscriptions">Voir tout →</a>
+      </div>
+      <div class="panel-body">
+        @if (inscDistribution().total === 0) {
+          <div class="panel-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
+            </svg>
+            <p>Aucune inscription pour le moment</p>
+          </div>
+        } @else {
+          <div class="donut-wrap">
+            <div class="donut-ring" [style.background]="inscDonutGradient()">
+              <div class="donut-hole">
+                <span class="donut-total">{{ inscDistribution().total }}</span>
+                <span class="donut-label">Inscriptions</span>
+              </div>
+            </div>
+          </div>
+          <div class="legend-list">
+            @for (item of inscDistribution().items; track item.statut) {
+              <div class="legend-row">
+                <div class="legend-left">
+                  <span class="legend-dot" [style.background]="item.color"></span>
+                  <span class="legend-name">{{ item.label }}</span>
+                </div>
+                <div class="legend-right">
+                  <span class="legend-count">{{ item.count }}</span>
+                  <span class="legend-pct" [style.color]="item.color">
+                    {{ pct(item.count, inscDistribution().total) }}%
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Sondages & Participation -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3 class="panel-title">Sondages & Participation</h3>
+        <a class="panel-link" routerLink="/bureau/sondages">Voir tout →</a>
+      </div>
+      <div class="panel-body">
+        @if (sondageStats().total === 0) {
+          <div class="panel-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
+            </svg>
+            <p>Aucun sondage pour le moment</p>
+          </div>
+        } @else {
+          <div class="sd-kpi-row">
+            <div class="sd-kpi">
+              <span class="sd-kpi__val">{{ sondageStats().total }}</span>
+              <span class="sd-kpi__label">Total</span>
+            </div>
+            <div class="sd-kpi">
+              <span class="sd-kpi__val sd-kpi__val--open">{{ sondageStats().open }}</span>
+              <span class="sd-kpi__label">En cours</span>
+            </div>
+            <div class="sd-kpi">
+              <span class="sd-kpi__val">{{ sondageStats().closed }}</span>
+              <span class="sd-kpi__label">Clôturés</span>
+            </div>
+            <div class="sd-kpi">
+              <span class="sd-kpi__val sd-kpi__val--votes">{{ sondageStats().totalVotes }}</span>
+              <span class="sd-kpi__label">Votes</span>
+            </div>
+          </div>
+          <div class="sd-sep"></div>
+          <div class="sd-list">
+            @for (s of sondageStats().recent; track s.titre) {
+              <div class="sd-item">
+                <div class="sd-item__top">
+                  <span class="sd-item__titre">{{ s.titre }}</span>
+                  <div class="sd-item__right">
+                    <span class="sd-item__votes">{{ s.votes }}</span>
+                    <span class="sd-status-dot"
+                          [class.sd-status-dot--open]="s.statut === 'OPEN'"
+                          [class.sd-status-dot--closed]="s.statut === 'CLOSED'"></span>
+                  </div>
+                </div>
+                <div class="sd-bar-track">
+                  <div class="sd-bar-fill"
+                       [class.sd-bar-fill--open]="s.statut === 'OPEN'"
+                       [style.width.%]="sondageStats().maxVotes > 0 ? (s.votes / sondageStats().maxVotes * 100) : 0"></div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+
   <!-- ─── Offres récentes avec panneau de détails ─── -->
   <div class="offres-section" [class.has-panel]="showDetail()">
 
@@ -130,123 +249,6 @@
         </div>
       </div>
     }
-  </div>
-
-  <!-- ─── Mid row : Calendrier + État des inscriptions + Sondages ─── -->
-  <div class="mid-row">
-
-    <!-- Calendrier -->
-    <div class="panel">
-      <div class="panel-head">
-        <h3 class="panel-title">Calendrier</h3>
-        <a class="panel-link" routerLink="/bureau/offres">Voir Plus</a>
-      </div>
-      <div class="calendar-body">
-        <app-mini-calendar [offres]="calendarOffres()" />
-      </div>
-    </div>
-
-    <!-- État des inscriptions -->
-    <div class="panel">
-      <div class="panel-head">
-        <h3 class="panel-title">État des inscriptions</h3>
-        <a class="panel-link" routerLink="/bureau/inscriptions">Voir tout →</a>
-      </div>
-      <div class="panel-body">
-        @if (inscDistribution().total === 0) {
-          <div class="panel-empty">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
-            </svg>
-            <p>Aucune inscription pour le moment</p>
-          </div>
-        } @else {
-          <div class="donut-wrap">
-            <div class="donut-ring" [style.background]="inscDonutGradient()">
-              <div class="donut-hole">
-                <span class="donut-total">{{ inscDistribution().total }}</span>
-                <span class="donut-label">Inscriptions</span>
-              </div>
-            </div>
-          </div>
-          <div class="legend-list">
-            @for (item of inscDistribution().items; track item.statut) {
-              <div class="legend-row">
-                <div class="legend-left">
-                  <span class="legend-dot" [style.background]="item.color"></span>
-                  <span class="legend-name">{{ item.label }}</span>
-                </div>
-                <div class="legend-right">
-                  <span class="legend-count">{{ item.count }}</span>
-                  <span class="legend-pct" [style.color]="item.color">
-                    {{ pct(item.count, inscDistribution().total) }}%
-                  </span>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- Sondages & Participation -->
-    <div class="panel">
-      <div class="panel-head">
-        <h3 class="panel-title">Sondages & Participation</h3>
-        <a class="panel-link" routerLink="/bureau/sondages">Voir tout →</a>
-      </div>
-      <div class="panel-body">
-        @if (sondageStats().total === 0) {
-          <div class="panel-empty">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
-            </svg>
-            <p>Aucun sondage pour le moment</p>
-          </div>
-        } @else {
-          <div class="sd-kpi-row">
-            <div class="sd-kpi">
-              <span class="sd-kpi__val">{{ sondageStats().total }}</span>
-              <span class="sd-kpi__label">Total</span>
-            </div>
-            <div class="sd-kpi">
-              <span class="sd-kpi__val sd-kpi__val--open">{{ sondageStats().open }}</span>
-              <span class="sd-kpi__label">En cours</span>
-            </div>
-            <div class="sd-kpi">
-              <span class="sd-kpi__val">{{ sondageStats().closed }}</span>
-              <span class="sd-kpi__label">Clôturés</span>
-            </div>
-            <div class="sd-kpi">
-              <span class="sd-kpi__val sd-kpi__val--votes">{{ sondageStats().totalVotes }}</span>
-              <span class="sd-kpi__label">Votes</span>
-            </div>
-          </div>
-          <div class="sd-sep"></div>
-          <div class="sd-list">
-            @for (s of sondageStats().recent; track s.titre) {
-              <div class="sd-item">
-                <div class="sd-item__top">
-                  <span class="sd-item__titre">{{ s.titre }}</span>
-                  <div class="sd-item__right">
-                    <span class="sd-item__votes">{{ s.votes }}</span>
-                    <span class="sd-status-dot"
-                          [class.sd-status-dot--open]="s.statut === 'OPEN'"
-                          [class.sd-status-dot--closed]="s.statut === 'CLOSED'"></span>
-                  </div>
-                </div>
-                <div class="sd-bar-track">
-                  <div class="sd-bar-fill"
-                       [class.sd-bar-fill--open]="s.statut === 'OPEN'"
-                       [style.width.%]="sondageStats().maxVotes > 0 ? (s.votes / sondageStats().maxVotes * 100) : 0"></div>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </div>
-
   </div>
 
   <!-- ─── Statistiques ─── -->
