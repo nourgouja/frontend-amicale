@@ -39,10 +39,10 @@ export class CreerOffreComponent implements OnInit {
 
   private readonly allTypes = [
     { value: 'VOYAGE',     label: 'Voyage',     color: '#3b82f6' },
-    { value: 'SEJOUR',     label: 'Séjour',     color: '#10b981' },
-    { value: 'ACTIVITE',   label: 'Activité',   color: '#f59e0b' },
-    { value: 'CONVENTION', label: 'Convention', color: '#8b5cf6' },
-    { value: 'EVENEMENT',    label: 'Événement',    color: '#ec4899' },
+    { value: 'SEJOUR',     label: 'Séjour',     color: '#0ea5e9' },
+    { value: 'ACTIVITE',   label: 'Activité',   color: '#16a34a' },
+    { value: 'CONVENTION', label: 'Convention', color: '#f97316' },
+    { value: 'EVENEMENT',  label: 'Événement',  color: '#ec4899' },
   ] as const;
 
   userPoleTypesOffre = signal<string[]>([]);

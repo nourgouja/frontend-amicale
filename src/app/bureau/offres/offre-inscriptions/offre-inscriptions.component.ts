@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -99,6 +99,41 @@ export class OffreInscriptionsComponent implements OnInit {
     );
     return data;
   });
+
+  readonly pageSize = 10;
+  currentPage = signal(1);
+
+  totalPages = computed(() => Math.max(1, Math.ceil(this.filtered().length / this.pageSize)));
+  pageStart  = computed(() => Math.min((this.currentPage() - 1) * this.pageSize + 1, this.filtered().length));
+  pageEnd    = computed(() => Math.min(this.currentPage() * this.pageSize, this.filtered().length));
+
+  paginated = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize;
+    return this.filtered().slice(start, start + this.pageSize);
+  });
+
+  pageNumbers = computed((): (number | '...')[] => {
+    const total   = this.totalPages();
+    const current = this.currentPage();
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const pages: (number | '...')[] = [1];
+    if (current > 3) pages.push('...');
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i);
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+    return pages;
+  });
+
+  constructor() {
+    effect(() => {
+      this.filtered();
+      this.currentPage.set(1);
+    }, { allowSignalWrites: true });
+  }
+
+  goToPage(p: number | '...'): void { if (typeof p === 'number') this.currentPage.set(p); }
+  prevPage(): void { if (this.currentPage() > 1) this.currentPage.update(p => p - 1); }
+  nextPage(): void { if (this.currentPage() < this.totalPages()) this.currentPage.update(p => p + 1); }
 
   counts = computed(() => ({
     total:     this.inscriptions().length,

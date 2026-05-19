@@ -5,8 +5,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { OfferCardComponent, Offre } from '../../shared/components/offer-card/offer-card.component';
 import { getOffreTypeColor } from '../../shared/utils/format.utils';
 
-type CategoryFilter = 'mes-offres' | 'tout' | 'VOYAGE' | 'SEJOUR' | 'ACTIVITE' | 'CONVENTION' | 'fermees';
-type StatusFilter   = 'tous' | 'OPEN' | 'CLOSED' | 'DRAFT';
+type CategoryFilter = 'mes-offres' | 'tout' | 'VOYAGE' | 'SEJOUR' | 'ACTIVITE' | 'CONVENTION';
+type StatusFilter   = 'tous' | 'OPEN' | 'CLOSED' | 'DRAFT' | 'ARCHIVED';
 
 const ALL_CAT_FILTERS: { key: CategoryFilter; label: string }[] = [
   { key: 'tout',       label: 'Toutes' },
@@ -14,7 +14,6 @@ const ALL_CAT_FILTERS: { key: CategoryFilter; label: string }[] = [
   { key: 'SEJOUR',     label: 'Séjours' },
   { key: 'ACTIVITE',   label: 'Activités' },
   { key: 'CONVENTION', label: 'Conventions' },
-  { key: 'fermees',    label: 'Fermées' },
 ];
 
 @Component({
@@ -50,16 +49,17 @@ export class BureauOffresComponent implements OnInit {
       { key: 'ACTIVITE',   label: 'Activités' },
       { key: 'CONVENTION', label: 'Conventions' },
       { key: 'tout',       label: 'Toutes les offres' },
-      { key: 'fermees',    label: 'Fermées' },
     ];
   });
 
   readonly statusFilters: { key: StatusFilter; label: string }[] = [
-    { key: 'tous',      label: 'Tous statuts' },
-    { key: 'OPEN',   label: 'Ouvertes' },
-    { key: 'CLOSED',    label: 'Fermées' },
-    { key: 'DRAFT', label: 'Brouillons' },
+    { key: 'tous',     label: 'Tous statuts' },
+    { key: 'OPEN',     label: 'Ouvertes' },
+    { key: 'CLOSED',   label: 'Fermées' },
+    { key: 'DRAFT',    label: 'Brouillons' },
   ];
+
+  openCount = computed(() => this.offres().filter(o => o.statutOffre === 'OPEN').length);
 
   filteredOffres = computed(() => {
     let data = this.offres();
@@ -68,21 +68,32 @@ export class BureauOffresComponent implements OnInit {
     const st    = this.statusFilter();
     const q     = this.searchTerm().toLowerCase().trim();
 
-    if (cat === 'mes-offres') {
-      if (types.length) {
-        data = data.filter(o => types.includes(o.typeOffre) && o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CLOSED');
-      } else {
-        data = data.filter(o => o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CLOSED');
-      }
-    } else if (cat === 'fermees') {
-      data = data.filter(o => o.statutOffre === 'CLOSED');
-    } else if (cat === 'tout') {
-      data = data.filter(o => o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CLOSED');
-    } else {
-      data = data.filter(o => o.typeOffre === cat && o.statutOffre !== 'ARCHIVED' && o.statutOffre !== 'CLOSED');
+    // Brouillons — show all DRAFT + ARCHIVED regardless of type/category
+    if (st === 'DRAFT') {
+      return data.filter(o =>
+        (o.statutOffre === 'DRAFT' || o.statutOffre === 'ARCHIVED') &&
+        (q ? o.titre.toLowerCase().includes(q) || (o.lieu ?? '').toLowerCase().includes(q) : true)
+      );
     }
 
-    if (st !== 'tous') data = data.filter(o => o.statutOffre === st);
+    // For all other status filters, apply status first then category
+    if (st === 'CLOSED') {
+      data = data.filter(o => o.statutOffre === 'CLOSED');
+    } else {
+      // 'tous' and 'OPEN' both show only OPEN
+      data = data.filter(o => o.statutOffre === 'OPEN');
+    }
+
+    // Category filter (type only)
+    if (cat === 'mes-offres') {
+      data = types.length
+        ? data.filter(o => types.includes(o.typeOffre) && o.typeOffre !== 'CONVENTION')
+        : data.filter(o => o.typeOffre !== 'CONVENTION');
+    } else if (cat !== 'tout') {
+      data = data.filter(o => o.typeOffre === cat);
+    } else {
+      data = data.filter(o => o.typeOffre !== 'CONVENTION');
+    }
     if (q) data = data.filter(o =>
       o.titre.toLowerCase().includes(q) || (o.lieu ?? '').toLowerCase().includes(q)
     );
@@ -94,12 +105,17 @@ export class BureauOffresComponent implements OnInit {
       next: p => {
         const types: string[] = p.poleTypesOffre ?? [];
         this.poleTypesOffre.set(types);
-        // If no pole types, fall back to showing all offers
         if (!types.length) this.activeFilter.set('tout');
       },
       error: () => this.activeFilter.set('tout'),
     });
     this.loadOffres();
+  }
+
+  resetFilters(): void {
+    this.activeFilter.set('tout');
+    this.statusFilter.set('tous');
+    this.searchTerm.set('');
   }
 
   loadOffres(): void {
@@ -126,7 +142,7 @@ export class BureauOffresComponent implements OnInit {
 
   goToCreate(): void               { this.router.navigate(['/bureau/offres/creer']); }
   onModifier(id: number): void     { this.closeDetail(); this.router.navigate(['/bureau/offres', id, 'edit']); }
-  goToParticipants(id: number): void { this.closeDetail(); this.router.navigate(['/bureau/offres', id, 'inscriptions']); }
+  goToParticipants(id: number): void { this.router.navigate(['/bureau/offres', id, 'inscriptions']); }
 
   onPublier(id: number): void {
     this.http.patch(`/api/offres/publier/${id}`, {}).subscribe({
@@ -138,8 +154,7 @@ export class BureauOffresComponent implements OnInit {
   onArchive(id: number): void {
     this.http.patch(`/api/offres/archiver/${id}`, {}).subscribe({
       next: () => {
-        this.showToast('Offre archivée avec succès.', 'success');
-        this.activeFilter.set('tout');
+        this.showToast('Offre archivée. Visible dans Brouillons.', 'success');
         this.loadOffres();
       },
       error: (err) => this.showToast(

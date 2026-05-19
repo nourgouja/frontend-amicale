@@ -23,11 +23,12 @@
           [attr.aria-label]="day.toLocaleDateString('fr-FR')"
         >
           <span class="day-num">{{ day.getDate() }}</span>
-          @for (item of labelsForDay(day).slice(0, 2); track item.label) {
-            <span class="event-pill" [style.background]="item.color">{{ item.label }}</span>
-          }
-          @if (labelsForDay(day).length > 2) {
-            <span class="event-more">+{{ labelsForDay(day).length - 2 }}</span>
+          @if (dotsForDay(day).length > 0) {
+            <div class="event-dots">
+              @for (color of dotsForDay(day).slice(0, 3); track color) {
+                <span class="event-dot" [style.background]="color"></span>
+              }
+            </div>
           }
         </button>
       }

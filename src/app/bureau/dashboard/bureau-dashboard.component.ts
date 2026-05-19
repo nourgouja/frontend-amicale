@@ -9,7 +9,7 @@ import { Offre } from '../../shared/components/offer-card/offer-card.component';
 import { AuthService } from '../../core/services/auth.service';
 import { Sondage } from '../../core/models/sondage.model';
 import { getDisplayName, getOffreTypeColor, getOffreTypeLabel, formatDate } from '../../shared/utils/format.utils';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, Tag, ClipboardList, DollarSign, CalendarDays } from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, Tag, ClipboardClock, TriangleAlert, CalendarDays, PlaneTakeoff, Footprints, Hotel, Handshake, Megaphone } from 'lucide-angular';
 
 interface PendingInscription {
   id: number;
@@ -39,17 +39,17 @@ interface SimpleInscription {
 
 const TYPE_META = [
   { type: 'VOYAGE',     label: 'Voyage',     color: '#3b82f6' },
-  { type: 'SEJOUR',     label: 'Séjour',     color: '#10b981' },
-  { type: 'ACTIVITE',   label: 'Activité',   color: '#f59e0b' },
-  { type: 'CONVENTION', label: 'Convention', color: '#8b5cf6' },
+  { type: 'SEJOUR',     label: 'Séjour',     color: '#0ea5e9' },
+  { type: 'ACTIVITE',   label: 'Activité',   color: '#16a34a' },
+  { type: 'CONVENTION', label: 'Convention', color: '#f97316' },
   { type: 'ANNONCE',    label: 'Annonce',    color: '#ec4899' },
 ];
 
 const INSC_META = [
-  { statut: 'PENDING', label: 'En Attente', color: '#f59e0b' },
-  { statut: 'APPROVED',  label: 'Confirmé',   color: '#10b981' },
-  { statut: 'REFUSEE',    label: 'Rejeté',     color: '#ef4444' },
-  { statut: 'CANCELLED',    label: 'Annulé',     color: '#6366f1' },
+  { statut: 'APPROVED',  label: 'Confirmé', color: '#026654' },
+  { statut: 'PENDING',   label: 'Attente',  color: '#10b981' },
+  { statut: 'CANCELLED', label: 'Annulé',   color: '#ef4444' },
+  { statut: 'REFUSEE',   label: 'Rejeté',   color: '#9ca3af' },
 ];
 
 @Component({
@@ -57,7 +57,7 @@ const INSC_META = [
   standalone: true,
   imports: [RouterLink, CommonModule, KpiCardComponent, StatusBadgeComponent, MiniCalendarComponent, LucideAngularModule],
   providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ Tag, ClipboardList, DollarSign, CalendarDays }) },
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ Tag, ClipboardClock, TriangleAlert, CalendarDays, PlaneTakeoff, Footprints, Hotel, Handshake, Megaphone }) },
   ],
   templateUrl: './bureau-dashboard.component.html',
   styleUrl: './bureau-dashboard.component.scss',
@@ -129,6 +129,48 @@ export class BureauDashboardComponent implements OnInit {
       return `${item.color} ${from.toFixed(1)}% ${pct.toFixed(1)}%`;
     });
     return `conic-gradient(${stops.join(', ')})`;
+  });
+
+  tauxActivation = computed(() => {
+    const { total, items } = this.inscDistribution();
+    if (!total) return 0;
+    const active = items
+      .filter(i => i.statut === 'APPROVED' || i.statut === 'PENDING')
+      .reduce((sum, i) => sum + i.count, 0);
+    return Math.round(active / total * 100);
+  });
+
+  sondageDistribution = computed(() => {
+    const all   = this.sondages();
+    const total = all.length;
+    const items = [
+      { label: 'En cours',  statut: 'OPEN',   color: '#026654', count: all.filter(s => s.statut === 'OPEN').length },
+      { label: 'Clôturés',  statut: 'CLOSED', color: '#9ca3af', count: all.filter(s => s.statut === 'CLOSED').length },
+    ];
+    return { total, items };
+  });
+
+  sondageDonutGradient = computed(() => {
+    const { total, items } = this.sondageDistribution();
+    const active = items.filter(i => i.count > 0);
+    if (!total || !active.length) return '#e5e7eb';
+    let pct = 0;
+    const stops = active.map(item => {
+      const share = (item.count / total) * 100;
+      const from  = pct;
+      pct += share;
+      return `${item.color} ${from.toFixed(1)}% ${pct.toFixed(1)}%`;
+    });
+    return `conic-gradient(${stops.join(', ')})`;
+  });
+
+  tauxParticipation = computed(() => {
+    const all = this.sondages();
+    if (!all.length) return 0;
+    const withVotes = all.filter(s =>
+      (s.options?.reduce((sum, o) => sum + (o.voteCount ?? 0), 0) ?? 0) > 0
+    ).length;
+    return Math.round(withVotes / all.length * 100);
   });
 
   tauxConfirmation = computed(() => {
@@ -255,6 +297,16 @@ export class BureauDashboardComponent implements OnInit {
   inscrits(o: Offre): number { return Math.max(0, (o.capaciteMax ?? 0) - (o.placesRestantes ?? 0)); }
   typeColor(t: string): string { return getOffreTypeColor(t); }
   typeLabel(t: string): string { return getOffreTypeLabel(t); }
+  typeIcon(t: string): string {
+    const map: Record<string, string> = {
+      VOYAGE:     'plane-takeoff',
+      ACTIVITE:   'footprints',
+      SEJOUR:     'hotel',
+      CONVENTION: 'handshake',
+      ANNONCE:    'megaphone',
+    };
+    return map[t] ?? 'tag';
+  }
   formatDate(s: string): string { return formatDate(s); }
   pct(count: number, total: number): number { return total ? Math.round(count / total * 100) : 0; }
 

@@ -13,12 +13,11 @@ export class KpiCardComponent {
   @Input() label = '';
   @Input() value: number | string = 0;
   @Input() icon = 'activity';
-  @Input() trend?: number;
   @Input() color: 'primary' | 'blue' | 'green' | 'orange' | 'purple' | 'red' = 'primary';
   @Input() unit = '';
   @Input() subtitle = '';
+  @Input() badge = '';
+  @Input() badgeVariant: 'green' | 'orange' | 'red' | 'muted' = 'green';
 
-  get trendPositive(): boolean { return (this.trend ?? 0) >= 0; }
-  get trendAbs(): number { return Math.abs(this.trend ?? 0); }
   get isNumeric(): boolean { return typeof this.value === 'number'; }
 }

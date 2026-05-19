@@ -1,14 +1,14 @@
-<div class="kpi-card" [class]="'kpi-card--' + color">
+<div class="kpi-card">
   <div class="kpi-header">
     <div class="kpi-icon" [class]="'kpi-icon--' + color">
-      <lucide-icon [name]="icon" [size]="18"></lucide-icon>
+      <lucide-icon [name]="icon" [size]="20"></lucide-icon>
     </div>
-    @if (trend !== undefined) {
-      <span class="kpi-trend" [class.up]="trendPositive" [class.down]="!trendPositive">
-        {{ trendPositive ? '↑' : '↓' }} {{ trendAbs }}%
-      </span>
+    @if (badge) {
+      <span class="kpi-badge" [class]="'kpi-badge--' + badgeVariant">{{ badge }}</span>
     }
   </div>
+
+  <div class="kpi-label">{{ label }}</div>
 
   <div class="kpi-value">
     @if (isNumeric) {
@@ -18,8 +18,6 @@
     }
     @if (unit) { <span class="kpi-unit">{{ unit }}</span> }
   </div>
-
-  <div class="kpi-label">{{ label }}</div>
 
   @if (subtitle) {
     <div class="kpi-subtitle">{{ subtitle }}</div>

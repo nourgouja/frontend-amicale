@@ -29,8 +29,8 @@
       </button>
     }
 
-    <!-- Admin / bureau three-dot menu -->
-    @if (mode === 'admin' || mode === 'bureau') {
+    <!-- Admin three-dot menu -->
+    @if (mode === 'admin') {
       <div class="card-menu-wrapper">
         <button class="card-menu-btn" (click)="toggleMenu($event)" aria-label="Options">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -111,5 +111,19 @@
       </div>
     }
   </div>
+
+  @if (mode === 'bureau') {
+    <div class="card-footer" (click)="$event.stopPropagation()">
+      @if (offre.statutOffre === 'OPEN') {
+        <button class="cf-btn cf-btn--ghost" (click)="onFermer($event)">Fermer</button>
+      }
+      <button class="cf-btn cf-btn--primary" (click)="onModifier($event)">Modifier</button>
+      @if (offre.statutOffre !== 'CANCELLED') {
+        <button class="cf-btn cf-btn--danger" (click)="onArchive($event)">
+          {{ offre.statutOffre === 'ARCHIVED' ? 'Réarchiver' : 'Archiver' }}
+        </button>
+      }
+    </div>
+  }
 
 </article>

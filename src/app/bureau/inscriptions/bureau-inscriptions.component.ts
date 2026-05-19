@@ -2,9 +2,10 @@ import { Component, OnInit, OnDestroy, signal, inject, computed } from '@angular
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { formatDate, getInitials } from '../../shared/utils/format.utils';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, Search } from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, Search, Download, ClipboardList, Sparkles, Users, CreditCard, ExternalLink, User, RotateCcw } from 'lucide-angular';
 
 interface Guest {
   nom: string;
@@ -46,9 +47,9 @@ interface Inscription {
 @Component({
   selector: 'app-bureau-inscriptions',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, LucideAngularModule],
+  imports: [CommonModule, FormsModule, RouterLink, StatusBadgeComponent, LucideAngularModule],
   providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ Search }) },
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ Search, Download, ClipboardList, Sparkles, Users, CreditCard, ExternalLink, User, RotateCcw }) },
   ],
   templateUrl: './bureau-inscriptions.component.html',
   styleUrl: './bureau-inscriptions.component.scss',
@@ -59,8 +60,43 @@ export class BureauInscriptionsComponent implements OnInit, OnDestroy {
   inscriptions   = signal<Inscription[]>([]);
   loading        = signal(true);
   searchQuery    = signal('');
+  offreQuery     = signal('');
   statutFilter   = signal('all');
   typeFilter     = signal('all');
+
+  filteredInscriptions = computed(() => {
+    const q = this.offreQuery().toLowerCase().trim();
+    if (!q) return this.inscriptions();
+    return this.inscriptions().filter(i => i.offreTitre.toLowerCase().includes(q));
+  });
+
+  readonly pageSize = 10;
+  currentPage = signal(1);
+
+  totalPages = computed(() => Math.max(1, Math.ceil(this.filteredInscriptions().length / this.pageSize)));
+  pageEnd    = computed(() => Math.min(this.currentPage() * this.pageSize, this.filteredInscriptions().length));
+  pageStart  = computed(() => Math.min((this.currentPage() - 1) * this.pageSize + 1, this.filteredInscriptions().length));
+
+  paginated = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize;
+    return this.filteredInscriptions().slice(start, start + this.pageSize);
+  });
+
+  pageNumbers = computed((): (number | '...')[] => {
+    const total   = this.totalPages();
+    const current = this.currentPage();
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const pages: (number | '...')[] = [1];
+    if (current > 3) pages.push('...');
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i);
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+    return pages;
+  });
+
+  goToPage(p: number | '...'): void { if (typeof p === 'number') this.currentPage.set(p); }
+  prevPage(): void { if (this.currentPage() > 1) this.currentPage.update(p => p - 1); }
+  nextPage(): void { if (this.currentPage() < this.totalPages()) this.currentPage.update(p => p + 1); }
 
   // Detail panel
   selectedIns    = signal<Inscription | null>(null);
@@ -91,9 +127,21 @@ export class BureauInscriptionsComponent implements OnInit, OnDestroy {
     { key: 'CONVENTION', label: 'Convention' },
   ];
 
+  private readonly LAST_LOGIN_KEY = 'bureau_insc_last_login';
+  private lastLoginTs = 0;
+
   pendingCount = computed(() => this.inscriptions().filter(i => i.statut === 'PENDING').length);
 
-  ngOnInit(): void { this.load(); }
+  newSinceLastLogin = computed(() =>
+    this.inscriptions().filter(i => new Date(i.dateInscription).getTime() > this.lastLoginTs).length
+  );
+
+  ngOnInit(): void {
+    const stored = localStorage.getItem(this.LAST_LOGIN_KEY);
+    this.lastLoginTs = stored ? parseInt(stored, 10) : Date.now() - 86_400_000;
+    localStorage.setItem(this.LAST_LOGIN_KEY, Date.now().toString());
+    this.load();
+  }
 
   ngOnDestroy(): void {
     if (this.searchDebounce) clearTimeout(this.searchDebounce);
@@ -110,13 +158,19 @@ export class BureauInscriptionsComponent implements OnInit, OnDestroy {
     if (t !== 'all') params = params.set('type', t);
     if (q)           params = params.set('search', q);
     this.http.get<Inscription[]>('/api/inscriptions/bureau', { params }).subscribe({
-      next:  list => { this.inscriptions.set(list); this.loading.set(false); },
+      next:  list => { this.inscriptions.set(list); this.currentPage.set(1); this.loading.set(false); },
       error: ()   => this.loading.set(false),
     });
   }
 
   onStatutChange(v: string): void { this.statutFilter.set(v); this.load(); }
   onTypeChange(v: string): void   { this.typeFilter.set(v);   this.load(); }
+  setStatut(key: string): void    { this.statutFilter.set(key); this.load(); }
+  resetFilters(): void {
+    this.searchQuery.set(''); this.offreQuery.set('');
+    this.statutFilter.set('all'); this.typeFilter.set('all');
+    this.load();
+  }
 
   onSearchInput(value: string): void {
     this.searchQuery.set(value);
@@ -198,6 +252,30 @@ export class BureauInscriptionsComponent implements OnInit, OnDestroy {
 
   sexeLabel(s?: string | null): string {
     return s === 'M' ? 'Homme' : s === 'F' ? 'Femme' : s === 'AUTRE' ? 'Autre' : '—';
+  }
+
+  exportData(): void {
+    const rows: string[][] = [
+      ['Adhérent', 'Email', 'Offre', 'Type', 'Date inscription', 'Statut', 'Période paiement', 'Montant (DT)'],
+    ];
+    for (const ins of this.inscriptions()) {
+      rows.push([
+        `${ins.adherentPrenom} ${ins.adherentNom}`,
+        ins.adherentEmail ?? ins.mailAdherent ?? '',
+        ins.offreTitre,
+        ins.typeOffre,
+        this.formatDate(ins.dateInscription),
+        ins.statut,
+        ins.periodePaiement ?? '',
+        ins.montant?.toString() ?? '',
+      ]);
+    }
+    const csv  = '﻿' + rows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(';')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = `inscriptions_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
   }
 
   formatDate(s: string): string { return s ? formatDate(s) : '—'; }

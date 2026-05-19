@@ -3,30 +3,101 @@
   <div class="page-head">
     <div>
       <h1 class="page-title">Inscriptions</h1>
-      <p class="page-sub">
-        @if (pendingCount() > 0) {
-          <span class="pending-badge">{{ pendingCount() }}</span>
-        }
-        Gérez les demandes d'inscription aux offres de votre pôle
-      </p>
+      <p class="page-sub">Gérez les demandes d'inscription aux offres de votre pôle</p>
     </div>
+    <button class="btn-export" (click)="exportData()">
+      <lucide-icon name="download" [size]="15"></lucide-icon>
+      Exporter Données
+    </button>
   </div>
 
-  <!-- Filters -->
-  <div class="filters-bar">
-    <div class="search-wrap">
-      <lucide-icon name="search" [size]="15" class="search-icon"></lucide-icon>
-      <input type="search" class="search-input" placeholder="Rechercher par nom d'adhérent…"
-             [value]="searchQuery()"
-             (input)="onSearchInput($any($event.target).value)" />
+  <!-- Filter panel + KPI cards in one aligned row -->
+  <div class="top-row">
+
+    <!-- Horizontal filter panel -->
+    <div class="filter-panel">
+
+    <div class="fp-group">
+      <label class="fp-label">Membre</label>
+      <div class="fp-input-wrap">
+        <lucide-icon name="user" [size]="13" class="fp-input-icon"></lucide-icon>
+        <input class="fp-input" type="text" placeholder="Nom ou Email…"
+               [value]="searchQuery()" (input)="onSearchInput($any($event.target).value)" />
+      </div>
     </div>
-    <select class="filter-select" [ngModel]="statutFilter()" (ngModelChange)="onStatutChange($event)">
-      @for (s of statuts; track s.key) { <option [value]="s.key">{{ s.label }}</option> }
-    </select>
-    <select class="filter-select" [ngModel]="typeFilter()" (ngModelChange)="onTypeChange($event)">
-      @for (t of types; track t.key) { <option [value]="t.key">{{ t.label }}</option> }
-    </select>
-  </div>
+
+    <div class="fp-group">
+      <label class="fp-label">Offre / Service</label>
+      <div class="fp-input-wrap">
+        <lucide-icon name="search" [size]="13" class="fp-input-icon"></lucide-icon>
+        <input class="fp-input" type="text" placeholder="Rechercher une offre…"
+               [ngModel]="offreQuery()" (ngModelChange)="offreQuery.set($event)" />
+      </div>
+    </div>
+
+    <div class="fp-group">
+      <label class="fp-label">Type</label>
+      <select class="fp-select" [ngModel]="typeFilter()" (ngModelChange)="onTypeChange($event)">
+        @for (t of types; track t.key) { <option [value]="t.key">{{ t.label }}</option> }
+      </select>
+    </div>
+
+    <div class="fp-group">
+      <label class="fp-label">Statut</label>
+      <div class="fp-chips">
+        @for (s of statuts; track s.key) {
+          <button class="fp-chip" [class.fp-chip--active]="statutFilter() === s.key"
+                  (click)="setStatut(s.key)">{{ s.label }}</button>
+        }
+      </div>
+    </div>
+
+    <div class="fp-group fp-group--action">
+      <button class="fp-reset" (click)="resetFilters()">
+        <lucide-icon name="rotate-ccw" [size]="13"></lucide-icon>
+        Réinitialiser
+      </button>
+    </div>
+
+    </div><!-- /filter-panel -->
+
+    <!-- KPI card 1 -->
+    <div class="insc-kpi-card">
+      <div class="insc-kpi-icon insc-kpi-icon--orange">
+        <lucide-icon name="clipboard-list" [size]="20"></lucide-icon>
+      </div>
+      <div class="insc-kpi-body">
+        <span class="insc-kpi-label">En attente d'approbation</span>
+        <div class="insc-kpi-value-row">
+          <span class="insc-kpi-value" [class.insc-kpi-value--orange]="pendingCount() > 0">{{ pendingCount() }}</span>
+          @if (pendingCount() > 0) {
+            <span class="insc-kpi-badge insc-kpi-badge--orange">Action requise</span>
+          } @else {
+            <span class="insc-kpi-badge insc-kpi-badge--muted">À jour</span>
+          }
+        </div>
+        <span class="insc-kpi-sub">inscription(s) à traiter</span>
+      </div>
+    </div>
+
+    <!-- KPI card 2 -->
+    <div class="insc-kpi-card">
+      <div class="insc-kpi-icon insc-kpi-icon--primary">
+        <lucide-icon name="sparkles" [size]="20"></lucide-icon>
+      </div>
+      <div class="insc-kpi-body">
+        <span class="insc-kpi-label">Nouvelles inscriptions</span>
+        <div class="insc-kpi-value-row">
+          <span class="insc-kpi-value">{{ newSinceLastLogin() }}</span>
+          @if (newSinceLastLogin() > 0) {
+            <span class="insc-kpi-badge insc-kpi-badge--green">Nouveau</span>
+          }
+        </div>
+        <span class="insc-kpi-sub">depuis votre dernière connexion</span>
+      </div>
+    </div>
+
+  </div><!-- /top-row -->
 
   <!-- Table -->
   @if (loading()) {
@@ -51,7 +122,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (ins of inscriptions(); track ins.id) {
+          @for (ins of paginated(); track ins.id) {
             <tr class="data-row" (click)="openDetail(ins)">
               <td>
                 <div class="member-cell">
@@ -88,6 +159,25 @@
           }
         </tbody>
       </table>
+
+      <!-- Pagination footer -->
+      <div class="pagination-footer">
+        <span class="pagination-info">
+          Affichage {{ pageStart() }}–{{ pageEnd() }} sur {{ filteredInscriptions().length }} inscription(s)
+        </span>
+        <div class="pagination-controls">
+          <button class="page-btn" (click)="prevPage()" [disabled]="currentPage() === 1">&#8249;</button>
+          @for (p of pageNumbers(); track $index) {
+            @if (p === '...') {
+              <span class="page-ellipsis">…</span>
+            } @else {
+              <button class="page-btn" [class.page-btn--active]="p === currentPage()" (click)="goToPage(p)">{{ p }}</button>
+            }
+          }
+          <button class="page-btn" (click)="nextPage()" [disabled]="currentPage() === totalPages()">&#8250;</button>
+        </div>
+      </div>
+
     </div>
   }
 
@@ -125,32 +215,41 @@
 
         <div class="panel-body">
 
-          <!-- Status row -->
-          <div class="detail-status-row">
-            <div class="detail-kv">
-              <span class="kv-label">Statut inscription</span>
-              <app-status-badge [statut]="ins.statut" type="inscription" />
-            </div>
-            <div class="detail-kv">
-              <span class="kv-label">Date d'inscription</span>
-              <span class="kv-val">{{ formatDate(ins.dateInscription) }}</span>
-            </div>
-            @if (ins.montant != null) {
-              <div class="detail-kv">
-                <span class="kv-label">Montant total</span>
-                <span class="kv-val kv-val--price">{{ ins.montant | number:'1.0-2' }} TND</span>
-              </div>
-            }
-          </div>
-
-          <!-- Participants -->
+          <!-- 1. À quoi il s'est inscrit + date + statut -->
           <div class="panel-section">
             <h3 class="section-title">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-              Participants : {{ ins.totalPeople ?? (1 + (ins.nombreAccompagnants ?? 0)) }} personne(s)
+              <lucide-icon name="credit-card" [size]="14"></lucide-icon>
+              Inscription
+            </h3>
+            <div class="insc-detail-card">
+              <div class="idc-offre-row">
+                <span class="idc-offre-title">{{ ins.offreTitre }}</span>
+                <span class="idc-type-badge">{{ ins.typeOffre | lowercase }}</span>
+              </div>
+              <div class="idc-meta">
+                <div class="idc-meta-item">
+                  <span class="idc-meta-label">Date d'inscription</span>
+                  <span class="idc-meta-value">{{ formatDate(ins.dateInscription) }}</span>
+                </div>
+                <div class="idc-meta-item">
+                  <span class="idc-meta-label">Statut</span>
+                  <app-status-badge [statut]="ins.statut" type="inscription" />
+                </div>
+                @if (ins.montant != null) {
+                  <div class="idc-meta-item">
+                    <span class="idc-meta-label">Montant total</span>
+                    <span class="idc-meta-value idc-meta-value--price">{{ ins.montant | number:'1.0-2' }} TND</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Guests / Participants -->
+          <div class="panel-section">
+            <h3 class="section-title">
+              <lucide-icon name="users" [size]="14"></lucide-icon>
+              Participants — {{ ins.totalPeople ?? (1 + (ins.nombreAccompagnants ?? 0)) }} personne(s)
             </h3>
             @if (ins.guests && ins.guests.length > 0) {
               <table class="guests-table">
@@ -171,57 +270,64 @@
             }
           </div>
 
-          <!-- Payment schedule -->
+          <!-- 3. Paiements — montant + statut uniquement -->
           @if (ins.echeances && ins.echeances.length > 0) {
             <div class="panel-section">
               <h3 class="section-title">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
                 </svg>
-                Échéancier de paiement
+                Paiements
               </h3>
-              <table class="echeances-table">
-                <thead>
-                  <tr><th>Date d'échéance</th><th>Montant</th><th>Statut</th><th></th></tr>
-                </thead>
-                <tbody>
-                  @for (e of ins.echeances; track e.id) {
-                    <tr>
-                      <td>{{ formatDate(e.dateEcheance) }}</td>
-                      <td class="echeance-montant">{{ e.montant | number:'1.0-2' }} TND</td>
-                      <td>
-                        <span class="pay-badge"
-                              [class.pay--ok]="e.statut === 'PAID'"
-                              [class.pay--late]="e.statut === 'OVERDUE'"
-                              [class.pay--attente]="e.statut === 'PENDING'">
-                          @switch (e.statut) {
-                            @case ('PAID')      { Payée }
-                            @case ('OVERDUE')  { En retard }
-                            @case ('PENDING') { En attente }
-                          }
-                        </span>
-                      </td>
-                      <td>
-                        @if (e.statut !== 'PAID' && ins.statut !== 'CANCELLED' && ins.statut !== 'REJECTED' && ins.statut !== 'PENDING') {
-                          <button class="btn-pay-row" [disabled]="payLoading() === e.id"
-                                  (click)="payer(e.id, ins.id)">
-                            @if (payLoading() === e.id) { … } @else { Marquer payée }
-                          </button>
-                        }
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
+              <div class="pay-list">
+                @for (e of ins.echeances; track e.id) {
+                  <div class="pay-item">
+                    <span class="pay-tranche">Tranche {{ e.numero }}/{{ ins.echeances!.length }}</span>
+                    <span class="pay-amount">{{ e.montant | number:'1.0-2' }} TND</span>
+                    <span class="pay-badge"
+                          [class.pay--ok]="e.statut === 'PAID'"
+                          [class.pay--late]="e.statut === 'OVERDUE'"
+                          [class.pay--attente]="e.statut === 'PENDING'">
+                      @switch (e.statut) {
+                        @case ('PAID')    { Payée }
+                        @case ('OVERDUE') { En retard }
+                        @case ('PENDING') { En attente }
+                      }
+                    </span>
+                    @if (e.statut !== 'PAID' && ins.statut !== 'CANCELLED' && ins.statut !== 'REJECTED' && ins.statut !== 'PENDING') {
+                      <button class="btn-pay-row" [disabled]="payLoading() === e.id" (click)="payer(e.id, ins.id)">
+                        @if (payLoading() === e.id) { … } @else { Marquer payée }
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
             </div>
           }
 
-          <!-- Notes -->
+          <!-- 4. Offer activity link card -->
+          <div class="panel-section">
+            <h3 class="section-title">
+              <lucide-icon name="external-link" [size]="14"></lucide-icon>
+              Activité concernée
+            </h3>
+            <a class="offre-link-card" [routerLink]="['/bureau/offres', ins.offreId, 'inscriptions']" (click)="closeDetail()">
+              <div class="olc-body">
+                <span class="olc-title">{{ ins.offreTitre }}</span>
+                <span class="olc-hint">Voir la liste des inscrits pour cette offre</span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </a>
+          </div>
+
+          <!-- 5. Notes -->
           <div class="panel-section">
             <h3 class="section-title">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="14 2 14 8 20 8"/>
               </svg>
               Notes
             </h3>
@@ -237,13 +343,11 @@
         <!-- Footer actions -->
         <div class="panel-footer">
           @if (ins.statut === 'PENDING') {
-            <button class="btn-confirm-main" [disabled]="actionLoading() === ins.id"
-                    (click)="confirmer(ins.id)">
+            <button class="btn-confirm-main" [disabled]="actionLoading() === ins.id" (click)="confirmer(ins.id)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               @if (actionLoading() === ins.id) { Traitement… } @else { Confirmer l'inscription }
             </button>
-            <button class="btn-reject-main" [disabled]="actionLoading() === ins.id"
-                    (click)="refuser(ins.id)">
+            <button class="btn-reject-main" [disabled]="actionLoading() === ins.id" (click)="refuser(ins.id)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               @if (actionLoading() === ins.id) { Traitement… } @else { Rejeter }
             </button>

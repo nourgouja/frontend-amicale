@@ -45,45 +45,107 @@
   @include reduced-motion { transition: none; }
 }
 
-.header-title-wrap { display: flex; flex-direction: column; gap: 8px; }
+.header-title-wrap { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
 
 .page-title {
   font-size: $font-size-xl; font-weight: 700; color: $color-text;
   .offer-name { color: $color-primary; }
 }
 
-.header-stats { display: flex; align-items: center; gap: $space-2; flex-wrap: wrap; }
-
-.stat-chip {
-  display: inline-flex; align-items: center;
-  padding: 3px 10px; border-radius: $radius-full;
-  font-size: $font-size-xs; font-weight: 600;
-
-  &--total  { background: rgba(2,102,84,0.10);  color: $color-primary; }
-  &--attente { background: rgba(245,158,11,0.12); color: #92400e; }
-  &--ok     { background: rgba(16,185,129,0.12); color: #047857; }
+/* ── Pending KPI card ── */
+.attente-kpi {
+  @include card;
+  display: flex; align-items: center; gap: $space-3;
+  padding: $space-3 $space-4; flex-shrink: 0; min-width: 190px;
 }
 
-/* ── Filters ── */
-.filter-bar   { @include filter-bar; }
-.filter-right { display: flex; align-items: center; gap: $space-3; flex-wrap: wrap; }
-.export-btns  { display: flex; align-items: center; gap: $space-2; }
+.attente-kpi-icon {
+  width: 40px; height: 40px; border-radius: $radius-md; flex-shrink: 0;
+  background: rgba(245,158,11,0.12); color: #d97706;
+  display: flex; align-items: center; justify-content: center;
+  &--green { background: rgba(2,102,84,0.10); color: $color-primary; }
+}
+
+.attente-kpi-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.attente-kpi-title {
+  font-size: $font-size-xs; font-weight: 600; color: $color-text-muted; line-height: 1.3;
+}
+
+.attente-kpi-count-row { display: flex; align-items: baseline; gap: $space-2; }
+
+.attente-kpi-count {
+  font-size: $font-size-2xl; font-weight: 800; color: $color-text; line-height: 1;
+}
+
+.attente-kpi-ok {
+  font-size: $font-size-xs; font-weight: 600; color: $color-success;
+}
+
+.attente-kpi-sub {
+  font-size: $font-size-xs; color: $color-primary; font-weight: 500;
+}
+
+/* ── Filter panel ── */
+.filter-panel {
+  @include card;
+  display: flex; align-items: flex-end; gap: $space-5;
+  padding: $space-3 $space-5; flex-wrap: nowrap;
+}
+
+.fp-group {
+  display: flex; flex-direction: column; gap: 6px;
+  &--search { flex: 1; min-width: 160px; }
+  &--action { flex-shrink: 0; }
+}
+
+.fp-label {
+  font-size: $font-size-xs; font-weight: 700; color: $color-text-muted;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+
+.fp-chips { display: flex; gap: $space-2; flex-wrap: nowrap; }
+
+.fp-chip {
+  padding: 5px 12px; border-radius: $radius-full;
+  border: 1px solid $color-border; background: $color-bg;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 600;
+  color: $color-text-muted; cursor: pointer; white-space: nowrap;
+  transition: background $transition-fast, color $transition-fast, border-color $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; }
+  &--active { background: $color-primary; color: #fff; border-color: $color-primary; }
+  @include reduced-motion { transition: none; }
+}
+
+.fp-input-wrap {
+  display: flex; align-items: center; gap: $space-2;
+  height: 36px; padding: 0 $space-3;
+  border: 1px solid $color-border; border-radius: $radius-md; background: $color-bg;
+  &:focus-within { border-color: $color-primary; }
+  svg { color: $color-text-muted; flex-shrink: 0; }
+}
+
+.fp-input {
+  flex: 1; border: none; background: none; outline: none;
+  font-family: $font-base; font-size: $font-size-xs; color: $color-text;
+  &::placeholder { color: $color-text-muted; }
+}
+
+.fp-export-btns { display: flex; gap: $space-2; }
 
 .btn-export {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 14px; border-radius: $radius-md;
-  font-family: $font-base; font-size: $font-size-sm; font-weight: 600;
+  height: 36px; padding: 0 $space-4; border-radius: $radius-md;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 600;
   cursor: pointer; border: 1px solid $color-border; background: $color-surface;
   color: $color-text-muted; white-space: nowrap;
   transition: all $transition-fast;
   &:focus-visible { @include focus-ring; }
   @include reduced-motion { transition: none; }
 
-  &--csv {
-    &:hover { background: rgba(5,150,105,0.07); border-color: rgba(5,150,105,0.35); color: #047857; }
-  }
-  &--pdf {
-    &:hover { background: rgba(59,130,246,0.07); border-color: rgba(59,130,246,0.35); color: #2563eb; }
+  &--csv, &--pdf {
+    background: $color-primary; color: #fff; border-color: $color-primary;
+    &:hover { background: $color-primary-dark; border-color: $color-primary-dark; }
   }
 }
 
@@ -122,7 +184,8 @@
     padding: 14px $space-5; border-bottom: 1px solid $color-border; vertical-align: middle;
   }
   tr:last-child td { border-bottom: none; }
-  tbody tr:hover td { background: rgba(2,102,84,0.025); }
+  tbody tr.tr-clickable { cursor: pointer; }
+  tbody tr.tr-clickable:hover td { background: rgba(2,102,84,0.04); }
 }
 
 .member-cell { display: flex; align-items: center; gap: $space-3; }
@@ -256,6 +319,32 @@
 
 .cap-hint { font-size: $font-size-xs; color: $color-text-muted; text-align: right; margin-top: 2px; }
 
+/* ── Pagination ── */
+.pagination-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: $space-3 $space-5; border-top: 1px solid $color-border;
+  flex-wrap: wrap; gap: $space-3;
+}
+
+.pagination-info { font-size: $font-size-xs; color: $color-text-muted; }
+
+.pagination-controls { display: flex; align-items: center; gap: $space-1; }
+
+.page-btn {
+  min-width: 30px; height: 30px; padding: 0 $space-2;
+  border: 1px solid $color-border; border-radius: $radius-sm;
+  background: $color-surface; font-family: $font-base;
+  font-size: $font-size-xs; font-weight: 500; color: $color-text-muted;
+  cursor: pointer; @include flex-center;
+  transition: background $transition-fast, color $transition-fast, border-color $transition-fast;
+  &:hover:not(:disabled) { background: $color-primary-light; color: $color-primary; border-color: $color-primary; }
+  &--active { background: $color-primary; color: #fff; border-color: $color-primary; font-weight: 700; }
+  &:disabled { opacity: 0.35; cursor: not-allowed; }
+  @include reduced-motion { transition: none; }
+}
+
+.page-ellipsis { min-width: 24px; text-align: center; font-size: $font-size-xs; color: $color-text-muted; }
+
 // ── Three-dot button ──────────────────────────────────────────────────────────
 .btn-dots {
   width: 30px; height: 30px; border-radius: $radius-md; border: 1px solid $color-border;
@@ -309,14 +398,58 @@
     display: flex; flex-direction: column; gap: 0;
   }
 
-  .detail-status-row {
-    display: flex; gap: $space-5; padding: $space-4 $space-6; flex-wrap: wrap;
-    border-bottom: 1px solid $color-border;
+  /* ── Inscription detail card ── */
+  .insc-detail-card {
+    margin: $space-5 $space-6; padding: $space-4;
+    border: 1px solid $color-border; border-radius: $radius-md;
+    background: rgba(2,102,84,0.03);
+    display: flex; flex-direction: column; gap: $space-3;
   }
-  .detail-kv    { display: flex; flex-direction: column; gap: 4px; }
-  .kv-label     { font-size: $font-size-xs; font-weight: 700; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.5px; }
-  .kv-val       { font-size: $font-size-sm; font-weight: 500; color: $color-text; }
-  .kv-val--price { font-size: $font-size-md; font-weight: 700; color: $color-primary; }
+
+  .idc-offre-row {
+    display: flex; align-items: center; gap: $space-3; flex-wrap: wrap;
+  }
+
+  .idc-offre-title {
+    font-size: $font-size-md; font-weight: 700; color: $color-text; flex: 1; min-width: 0;
+  }
+
+  .idc-type-badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px; border-radius: $radius-full; flex-shrink: 0;
+    font-size: $font-size-xs; font-weight: 700; letter-spacing: 0.5px;
+    background: $color-primary-light; color: $color-primary; text-transform: capitalize;
+  }
+
+  .idc-meta {
+    display: flex; gap: $space-4; flex-wrap: wrap;
+    padding-top: $space-3; border-top: 1px solid $color-border;
+  }
+
+  .idc-meta-item { display: flex; flex-direction: column; gap: 3px; }
+
+  .idc-meta-label {
+    font-size: $font-size-xs; font-weight: 700; color: $color-text-muted;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+
+  .idc-meta-val {
+    font-size: $font-size-sm; font-weight: 500; color: $color-text;
+    &--price { font-size: $font-size-md; font-weight: 700; color: $color-primary; }
+  }
+
+  /* ── Payments flat list ── */
+  .pay-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .pay-item {
+    display: flex; align-items: center; gap: $space-3;
+    padding: $space-2 $space-3; border-radius: $radius-md;
+    border: 1px solid $color-border; background: $color-bg;
+    font-size: $font-size-xs;
+  }
+
+  .pay-tranche { font-weight: 600; color: $color-text-muted; min-width: 80px; }
+  .pay-amount  { font-weight: 700; color: $color-text; flex: 1; }
 
   .panel-section {
     padding: $space-5 $space-6; border-bottom: 1px solid $color-border;
@@ -404,4 +537,42 @@
 @keyframes slide-right {
   from { transform: translateX(40px); opacity: 0; }
   to   { transform: translateX(0); opacity: 1; }
+}
+
+/* ── Responsive ── */
+@include mobile {
+  .page-layout {
+    grid-template-columns: 1fr;
+    padding: $space-3;
+    gap: $space-3;
+  }
+
+  .page-header {
+    flex-wrap: wrap;
+    gap: $space-3;
+  }
+  .header-title-wrap { order: 3; width: 100%; }
+  .attente-kpi { flex: 1; min-width: 140px; }
+
+  .filter-panel {
+    flex-direction: column; gap: $space-3;
+  }
+  .fp-group--search { min-width: unset; }
+  .fp-export-btns { width: 100%; }
+  .btn-export { flex: 1; justify-content: center; }
+
+  .table-card { overflow-x: auto; }
+  .participants-table {
+    min-width: 520px;
+    th:nth-child(2), td:nth-child(2) { display: none; }
+  }
+
+  .panel-side { width: 100vw !important; max-width: 100vw; }
+  .detail-panel { display: none; }
+}
+
+@include tablet {
+  .page-layout { grid-template-columns: 1fr; padding: $space-4; }
+  .page-header { flex-wrap: wrap; }
+  .detail-panel { display: none; }
 }

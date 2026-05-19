@@ -5,7 +5,10 @@
       "Bash(xargs grep -l \"EN_ATTENTE\\\\|CONFIRMEE\\\\|REJETEE\\\\|ANNULEE\\\\|OUVERTE\\\\|FERMEE\\\\|BROUILLON\\\\|ARCHIVEE\\\\|PAYEE\\\\|EN_RETARD\\\\|'ACTIVE'\")",
       "Bash(Get-Content \"c:\\\\Users\\\\nourg\\\\amicale-star\\\\src\\\\app\\\\adherent\\\\dashboard\\\\adherent-dashboard.component.scss\")",
       "Bash(Measure-Object -Line)",
-      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\nourg\\\\amicale-star\\\\src\\\\app\\\\adherent\\\\dashboard\\\\adherent-dashboard.component.scss\"\\).Count)"
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\nourg\\\\amicale-star\\\\src\\\\app\\\\adherent\\\\dashboard\\\\adherent-dashboard.component.scss\"\\).Count)",
+      "Bash(dir /s \"c:\\\\Users\\\\nourg\\\\amicale-star\\\\src\\\\app\\\\bureau\")",
+      "Bash(powershell -Command \"Get-ChildItem 'c:/Users/nourg/amicale-star/node_modules/lucide-angular' -Name | Select-Object -First 5\")",
+      "Bash(powershell -Command \"Get-ChildItem 'c:/Users/nourg/amicale-star/node_modules/lucide-angular' -Recurse -Filter '*.d.ts' | Select-Object FullName\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\election\\candidate",

@@ -2,7 +2,59 @@
 
 .bureau-inscriptions { display: flex; flex-direction: column; gap: $space-6; }
 
-.page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: $space-4; }
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: $space-4; }
+
+// ── Top row: filter panel + 2 KPI cards ──────────────────────────────────────
+.top-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: $space-4;
+  align-items: stretch;
+}
+
+.btn-export {
+  display: inline-flex; align-items: center; gap: $space-2;
+  padding: $space-3 $space-4; border-radius: $radius-md; border: none;
+  background: $color-primary; color: #fff;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600;
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: background $transition-fast;
+  &:hover { background: $color-primary-dark; }
+  &:focus-visible { @include focus-ring; }
+  @include reduced-motion { transition: none; }
+}
+
+// ── Inscription KPI cards ─────────────────────────────────────────────────────
+.insc-kpi-card {
+  @include card;
+  display: flex; align-items: center; gap: $space-3;
+  padding: $space-4 $space-5; width: 240px;
+}
+
+.insc-kpi-icon {
+  width: 44px; height: 44px; border-radius: $radius-md; @include flex-center; flex-shrink: 0;
+  &--orange  { background: rgba(245,158,11,0.12); color: #d97706; }
+  &--primary { background: rgba(2,102,84,0.10);   color: $color-primary; }
+}
+
+.insc-kpi-body  { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.insc-kpi-label { font-size: $font-size-sm; font-weight: 500; color: $color-text-muted; }
+
+.insc-kpi-value-row { display: flex; align-items: baseline; gap: $space-2; }
+
+.insc-kpi-value {
+  font-size: $font-size-2xl; font-weight: 700; color: $color-text; line-height: 1.1;
+  &--orange { color: #d97706; }
+}
+
+.insc-kpi-badge {
+  font-size: $font-size-xs; font-weight: 600;
+  &--orange { color: #d97706; }
+  &--green  { color: $color-success; }
+  &--muted  { color: $color-text-muted; }
+}
+
+.insc-kpi-sub { font-size: $font-size-xs; color: $color-text-muted; }
 .page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; }
 .page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin-top: 4px; display: flex; align-items: center; gap: $space-2; }
 
@@ -13,15 +65,67 @@
   font-size: $font-size-xs; font-weight: 700;
 }
 
-.filters-bar  { display: flex; align-items: center; gap: $space-3; flex-wrap: wrap; }
-.search-wrap  { @include filter-search-wrap; flex: 1; max-width: 320px; .search-icon { color: $color-text-muted; flex-shrink: 0; } }
-.search-input { @include filter-search-input; }
+// ── Horizontal filter panel ──────────────────────────────────────────────────
+.filter-panel {
+  @include card;
+  display: flex; align-items: center; gap: $space-4; padding: $space-3 $space-5;
+  flex-wrap: nowrap;
+}
 
-.filter-select {
-  height: 38px; padding: 0 $space-3; border: 1px solid $color-border; border-radius: $radius-md;
-  background: $color-surface; font-family: $font-base; font-size: $font-size-sm; color: $color-text;
-  cursor: pointer; outline: none;
+.fp-group {
+  display: flex; flex-direction: column; gap: 4px; min-width: 0;
+  &--action { margin-left: auto; justify-content: center; }
+}
+
+.fp-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.4px; color: $color-text-muted; white-space: nowrap;
+}
+
+.fp-input-wrap {
+  display: flex; align-items: center; gap: $space-2;
+  border: 1px solid $color-border; border-radius: $radius-md;
+  padding: 0 $space-3; height: 36px; background: $color-bg; min-width: 160px;
+  &:focus-within { border-color: $color-primary; }
+  .fp-input-icon { color: $color-text-muted; flex-shrink: 0; }
+}
+
+.fp-input {
+  flex: 1; border: none; background: none; outline: none;
+  font-family: $font-base; font-size: $font-size-xs; color: $color-text;
+  &::placeholder { color: $color-text-muted; }
+}
+
+.fp-select {
+  height: 36px; padding: 0 $space-3; min-width: 140px;
+  border: 1px solid $color-border; border-radius: $radius-md;
+  background: $color-bg; font-family: $font-base;
+  font-size: $font-size-xs; color: $color-text; cursor: pointer; outline: none;
   &:focus { border-color: $color-primary; }
+}
+
+.fp-chips { display: flex; align-items: center; gap: $space-1; flex-wrap: wrap; }
+
+.fp-chip {
+  padding: 5px 12px; border-radius: 9999px;
+  border: 1px solid $color-border; background: $color-bg;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 500;
+  color: $color-text-muted; cursor: pointer; white-space: nowrap;
+  transition: background $transition-fast, color $transition-fast, border-color $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; }
+  &--active { background: $color-primary; color: #fff; border-color: $color-primary; }
+  @include reduced-motion { transition: none; }
+}
+
+.fp-reset {
+  display: inline-flex; align-items: center; gap: $space-2;
+  height: 36px; padding: 0 $space-4; border-radius: $radius-md;
+  border: 1px solid $color-border; background: $color-bg;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 600;
+  color: $color-text-muted; cursor: pointer; white-space: nowrap;
+  transition: background $transition-fast, color $transition-fast;
+  &:hover { background: $color-primary-light; color: $color-primary; border-color: $color-primary; }
+  @include reduced-motion { transition: none; }
 }
 
 // ── Main table ───────────────────────────────────────────────────────────────
@@ -69,6 +173,32 @@
 .echeances-summary { display: flex; flex-direction: column; gap: 2px; }
 .mode-label        { font-size: $font-size-xs; color: $color-text-muted; text-transform: capitalize; }
 .echeances-count   { font-size: $font-size-xs; font-weight: 600; color: $color-primary; }
+
+// ── Pagination ───────────────────────────────────────────────────────────────
+.pagination-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: $space-3 $space-4; border-top: 1px solid $color-border;
+  flex-wrap: wrap; gap: $space-3;
+}
+
+.pagination-info { font-size: $font-size-xs; color: $color-text-muted; }
+
+.pagination-controls { display: flex; align-items: center; gap: $space-1; }
+
+.page-btn {
+  min-width: 30px; height: 30px; padding: 0 $space-2;
+  border: 1px solid $color-border; border-radius: $radius-sm;
+  background: $color-surface; font-family: $font-base;
+  font-size: $font-size-xs; font-weight: 500; color: $color-text-muted;
+  cursor: pointer; @include flex-center;
+  transition: background $transition-fast, color $transition-fast, border-color $transition-fast;
+  &:hover:not(:disabled) { background: $color-primary-light; color: $color-primary; border-color: $color-primary; }
+  &--active { background: $color-primary; color: #fff; border-color: $color-primary; font-weight: 700; }
+  &:disabled { opacity: 0.35; cursor: not-allowed; }
+  @include reduced-motion { transition: none; }
+}
+
+.page-ellipsis { min-width: 24px; text-align: center; font-size: $font-size-xs; color: $color-text-muted; }
 
 // ── Right detail panel ────────────────────────────────────────────────────────
 .panel-backdrop {
@@ -156,14 +286,67 @@
 .muted { color: $color-text-muted; }
 .no-guests { font-size: $font-size-sm; color: $color-text-muted; font-style: italic; }
 
-// Echeances table
-.echeances-table {
-  width: 100%; border-collapse: collapse; font-size: $font-size-xs;
-  th { padding: 6px $space-3; text-align: left; color: $color-text-muted; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid $color-border; }
-  td { padding: 9px $space-3; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; }
-  tr:last-child td { border-bottom: none; }
+// Inscription detail card
+.insc-detail-card {
+  border: 1px solid $color-border; border-radius: $radius-md; overflow: hidden;
 }
-.echeance-montant { font-weight: 700; }
+
+.idc-offre-row {
+  display: flex; align-items: center; gap: $space-2; flex-wrap: wrap;
+  padding: $space-3 $space-4; background: $color-primary-light;
+  border-bottom: 1px solid $color-border;
+}
+
+.idc-offre-title { font-weight: 700; font-size: $font-size-sm; color: $color-text; flex: 1; }
+
+.idc-type-badge {
+  font-size: 10px; font-weight: 700; text-transform: capitalize;
+  padding: 2px 8px; border-radius: $radius-sm;
+  background: rgba(2,102,84,0.12); color: $color-primary;
+}
+
+.idc-meta {
+  display: flex; gap: 0; flex-wrap: wrap;
+}
+
+.idc-meta-item {
+  flex: 1; min-width: 100px;
+  display: flex; flex-direction: column; gap: 3px;
+  padding: $space-3 $space-4; border-right: 1px solid $color-border;
+  &:last-child { border-right: none; }
+}
+
+.idc-meta-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: $color-text-muted; }
+.idc-meta-value { font-size: $font-size-sm; font-weight: 600; color: $color-text; }
+.idc-meta-value--price { color: $color-primary; font-size: $font-size-md; }
+
+// Paiements — flat list
+.pay-list { display: flex; flex-direction: column; gap: $space-2; }
+
+.pay-item {
+  display: flex; align-items: center; gap: $space-3;
+  padding: $space-2 $space-3; border-radius: $radius-md;
+  background: $color-bg; border: 1px solid $color-border;
+}
+
+.pay-tranche { font-size: $font-size-xs; color: $color-text-muted; min-width: 70px; }
+.pay-amount  { font-size: $font-size-sm; font-weight: 700; color: $color-text; flex: 1; }
+
+// Offer link card
+.offre-link-card {
+  display: flex; align-items: center; gap: $space-3;
+  padding: $space-3 $space-4; border-radius: $radius-md;
+  border: 1px solid $color-border; background: $color-bg;
+  text-decoration: none; cursor: pointer;
+  transition: border-color $transition-fast, background $transition-fast;
+  &:hover { border-color: $color-primary; background: $color-primary-light; }
+  svg { color: $color-text-muted; flex-shrink: 0; }
+  @include reduced-motion { transition: none; }
+}
+
+.olc-body { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.olc-title { font-size: $font-size-sm; font-weight: 600; color: $color-text; @include truncate; }
+.olc-hint  { font-size: $font-size-xs; color: $color-primary; }
 
 .pay-badge {
   display: inline-block; padding: 2px 8px; border-radius: $radius-full;

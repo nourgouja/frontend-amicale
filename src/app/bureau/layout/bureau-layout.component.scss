@@ -26,7 +26,7 @@
 
 .nav-item {
   display: flex; align-items: center; gap: 12px; padding: 10px $space-4;
-  border-radius: $radius-md; color: $color-text-muted; text-decoration: none;
+  border-radius: $radius-md; color: $color-text; text-decoration: none;
   font-size: 13.5px; font-weight: 500;
   transition: background $transition-fast, color $transition-fast;
 
@@ -157,3 +157,41 @@
 .dropdown-empty  { padding: $space-6 $space-4; text-align: center; font-size: $font-size-sm; color: $color-text-muted; }
 
 .content { flex: 1; overflow-y: auto; padding: $content-padding; }
+
+/* ── Hamburger (hidden on desktop) ── */
+.hamburger {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border: none; background: none;
+  color: $color-text; cursor: pointer; border-radius: $radius-md;
+  flex-shrink: 0;
+  &:hover { background: $color-bg; }
+}
+
+/* ── Mobile sidebar overlay ── */
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4); z-index: 899;
+  &--open { display: block; }
+}
+
+/* ── Responsive breakpoints ── */
+@include mobile {
+  .hamburger { display: flex; }
+
+  .sidebar {
+    position: fixed; left: 0; top: 0; height: 100vh; z-index: 900;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    &--open { transform: translateX(0); }
+    @include reduced-motion { transition: none; }
+  }
+
+  .top-bar { padding: 0 $space-4; }
+  .search-bar { display: none; }
+  .content { padding: $space-4; }
+}
+
+@include tablet {
+  .sidebar { width: 200px; min-width: 200px; }
+  .content { padding: $space-5; }
+}

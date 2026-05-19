@@ -2,61 +2,53 @@
 
 .kpi-card {
   @include card;
-  padding: $space-5 $space-6;
+  padding: $space-5 $space-5 $space-5 $space-5;
   display: flex;
   flex-direction: column;
   gap: $space-2;
-  position: relative;
-  overflow: hidden;
-  transition: box-shadow $transition-base, transform $transition-base;
+  transition: box-shadow $transition-base;
 
   &:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); }
-
-  // Colored left accent bar
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 4px;
-    border-radius: $radius-lg 0 0 $radius-lg;
-  }
-
-  &--primary::before { background: $color-primary; }
-  &--blue::before    { background: $color-info; }
-  &--green::before   { background: $color-success; }
-  &--orange::before  { background: $color-warning; }
-  &--purple::before  { background: $color-convention; }
-  &--red::before     { background: $color-error; }
 }
 
 .kpi-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: $space-1;
 }
 
 .kpi-icon {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: $radius-md;
   @include flex-center;
+  flex-shrink: 0;
 
-  &--primary { background: $color-primary-light; color: $color-primary; }
-  &--blue    { background: rgba(59,130,246,0.12); color: $color-info; }
-  &--green   { background: rgba(16,185,129,0.12); color: $color-success; }
-  &--orange  { background: rgba(245,158,11,0.12); color: $color-warning; }
-  &--purple  { background: rgba(139,92,246,0.12); color: $color-convention; }
-  &--red     { background: rgba(220,38,38,0.10);  color: $color-error; }
+  &--primary { background: rgba(2,102,84,0.10);   color: $color-primary; }
+  &--blue    { background: rgba(59,130,246,0.10);  color: $color-info; }
+  &--green   { background: rgba(16,185,129,0.10);  color: $color-success; }
+  &--orange  { background: rgba(245,158,11,0.12);  color: $color-warning; }
+  &--purple  { background: rgba(139,92,246,0.10);  color: $color-convention; }
+  &--red     { background: rgba(220,38,38,0.10);   color: $color-error; }
 }
 
-.kpi-trend {
+/* ── Status badge (top-right of header) ── */
+.kpi-badge {
   font-size: $font-size-xs;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: $radius-full;
+  line-height: 1;
 
-  &.up   { background: rgba(16,185,129,0.12); color: #047857; }
-  &.down { background: rgba(220,38,38,0.10);  color: #b91c1c; }
+  &--green  { color: $color-primary; }
+  &--orange { color: $color-warning; }
+  &--red    { color: $color-error; }
+  &--muted  { color: $color-text-muted; }
+}
+
+.kpi-label {
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $color-text-muted;
 }
 
 .kpi-value {
@@ -67,21 +59,12 @@
   display: flex;
   align-items: baseline;
   gap: 4px;
-  margin-top: $space-1;
 }
 
 .kpi-unit {
   font-size: $font-size-md;
   font-weight: 500;
   color: $color-text-muted;
-}
-
-.kpi-label {
-  font-size: $font-size-xs;
-  font-weight: 600;
-  color: $color-text-muted;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
 }
 
 .kpi-subtitle {

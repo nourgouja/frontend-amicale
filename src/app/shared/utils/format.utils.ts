@@ -35,9 +35,9 @@ export function formatDate(dateString: string): string {
 export function getOffreTypeColor(type: string): string {
   const map: Record<string, string> = {
     VOYAGE:     '#3b82f6',
-    SEJOUR:     '#10b981',
-    ACTIVITE:   '#f59e0b',
-    CONVENTION: '#8b5cf6',
+    SEJOUR:     '#0ea5e9',
+    ACTIVITE:   '#16a34a',
+    CONVENTION: '#f97316',
     ANNONCE:    '#ec4899',
   };
   return map[type] ?? '#9ca3af';

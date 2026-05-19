@@ -8,14 +8,14 @@ import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
 import { getDisplayName, getInitials } from '../../shared/utils/format.utils';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie } from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, Banknote, CalendarDays, ChartPie } from 'lucide-angular';
 
 @Component({
   selector: 'app-bureau-layout',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LowerCasePipe, ProfileCardComponent, LucideAngularModule],
   providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie }) },
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, Banknote, CalendarDays, ChartPie }) },
   ],
   templateUrl: './bureau-layout.component.html',
   styleUrl: './bureau-layout.component.scss',
@@ -40,6 +40,7 @@ export class BureauLayoutComponent implements OnInit {
 
   profileOpen        = signal(false);
   notifOpen          = signal(false);
+  sidebarOpen        = signal(false);
   isResponsablePole  = signal(false);
   posteLabel         = signal('Membre Bureau');
 
@@ -54,13 +55,12 @@ export class BureauLayoutComponent implements OnInit {
     items.push(
       { label: 'Sondages',     route: '/bureau/sondages',     icon: 'ChartPie'      },
       { label: 'Inscriptions', route: '/bureau/inscriptions', icon: 'ClipboardList' },
-      { label: 'Cotisations',  route: '/bureau/cotisations',  icon: 'DollarSign'    },
-      { label: 'Calendrier',   route: '/bureau/calendrier',   icon: 'CalendarDays'  },
+      { label: 'Cotisations',  route: '/bureau/cotisations',  icon: 'Banknote'      },
     );
     return items;
   });
 
-  readonly icons = { LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, DollarSign, CalendarDays, ChartPie };
+  readonly icons = { LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, Banknote, CalendarDays, ChartPie };
 
   ngOnInit(): void {
     this.notifService.init();
@@ -81,6 +81,8 @@ export class BureauLayoutComponent implements OnInit {
 
   toggleProfile(e: MouseEvent): void { e.stopPropagation(); this.notifOpen.set(false); this.profileOpen.update(v => !v); }
   toggleNotif(e: MouseEvent): void   { e.stopPropagation(); this.profileOpen.set(false); this.notifOpen.update(v => !v); }
+  toggleSidebar(): void              { this.sidebarOpen.update(v => !v); }
+  closeSidebar(): void               { this.sidebarOpen.set(false); }
 
   @HostListener('document:click')
   closeDropdowns(): void { this.profileOpen.set(false); this.notifOpen.set(false); }

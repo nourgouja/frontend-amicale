@@ -9,16 +9,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $space-3;
+  margin-bottom: $space-2;
 }
 
 .cal-nav-btn {
   background: none;
   border: 1px solid $color-border;
   border-radius: $radius-md;
-  width: 28px; height: 28px;
+  width: 24px; height: 24px;
   @include flex-center;
-  font-size: 16px;
+  font-size: 14px;
   color: $color-text-muted;
   cursor: pointer;
   transition: background $transition-fast, color $transition-fast;
@@ -29,7 +29,7 @@
 }
 
 .cal-month {
-  font-size: $font-size-base;
+  font-size: $font-size-sm;
   font-weight: 600;
   color: $color-text;
   text-transform: capitalize;
@@ -38,14 +38,14 @@
 .cal-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: $space-1;
+  margin-bottom: 2px;
 
   span {
     text-align: center;
-    font-size: $font-size-xs;
+    font-size: 10px;
     font-weight: 600;
     color: $color-text-muted;
-    padding: $space-1 0;
+    padding: 3px 0;
   }
 }
 
@@ -58,15 +58,15 @@
 .cal-day {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
   justify-content: flex-start;
-  padding: 4px 3px 3px;
+  padding: 3px 2px;
   border-radius: $radius-sm;
   border: none;
   background: none;
   cursor: pointer;
   transition: background $transition-fast;
-  min-height: 72px;
+  min-height: 42px;
   gap: 2px;
 
   &:hover:not(.other-month) { background: $color-primary-light; }
@@ -77,48 +77,36 @@
     background: $color-primary;
     color: #fff;
     border-radius: 50%;
-    width: 20px; height: 20px;
+    width: 18px; height: 18px;
     @include flex-center;
   }
 
   @include reduced-motion { transition: none; }
-  @include mobile { min-height: 44px; padding: 3px 2px; }
 }
 
 .day-num {
-  font-size: $font-size-xs;
+  font-size: 11px;
   font-weight: 500;
   color: $color-text;
   line-height: 1;
-  width: 20px; height: 20px;
+  width: 18px; height: 18px;
   @include flex-center;
   align-self: center;
   flex-shrink: 0;
 }
 
-/* Event pills */
-.event-pill {
-  display: block;
-  width: 100%;
-  padding: 1px 3px;
-  border-radius: 3px;
-  font-size: 9px;
-  font-weight: 600;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: left;
-  line-height: 14px;
-  flex-shrink: 0;
-  @include mobile { display: none; }
+/* Event dots */
+.event-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-wrap: nowrap;
 }
 
-.event-more {
-  font-size: 9px;
-  font-weight: 600;
-  color: $color-text-muted;
-  text-align: center;
-  padding: 1px 0;
-  line-height: 1;
+.event-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
