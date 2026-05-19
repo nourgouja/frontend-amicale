@@ -4,14 +4,14 @@ import { DatePipe, LowerCasePipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, LayoutGrid, ClipboardList, Megaphone, CreditCard, CalendarDays, Bell, Vote } from 'lucide-angular';
+import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, ClipboardList, Megaphone, CreditCard, CalendarDays, Settings } from 'lucide-angular';
 
 @Component({
   selector: 'app-adherent-layout',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LowerCasePipe, ProfileCardComponent, LucideAngularModule],
   providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, LayoutGrid, ClipboardList, Megaphone, CreditCard, CalendarDays, Bell, Vote }) },
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, ClipboardList, Megaphone, CreditCard, CalendarDays, Settings }) },
   ],
   templateUrl: './adherent-layout.component.html',
   styleUrl: './adherent-layout.component.scss',
@@ -25,11 +25,10 @@ export class AdherentLayoutComponent implements OnInit {
   notifOpen   = signal(false);
 
   readonly navItems = [
-    { label: 'Home',             route: '/adherent/dashboard',    icon: 'LayoutDashboard' },
-    { label: 'Catalogue',        route: '/adherent/offres',       icon: 'LayoutGrid'      },
+    { label: 'Tableau de bord',  route: '/adherent/dashboard',    icon: 'LayoutDashboard' },
     { label: 'Mes Inscriptions', route: '/adherent/inscriptions', icon: 'ClipboardList'   },
-    { label: 'Sondages',          route: '/adherent/sondages',     icon: 'Vote'            },
     { label: 'Annonces',         route: '/adherent/annonces',     icon: 'Megaphone'       },
+    { label: 'Cotisations',      route: '/adherent/cotisation',   icon: 'CreditCard'      },
     { label: 'Calendrier',       route: '/adherent/calendrier',   icon: 'CalendarDays'    },
   ];
 

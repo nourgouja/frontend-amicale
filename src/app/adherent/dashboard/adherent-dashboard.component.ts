@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -88,6 +88,19 @@ export class AdherentDashboardComponent implements OnInit {
     next.add(id);
     this.dismissedIds.set(next);
     try { localStorage.setItem('dismissed_sondages', JSON.stringify([...next])); } catch {}
+  }
+
+  @ViewChild('conventionsCarousel') conventionsCarousel!: ElementRef<HTMLElement>;
+  @ViewChild('membresCarousel') membresCarousel!: ElementRef<HTMLElement>;
+
+  scrollConventions(dir: -1 | 1): void {
+    const el = this.conventionsCarousel?.nativeElement;
+    if (el) el.scrollBy({ left: dir * 496, behavior: 'smooth' });
+  }
+
+  scrollMembres(dir: -1 | 1): void {
+    const el = this.membresCarousel?.nativeElement;
+    if (el) el.scrollBy({ left: dir * 180, behavior: 'smooth' });
   }
 
   isBureau = computed(() => this.authService.isBureau());
@@ -217,9 +230,9 @@ export class AdherentDashboardComponent implements OnInit {
       PRESIDENT:                              'Président',
       SECRETARY:                              'Secrétaire',
       TREASURER:                              'Trésorier',
-      RESPONSABLE_POLE_VOYAGE_SEJOURS:        'Resp. Pôle Voyage & Séjours',
-      RESPONSABLE_POLE_ACTIVITES_LOISIRS:     'Resp. Pôle Activités & Loisirs',
-      RESPONSABLE_POLE_EVENEMENTS_CONVENTIONS: 'Resp. Pôle Événements & Conventions',
+      RESPONSABLE_POLE_VOYAGE_SEJOURS:        'Responsable de Pôle',
+      RESPONSABLE_POLE_ACTIVITES_LOISIRS:     'Responsable de Pôle',
+      RESPONSABLE_POLE_EVENEMENTS_CONVENTIONS: 'Responsable de Pôle',
       RESPONSABLE_POLE:                       'Responsable de Pôle',
       MEMBER:                                 'Membre',
     };
