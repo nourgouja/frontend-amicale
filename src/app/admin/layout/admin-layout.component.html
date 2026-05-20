@@ -1,51 +1,93 @@
 <div class="admin-shell">
 
-  <!-- ── Sidebar ── -->
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <img src="logo.png" alt="Logo" class="sidebar-logo-img" />
+      <img src="logo.png" alt="AmicaleStar" class="sidebar-logo" />
     </div>
-    <nav class="sidebar-nav">
-      @for (item of navItems; track item.route) {
-        <a [routerLink]="item.route" routerLinkActive="active" class="nav-item">
-          <lucide-icon [name]="item.icon" [size]="18" class="nav-icon"></lucide-icon>
-          <span>{{ item.label }}</span>
-        </a>
-      }
+
+    <nav class="sidebar-nav" aria-label="Navigation admin">
+
+      <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-item">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 6V0H18V6H10ZM0 10V0H8V10H0ZM10 18V8H18V18H10ZM0 18V12H8V18H0ZM2 8H6V2H2V8ZM12 16H16V10H12V16ZM12 4H16V2H12V4ZM2 16H6V14H2V16Z" fill="currentColor"/>
+        </svg>
+        <span>Tableau de bord</span>
+      </a>
+
+      <a routerLink="/admin/chiffres-cles" routerLinkActive="active" class="nav-item">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 14v-3l5-5 4 4 9-10v3L9 13 5 9 0 14z" fill="currentColor"/>
+        </svg>
+        <span>Chiffres Clés</span>
+      </a>
+
+      <a routerLink="/admin/utilisateurs" routerLinkActive="active" class="nav-item">
+        <svg class="nav-icon" width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 9a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm7.5-1.7C15.92 8.42 17 7.3 17 6a4 4 0 0 0-4-4c-.34 0-.68.05-1 .12A6 6 0 0 1 13 6c0 1.38-.47 2.63-1.24 3.64L13 10c.5.1.98.26 1.5.3zM15 11c1.34.67 3 1.7 3 4v2h-3v-2c0-1.33-.46-2.5-1.22-3.45.42-.16.83-.33 1.22-.55z" fill="currentColor"/>
+        </svg>
+        <span>Utilisateurs</span>
+      </a>
+
+      <a routerLink="/admin/activites" routerLinkActive="active" class="nav-item">
+        <svg class="nav-icon" width="14" height="18" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7.667 0L0 10h6L4.333 18 14 8H8L7.667 0z" fill="currentColor"/>
+        </svg>
+        <span>Activités</span>
+      </a>
+
+      <a routerLink="/admin/offres" routerLinkActive="active" class="nav-item">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0h4v4H0V0zm6 1h12v2H6V1zM0 7h4v4H0V7zm6 1h12v2H6V8zM0 14h4v4H0v-4zm6 1h12v2H6v-2z" fill="currentColor"/>
+        </svg>
+        <span>Offres</span>
+      </a>
+
+      <a routerLink="/admin/calendrier" routerLinkActive="active" class="nav-item">
+        <svg class="nav-icon" width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 20C1.45 20 0.979167 19.8042 0.5875 19.4125C0.195833 19.0208 0 18.55 0 18V4C0 3.45 0.195833 2.97917 0.5875 2.5875C0.979167 2.19583 1.45 2 2 2H3V0H5V2H13V0H15V2H16C16.55 2 17.0208 2.19583 17.4125 2.5875C17.8042 2.97917 18 3.45 18 4V18C18 18.55 17.8042 19.0208 17.4125 19.4125C17.0208 19.8042 16.55 20 16 20H2ZM2 18H16V8H2V18ZM2 6H16V4H2V6Z" fill="currentColor"/>
+        </svg>
+        <span>Calendrier</span>
+      </a>
+
+      <a routerLink="/admin/elections" routerLinkActive="active" class="nav-item">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 0l2.3 6.3H18l-5.4 3.9 2 6.3L9 12.6l-5.6 3.9 2-6.3L0 6.3h6.7z" fill="currentColor"/>
+        </svg>
+        <span>Élections</span>
+      </a>
+
     </nav>
-    <div style="flex:1"></div>
+
+    <div class="sidebar-spacer"></div>
+
     <div class="sidebar-footer">
-      <div class="sidebar-user">
+      <div class="sidebar-footer-card">
         @if (authService.photoUrl()) {
           <img [src]="authService.photoUrl()!" class="sidebar-avatar sidebar-avatar--img" alt="Photo" />
         } @else {
           <div class="sidebar-avatar">{{ initials() }}</div>
         }
-        <div class="sidebar-user-info">
-          <span class="sidebar-user-name">{{ adminDisplayName() }}</span>
-          <span class="sidebar-user-role">Administrateur</span>
+        <div class="sidebar-info">
+          <span class="sidebar-name">{{ adminDisplayName() }}</span>
+          <span class="sidebar-role">Administrateur</span>
         </div>
+        <a routerLink="/admin/profil" class="sidebar-gear" aria-label="Paramètres">
+          <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.3 20L6.9 16.8C6.68333 16.7167 6.47917 16.6167 6.2875 16.5C6.09583 16.3833 5.90833 16.2583 5.725 16.125L2.75 17.375L0 12.625L2.575 10.675C2.55833 10.5583 2.55 10.4458 2.55 10.3375C2.55 10.2292 2.55 10.1167 2.55 10C2.55 9.88333 2.55 9.77083 2.55 9.6625C2.55 9.55417 2.55833 9.44167 2.575 9.325L0 7.375L2.75 2.625L5.725 3.875C5.90833 3.74167 6.1 3.61667 6.3 3.5C6.5 3.38333 6.7 3.28333 6.9 3.2L7.3 0H12.8L13.2 3.2C13.4167 3.28333 13.6208 3.38333 13.8125 3.5C14.0042 3.61667 14.1917 3.74167 14.375 3.875L17.35 2.625L20.1 7.375L17.525 9.325C17.5417 9.44167 17.55 9.55417 17.55 9.6625C17.55 9.77083 17.55 9.88333 17.55 10C17.55 10.1167 17.55 10.2292 17.55 10.3375C17.55 10.4458 17.5333 10.5583 17.5 10.675L20.075 12.625L17.325 17.375L14.375 16.125C14.1917 16.2583 14 16.3833 13.8 16.5C13.6 16.6167 13.4 16.7167 13.2 16.8L12.8 20H7.3ZM9.05 18H11.025L11.375 15.35C11.8917 15.2167 12.3708 15.0208 12.8125 14.7625C13.2542 14.5042 13.6583 14.1917 14.025 13.825L16.5 14.85L17.475 13.15L15.325 11.525C15.4083 11.2917 15.4667 11.0458 15.5 10.7875C15.5333 10.5292 15.55 10.2667 15.55 10C15.55 9.73333 15.5333 9.47083 15.5 9.2125C15.4667 8.95417 15.4083 8.70833 15.325 8.475L17.475 6.85L16.5 5.15L14.025 6.2C13.6583 5.81667 13.2542 5.49583 12.8125 5.2375C12.3708 4.97917 11.8917 4.78333 11.375 4.65L11.05 2H9.075L8.725 4.65C8.20833 4.78333 7.72917 4.97917 7.2875 5.2375C6.84583 5.49583 6.44167 5.80833 6.075 6.175L3.6 5.15L2.625 6.85L4.775 8.45C4.69167 8.7 4.63333 8.95 4.6 9.2C4.56667 9.45 4.55 9.71667 4.55 10C4.55 10.2667 4.56667 10.525 4.6 10.775C4.63333 11.025 4.69167 11.275 4.775 11.525L2.625 13.15L3.6 14.85L6.075 13.8C6.44167 14.1833 6.84583 14.5042 7.2875 14.7625C7.72917 15.0208 8.20833 15.2167 8.725 15.35L9.05 18ZM10.1 13.5C11.0667 13.5 11.8917 13.1583 12.575 12.475C13.2583 11.7917 13.6 10.9667 13.6 10C13.6 9.03333 13.2583 8.20833 12.575 7.525C11.8917 6.84167 11.0667 6.5 10.1 6.5C9.11667 6.5 8.2875 6.84167 7.6125 7.525C6.9375 8.20833 6.6 9.03333 6.6 10C6.6 10.9667 6.9375 11.7917 7.6125 12.475C8.2875 13.1583 9.11667 13.5 10.1 13.5Z" fill="currentColor"/>
+          </svg>
+        </a>
       </div>
     </div>
   </aside>
 
-  <!-- ── Main area ── -->
   <div class="main-area">
-
     <header class="top-bar">
-      <div class="top-bar-left">
-        <div class="blank">
-
-        </div>
-      </div>
+      <div class="top-bar-left"></div>
 
       <div class="top-bar-right">
-
-        <!-- Notifications -->
-        <div class="profile-wrapper">
-          <button class="icon-btn notif-btn" aria-label="Notifications" (click)="toggleNotif($event)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="icon-wrap">
+          <button class="icon-btn" aria-label="Notifications" (click)="toggleNotif($event)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
@@ -53,72 +95,66 @@
               <span class="notif-badge">{{ notifService.unreadCount() > 9 ? '9+' : notifService.unreadCount() }}</span>
             }
           </button>
-
           @if (notifOpen()) {
-            <div class="profile-dropdown notif-dropdown" (click)="$event.stopPropagation()">
-              <div class="notif-header">
-                <span class="notif-title">Notifications</span>
-                @if (notifService.notifications().length > 0) {
-                  <button class="notif-clear-btn" (click)="clearNotifs($event)">Tout effacer</button>
+            <div class="dropdown notif-dropdown" (click)="$event.stopPropagation()" role="menu">
+              <div class="notif-dropdown-header">
+                <span>Notifications</span>
+                @if (notifService.unreadCount() > 0) {
+                  <button class="notif-read-all" (click)="notifService.markAllRead()">Tout effacer</button>
                 }
               </div>
-              <div class="dropdown-divider"></div>
-
               @if (notifService.notifications().length === 0) {
-                <div class="notif-empty">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <div class="dropdown-empty">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                   </svg>
                   <p>Aucune notification</p>
                 </div>
               } @else {
-                <ul class="notif-list">
+                <div class="notif-list">
                   @for (n of notifService.notifications(); track n.id) {
-                    <li class="notif-item notif-item--{{ n.severity | lowercase }}"
-                        [class.notif-item--clickable]="n.link"
-                        (click)="navigateNotif(n.link)">
-                      <span class="notif-icon notif-icon--{{ n.severity | lowercase }}">
-                        @switch (n.severity) {
-                          @case ('ERROR')   { ✕ }
-                          @case ('WARNING') { ⚠ }
-                          @case ('SUCCESS') { ✓ }
-                          @default          { ℹ }
-                        }
-                      </span>
-                      <div class="notif-body">
-                        <p class="notif-msg">{{ n.message }}</p>
-                        <time class="notif-time">{{ n.createdAt | date:'dd/MM HH:mm' }}</time>
+                    @if (n.link) {
+                      <a class="notif-item" [routerLink]="n.link" (click)="notifOpen.set(false)">
+                        <span class="notif-sev-dot notif-sev-dot--{{ n.severity | lowercase }}"></span>
+                        <span class="notif-body"><span class="notif-msg">{{ n.message }}</span><span class="notif-time">{{ n.createdAt | date:'dd/MM HH:mm' }}</span></span>
+                      </a>
+                    } @else {
+                      <div class="notif-item">
+                        <span class="notif-sev-dot notif-sev-dot--{{ n.severity | lowercase }}"></span>
+                        <span class="notif-body"><span class="notif-msg">{{ n.message }}</span><span class="notif-time">{{ n.createdAt | date:'dd/MM HH:mm' }}</span></span>
                       </div>
-                    </li>
+                    }
                   }
-                </ul>
+                </div>
               }
             </div>
           }
         </div>
 
-        <!-- Profile -->
-        <div class="profile-wrapper">
-          <button class="icon-btn profile-btn" aria-label="Mon compte" (click)="toggleProfile($event)">
+        <div class="topbar-divider"></div>
+
+        <div class="icon-wrap">
+          <button class="avatar-btn" aria-label="Mon compte" (click)="toggleProfile($event)">
             @if (authService.photoUrl()) {
               <img [src]="authService.photoUrl()!" class="top-avatar top-avatar--img" alt="Photo" />
             } @else {
               <div class="top-avatar">{{ initials() }}</div>
             }
+            <div class="top-user-info">
+              <span class="top-user-name">{{ adminDisplayName() }}</span>
+              <span class="top-user-role">Administrateur</span>
+            </div>
           </button>
           @if (profileOpen()) {
             <app-profile-card (close)="profileOpen.set(false)" />
           }
         </div>
-
       </div>
     </header>
 
     <main class="content">
       <router-outlet />
     </main>
-
   </div>
 </div>

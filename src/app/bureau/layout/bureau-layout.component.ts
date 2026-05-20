@@ -8,15 +8,11 @@ import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ProfileCardComponent } from '../../shared/profile-card/profile-card.component';
 import { getDisplayName, getInitials } from '../../shared/utils/format.utils';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, Banknote, CalendarDays, ChartPie } from 'lucide-angular';
 
 @Component({
   selector: 'app-bureau-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LowerCasePipe, ProfileCardComponent, LucideAngularModule],
-  providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, Banknote, CalendarDays, ChartPie }) },
-  ],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LowerCasePipe, ProfileCardComponent],
   templateUrl: './bureau-layout.component.html',
   styleUrl: './bureau-layout.component.scss',
 })
@@ -60,7 +56,6 @@ export class BureauLayoutComponent implements OnInit {
     return items;
   });
 
-  readonly icons = { LayoutDashboard, Tag, BookOpen, Building2, ClipboardList, Banknote, CalendarDays, ChartPie };
 
   ngOnInit(): void {
     this.notifService.init();
