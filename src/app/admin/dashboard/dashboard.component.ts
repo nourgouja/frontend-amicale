@@ -11,7 +11,8 @@ import { Offre } from '../../shared/components/offer-card/offer-card.component';
 import { getDisplayName, getOffreTypeLabel, formatDate, getOffreTypeColor } from '../../shared/utils/format.utils';
 import {
   LucideAngularModule, LUCIDE_ICONS, LucideIconProvider,
-  Users, ClipboardList, Tag, DollarSign, CheckCircle, Calendar
+  Users, ClipboardList, Tag, DollarSign, CheckCircle, Calendar,
+  PlaneTakeoff, Footprints, Hotel, Handshake, Megaphone, CalendarDays, TriangleAlert, ClipboardClock
 } from 'lucide-angular';
 
 interface RecentInscription {
@@ -30,7 +31,7 @@ interface RecentInscription {
   standalone: true,
   imports: [CommonModule, RouterLink, KpiCardComponent, MiniCalendarComponent, StatusBadgeComponent, LucideAngularModule],
   providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ Users, ClipboardList, Tag, DollarSign, CheckCircle, Calendar }) },
+    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ Users, ClipboardList, Tag, DollarSign, CheckCircle, Calendar, PlaneTakeoff, Footprints, Hotel, Handshake, Megaphone, CalendarDays, TriangleAlert, ClipboardClock }) },
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -54,20 +55,40 @@ export class AdminDashboardComponent implements OnInit {
   /* ── Recent inscriptions ── */
   recentInscriptions = signal<RecentInscription[]>([]);
 
-  /* ── Monthly chart ── */
-  monthlyChart = computed(() => {
-    const inscriptions = this.recentInscriptions();
+  /* ── Line chart (12 months) ── */
+  lineChart = computed(() => {
     const now = new Date();
     const months: { label: string; count: number }[] = [];
-    for (let i = 5; i >= 0; i--) {
+    for (let i = 11; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      const label = d.toLocaleDateString('fr-FR', { month: 'short' });
-      const count = inscriptions.filter(ins => ins.dateInscription?.startsWith(key)).length;
+      const label = d.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '');
+      const count = this.recentInscriptions().filter(ins => ins.dateInscription?.startsWith(key)).length;
       months.push({ label, count });
     }
-    const max = Math.max(...months.map(m => m.count), 1);
-    return months.map(m => ({ ...m, pct: Math.round(m.count / max * 100) }));
+
+    const W = 560, H = 180;
+    const padL = 36, padR = 16, padT = 16, padB = 32;
+    const plotW = W - padL - padR;
+    const plotH = H - padT - padB;
+    const maxVal = Math.max(...months.map(m => m.count), 1);
+
+    const pts = months.map((m, i) => ({
+      x: padL + (i / (months.length - 1)) * plotW,
+      y: padT + (1 - m.count / maxVal) * plotH,
+      label: m.label,
+      count: m.count,
+    }));
+
+    const linePath = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    const yLabels = [
+      { y: padT + plotH,      val: 0 },
+      { y: padT + plotH / 2,  val: Math.round(maxVal / 2) },
+      { y: padT,              val: maxVal },
+    ];
+    const gridLines = [padT, padT + plotH / 2, padT + plotH];
+
+    return { pts, linePath, yLabels, gridLines, W, H, padL, padR, padT, padB };
   });
 
   readonly today = new Intl.DateTimeFormat('fr-FR', {
@@ -97,8 +118,8 @@ export class AdminDashboardComponent implements OnInit {
       score: +(d.confirmees / total * 10).toFixed(1),
       breakdown: [
         { label: 'En attente', color: '#f59e0b', count: d.enAttente,  pct: Math.round(d.enAttente  / total * 100) },
-        { label: 'Confirmées', color: '#10b981', count: d.confirmees, pct: Math.round(d.confirmees / total * 100) },
-        { label: 'Annulées',   color: '#6366f1', count: d.annulees,   pct: Math.round(d.annulees   / total * 100) },
+        { label: 'Confirmées', color: '#026654', count: d.confirmees, pct: Math.round(d.confirmees / total * 100) },
+        { label: 'Annulées',   color: '#9ca3af', count: d.annulees,   pct: Math.round(d.annulees   / total * 100) },
       ],
     };
   });
@@ -130,7 +151,7 @@ export class AdminDashboardComponent implements OnInit {
     return {
       score: +(d.echeancesPayees / total * 10).toFixed(1),
       breakdown: [
-        { label: 'Payées',     color: '#10b981', count: d.echeancesPayees   ?? 0, pct: Math.round((d.echeancesPayees   ?? 0) / total * 100) },
+        { label: 'Payées',     color: '#026654', count: d.echeancesPayees   ?? 0, pct: Math.round((d.echeancesPayees   ?? 0) / total * 100) },
         { label: 'En attente', color: '#f59e0b', count: d.echeancesEnAttente ?? 0, pct: Math.round((d.echeancesEnAttente ?? 0) / total * 100) },
         { label: 'En retard',  color: '#dc2626', count: d.echeancesEnRetard  ?? 0, pct: Math.round((d.echeancesEnRetard  ?? 0) / total * 100) },
       ],
@@ -215,6 +236,18 @@ export class AdminDashboardComponent implements OnInit {
 
   fmtDate(d: string | undefined | null): string { return d ? formatDate(d) : '—'; }
   typeLabel(t: string): string { return getOffreTypeLabel(t); }
+  typeColor(t: string): string { return getOffreTypeColor(t); }
+  typeIcon(t: string): string {
+    const map: Record<string, string> = {
+      VOYAGE:     'plane-takeoff',
+      ACTIVITE:   'footprints',
+      SEJOUR:     'hotel',
+      CONVENTION: 'handshake',
+      ANNONCE:    'megaphone',
+      EVENEMENT:  'calendar-days',
+    };
+    return map[t] ?? 'tag';
+  }
   recentFive = computed(() => this.recentInscriptions().slice(0, 4));
 
   inscrits(offre: Offre): number {

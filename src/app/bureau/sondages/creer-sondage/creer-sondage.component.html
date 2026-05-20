@@ -59,12 +59,8 @@
                 type="text"
                 class="form-input form-input-sm"
                 formControlName="description"
-                placeholder="Description *"
-                [class.has-error]="form.get('option1.description')?.invalid && form.get('option1.description')?.touched"
+                placeholder="Description (optionnelle)"
               />
-              @if (form.get('option1.description')?.invalid && form.get('option1.description')?.touched) {
-                <span class="error-text">Description requise</span>
-              }
 
               <div class="image-upload">
                 <input type="file" id="image1" class="file-input" accept="image/*" (change)="onImageSelect1($event)" />
@@ -106,12 +102,8 @@
                 type="text"
                 class="form-input form-input-sm"
                 formControlName="description"
-                placeholder="Description *"
-                [class.has-error]="form.get('option2.description')?.invalid && form.get('option2.description')?.touched"
+                placeholder="Description (optionnelle)"
               />
-              @if (form.get('option2.description')?.invalid && form.get('option2.description')?.touched) {
-                <span class="error-text">Description requise</span>
-              }
 
               <div class="image-upload">
                 <input type="file" id="image2" class="file-input" accept="image/*" (change)="onImageSelect2($event)" />

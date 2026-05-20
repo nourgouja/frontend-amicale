@@ -19,6 +19,7 @@
           [class.today]="isToday(day)"
           [class.other-month]="!isCurrentMonth(day)"
           [class.has-events]="offresForDay(day).length > 0"
+          [class.selected]="isSelectedDay(day)"
           (click)="onDayClick(day)"
           [attr.aria-label]="day.toLocaleDateString('fr-FR')"
         >
@@ -34,4 +35,23 @@
       }
     }
   </div>
+
+  <!-- Selected day events -->
+  @if (selectedDay() && selectedDayOffres().length > 0) {
+    <div class="cal-events">
+      <div class="cal-events-date">{{ fmtSelectedDay() }}</div>
+      @for (o of selectedDayOffres(); track o.id) {
+        <div class="cal-event-item">
+          <span class="cal-event-bar" [style.background]="typeColor(o.typeOffre)"></span>
+          <div class="cal-event-info">
+            <span class="cal-event-title">{{ o.titre }}</span>
+            <span class="cal-event-meta">{{ typeLabel(o.typeOffre) }}
+              @if (o.dateDebut) { · {{ o.dateDebut | date:'dd/MM' }} }
+              @if (o.dateFin) { → {{ o.dateFin | date:'dd/MM' }} }
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </div>

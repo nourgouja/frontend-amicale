@@ -50,13 +50,14 @@
 .type-badge {
   position: absolute;
   top: $space-3; left: $space-3;
-  color: #fff;
+  background: rgba(255,255,255,0.9);
   font-size: $font-size-xs;
   font-weight: 700;
   padding: 3px 10px;
   border-radius: $radius-full;
   letter-spacing: 0.3px;
   text-transform: uppercase;
+  backdrop-filter: blur(4px);
 }
 
 /* ── Star (adherent favourite) ── */
@@ -173,13 +174,13 @@
   font-size: $font-size-xs;
   color: $color-text-muted;
 
-  svg { flex-shrink: 0; color: #b0b8c1; }
+  svg { flex-shrink: 0; color: var(--type-color, #b0b8c1); opacity: 0.7; }
 }
 
 .card-price {
   font-size: $font-size-lg;
   font-weight: 700;
-  color: $color-primary;
+  color: var(--type-color, #{$color-primary});
   margin-top: $space-1;
 
   span {
@@ -206,7 +207,7 @@
 
 .capacity-fill {
   height: 100%;
-  background: $color-primary;
+  background: var(--type-color, #{$color-primary});
   border-radius: $radius-full;
   transition: width $transition-slow;
 

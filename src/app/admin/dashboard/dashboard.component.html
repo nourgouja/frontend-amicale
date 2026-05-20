@@ -19,66 +19,25 @@
     <!-- KPI Cards -->
     <div class="kpi-grid">
       <app-kpi-card label="Utilisateurs" [value]="d.totalUtilisateurs" icon="users" color="primary"
-        [subtitle]="(d.parRole['ADMIN'] ?? 0) + ' admins · ' + (d.parRole['ADHERENT'] ?? 0) + ' adhérents'" />
-      <app-kpi-card label="Inscriptions" [value]="d.totalInscriptions" icon="clipboard-list" color="purple"
-        [subtitle]="d.enAttente + ' en attente · ' + d.confirmees + ' confirmées'" />
-      <app-kpi-card label="Offres actives" [value]="offresOuvertes()" icon="tag" color="blue"
-        [subtitle]="offresBrouillon() + ' brouillons · ' + totalOffres() + ' total'" />
-      <app-kpi-card label="Collecté" [value]="d.totalCollecte" icon="dollar-sign" color="green" unit="DT"
-        [subtitle]="d.echeancesEnRetard + ' échéances en retard'" />
-    </div>
-
-    <!-- Statistics -->
-    <div class="stats-grid">
-
-      <div class="stat-card">
-        <h4 class="stat-title">Taux de Confirmation</h4>
-        <div class="stat-score">{{ d.confirmees }}<span class="stat-unit"> / {{ d.totalInscriptions }}</span></div>
-        <div class="stat-rows">
-          @for (row of inscriptionStats().breakdown; track row.label) {
-            <div class="stat-row">
-              <span class="stat-dot" [style.background]="row.color"></span>
-              <span class="stat-label">{{ row.label }}</span>
-              <span class="stat-pct">{{ row.pct }}%</span>
-              <span class="stat-count">({{ row.count }})</span>
-            </div>
-          }
-          @if (inscriptionStats().breakdown.length === 0) { <p class="stat-empty">Aucune inscription</p> }
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <h4 class="stat-title">État des Offres</h4>
-        <div class="stat-score">{{ offresOuvertes() }}<span class="stat-unit"> / {{ totalOffres() }}</span></div>
-        <div class="stat-rows">
-          @for (row of offresStats().breakdown; track row.label) {
-            <div class="stat-row">
-              <span class="stat-dot" [style.background]="row.color"></span>
-              <span class="stat-label">{{ row.label }}</span>
-              <span class="stat-pct">{{ row.pct }}%</span>
-              <span class="stat-count">({{ row.count }})</span>
-            </div>
-          }
-          @if (offresStats().breakdown.length === 0) { <p class="stat-empty">Aucune offre</p> }
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <h4 class="stat-title">État des Cotisations</h4>
-        <div class="stat-score">{{ d.echeancesPayees }}<span class="stat-unit"> / {{ cotisationTotal() }}</span></div>
-        <div class="stat-rows">
-          @for (row of cotisationStats().breakdown; track row.label) {
-            <div class="stat-row">
-              <span class="stat-dot" [style.background]="row.color"></span>
-              <span class="stat-label">{{ row.label }}</span>
-              <span class="stat-pct">{{ row.pct }}%</span>
-              <span class="stat-count">({{ row.count }})</span>
-            </div>
-          }
-          @if (cotisationStats().breakdown.length === 0) { <p class="stat-empty">Aucune donnée</p> }
-        </div>
-      </div>
-
+        [breakdown]="[
+          { label: 'Administrateurs', count: d.parRole['ADMIN'] ?? 0 },
+          { label: 'Membres Bureau',  count: d.parRole['BUREAU'] ?? 0 },
+          { label: 'Adhérents',       count: d.parRole['ADHERENT'] ?? 0 }
+        ]" />
+      <app-kpi-card label="Inscriptions" [value]="d.totalInscriptions" icon="clipboard-clock" color="primary"
+        [breakdown]="[
+          { label: 'En attente',  count: d.enAttente },
+          { label: 'Confirmées', count: d.confirmees },
+          { label: 'Annulées',   count: d.annulees }
+        ]" />
+      <app-kpi-card label="Cotisations" [value]="cotisationTotal()" icon="triangle-alert" color="red"
+        [breakdown]="[
+          { label: 'Payées',     count: d.echeancesPayees   ?? 0 },
+          { label: 'En attente', count: d.echeancesEnAttente ?? 0 },
+          { label: 'En retard',  count: d.echeancesEnRetard  ?? 0 }
+        ]" />
+      <app-kpi-card label="Offres" [value]="totalOffres()" icon="tag" color="primary"
+        [breakdown]="offresStats().breakdown.map(b => ({ label: b.label, count: b.count }))" />
     </div>
 
     <!-- Mid row -->
@@ -123,17 +82,48 @@
 
       </div>
 
-      <!-- Right column: calendar -->
-      <div class="calendar-card">
+      <!-- Right column: inscriptions line chart -->
+      <div class="chart-card">
         <div class="card-head">
-          <h3 class="card-head-title">Calendrier</h3>
-          <a class="card-head-link" routerLink="/admin/calendrier">Voir →</a>
+          <h3 class="card-head-title">Inscriptions par mois</h3>
         </div>
-        <div class="calendar-body">
-          <app-mini-calendar [offres]="calendarOffres()" />
+        <div class="line-chart-body">
+          <svg class="line-chart-svg"
+               [attr.viewBox]="'0 0 ' + lineChart().W + ' ' + lineChart().H"
+               preserveAspectRatio="xMidYMid meet">
+
+            <!-- grid lines -->
+            @for (gy of lineChart().gridLines; track gy) {
+              <line [attr.x1]="lineChart().padL" [attr.x2]="lineChart().W - lineChart().padR"
+                    [attr.y1]="gy" [attr.y2]="gy"
+                    stroke="#e5e7eb" stroke-width="1"/>
+            }
+
+            <!-- y-axis labels -->
+            @for (yl of lineChart().yLabels; track yl.val) {
+              <text [attr.x]="lineChart().padL - 6" [attr.y]="yl.y + 4"
+                    text-anchor="end" font-size="10" fill="#9ca3af">{{ yl.val }}</text>
+            }
+
+            <!-- line -->
+            <path [attr.d]="lineChart().linePath"
+                  fill="none" stroke="#f59e0b" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+
+            <!-- dots + x labels -->
+            @for (p of lineChart().pts; track p.label) {
+              <circle [attr.cx]="p.x" [attr.cy]="p.y" r="3.5" fill="#f59e0b"/>
+              <text [attr.x]="p.x" [attr.y]="lineChart().H - 6"
+                    text-anchor="middle" font-size="9.5" fill="#9ca3af">{{ p.label }}</text>
+            }
+
+          </svg>
         </div>
       </div>
     </div>
+
+    <!-- Offers + Calendar row -->
+    <div class="offers-cal-row">
 
     <!-- Recent offers — cards -->
     <div class="cards-section">
@@ -149,20 +139,20 @@
           @for (offre of recentOffres(); track offre.id) {
             <div class="offre-card" (click)="openDetail(offre.id)" role="button" tabindex="0"
                  (keydown.enter)="openDetail(offre.id)" (keydown.space)="openDetail(offre.id)">
-              <div class="offre-card-cover offre-card-cover--{{ offre.statut.toLowerCase() }}">
+              <div class="offre-card-cover" [style.background]="'linear-gradient(135deg,' + typeColor(offre.typeOffre ?? '') + ' 0%, ' + typeColor(offre.typeOffre ?? '') + 'cc 100%)'">
                 @if (getOffreImage(offre.id); as src) {
                   <img [src]="src" [alt]="offre.titre" class="offre-card-img" />
                 } @else {
-                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/>
-                    <path d="M12 22V7"/>
-                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
-                    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
-                  </svg>
+                  <lucide-icon [name]="typeIcon(offre.typeOffre ?? '')" [size]="32" color="rgba(255,255,255,0.85)"></lucide-icon>
                 }
               </div>
               <div class="offre-card-body">
-                <app-status-badge [statut]="offre.statut" type="offre" />
+                <div class="offre-card-top">
+                  <span class="type-pill" [style.background]="typeColor(offre.typeOffre ?? '') + '22'" [style.color]="typeColor(offre.typeOffre ?? '')" [style.border]="'1.5px solid ' + typeColor(offre.typeOffre ?? '') + '88'">
+                    {{ typeLabel(offre.typeOffre ?? '') }}
+                  </span>
+                  <app-status-badge [statut]="offre.statut" type="offre" />
+                </div>
                 <p class="offre-card-title">{{ offre.titre }}</p>
                 <div class="offre-card-meta">
                   <span class="meta-item">
@@ -203,6 +193,19 @@
         </div>
       }
     </div>
+
+    <!-- Calendar beside offers -->
+    <div class="calendar-card calendar-card--side">
+      <div class="card-head">
+        <h3 class="card-head-title">Calendrier</h3>
+        <a class="card-head-link" routerLink="/admin/calendrier">Voir →</a>
+      </div>
+      <div class="calendar-body">
+        <app-mini-calendar [offres]="calendarOffres()" />
+      </div>
+    </div>
+
+    </div><!-- /offers-cal-row -->
 
   </div>
 }

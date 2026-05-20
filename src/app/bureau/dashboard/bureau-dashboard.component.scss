@@ -50,9 +50,9 @@
    ══════════════════════════════════════════ */
 .bottom-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
   gap: $space-4;
-  align-items: start;
+  align-items: stretch;
   @include tablet { grid-template-columns: 1fr; }
   @include mobile { grid-template-columns: 1fr; }
 }
@@ -84,7 +84,17 @@
   svg { opacity: 0.5; }
 }
 
-.calendar-body { padding: $space-2 $space-3 $space-3; }
+.calendar-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-body {
+  padding: $space-2 $space-3 $space-3;
+  flex: 1;
+  overflow: hidden;
+  app-mini-calendar { transform: scale(0.88); transform-origin: top center; display: block; }
+}
 
 /* ── Spinner ── */
 .spinner {

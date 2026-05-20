@@ -380,7 +380,7 @@
       }
 
       <div class="panel-body">
-        <span class="type-badge" [style.background]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span>
+        <span class="type-badge" [style.background]="typeColor(o.typeOffre) + '22'" [style.color]="typeColor(o.typeOffre)" [style.border]="'1.5px solid ' + typeColor(o.typeOffre) + '88'">{{ typeLabel(o.typeOffre) }}</span>
         <h2 class="panel-title">{{ o.titre }}</h2>
         @if (o.description) { <p class="panel-desc">{{ o.description }}</p> }
 

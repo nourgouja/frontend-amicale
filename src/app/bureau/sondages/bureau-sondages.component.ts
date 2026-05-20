@@ -27,12 +27,11 @@ export class BureauSondagesComponent implements OnInit {
   participationStat = computed(() => {
     const members      = this.totalMembres();
     const all          = this.sondages();
-    const sondageCount = all.length;
+    const sondageCount = all.filter(s => s.statut === 'OPEN' || s.statut === 'CLOSED').length;
     const totalVotes   = all.reduce((sum, s) => sum + this.totalVotes(s), 0);
     if (!members || !sondageCount) {
       return { pct: 0, totalVotes, sondageCount, total: members };
     }
-    // totalVotes / (sondageCount × members)
     const pct = Math.min(100, Math.round((totalVotes / (sondageCount * members)) * 100));
     return { pct, totalVotes, sondageCount, total: members };
   });
@@ -46,16 +45,15 @@ export class BureauSondagesComponent implements OnInit {
   sondageStatusStat = computed(() => {
     const all = this.sondages();
     return [
-      { label: 'En cours',  color: '#026654', count: all.filter(s => s.statut === 'OPEN').length },
-      { label: 'Clôturés',  color: '#9ca3af', count: all.filter(s => s.statut === 'CLOSED').length },
-      { label: 'Brouillons',color: '#f59e0b', count: all.filter(s => s.statut === 'DRAFT').length },
+      { label: 'En cours', color: '#026654', count: all.filter(s => s.statut === 'OPEN').length },
+      { label: 'Clôturés', color: '#9ca3af', count: all.filter(s => s.statut === 'CLOSED').length },
     ];
   });
 
   ngOnInit(): void {
     this.loadSondages();
-    this.http.get<any>('/api/statistiques/bureau').subscribe({
-      next: s => this.totalMembres.set(s.totalMembres ?? 0),
+    this.http.get<any>('/api/bureau/dashboard').subscribe({
+      next: s => this.totalMembres.set(s.totalAdherents ?? 0),
       error: () => {},
     });
   }

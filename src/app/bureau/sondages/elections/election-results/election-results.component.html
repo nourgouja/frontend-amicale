@@ -97,18 +97,19 @@
             }
           </div>
 
-          <div class="candidates-list">
+          <div class="candidates-grid">
             @for (c of group.candidates; track c.id; let i = $index) {
-              <div class="result-row" [class.result-row--winner]="c.winner" [class.result-row--tied]="group.tied">
-                <div class="rank">
+              <div class="result-card" [class.result-card--winner]="c.winner" [class.result-card--tied]="group.tied">
+
+                <div class="rc-rank">
                   @if (c.winner && !c.autoSelected) {
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><path d="M2 19h20l-2-10-5 5-3-8-3 8-5-5z"/></svg>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#f59e0b"><path d="M2 19h20l-2-10-5 5-3-8-3 8-5-5z"/></svg>
                   } @else {
                     <span class="rank-num">{{ i + 1 }}</span>
                   }
                 </div>
 
-                <div class="candidate-photo">
+                <div class="rc-photo">
                   @if (c.pictureUrl) {
                     <img [src]="c.pictureUrl" [alt]="c.prenom + ' ' + c.nom" />
                   } @else {
@@ -116,27 +117,20 @@
                   }
                 </div>
 
-                <div class="candidate-details">
-                  <div class="name-row">
-                    <span class="candidate-name">{{ c.prenom }} {{ c.nom }}</span>
-                    @if (c.winner && !c.autoSelected) {
-                      <span class="winner-badge">Élu(e)</span>
-                    }
-                    @if (c.autoSelected) {
-                      <span class="winner-badge">Élu(e)</span>
-                    }
-                  </div>
-                  @if (c.description) {
-                    <p class="candidate-desc">{{ c.description }}</p>
-                  }
-                  <div class="progress-row">
-                    <div class="progress-track">
-                      <div class="progress-fill" [style.width.%]="c.votePercentage"
-                           [class.progress-fill--winner]="c.winner"></div>
-                    </div>
-                    <span class="vote-stats">{{ c.voteCount }} vote(s) — {{ c.votePercentage | number:'1.0-0' }}%</span>
-                  </div>
+                <span class="rc-name">{{ c.prenom }} {{ c.nom }}</span>
+
+                @if (c.winner || c.autoSelected) {
+                  <span class="winner-badge">Élu(e)</span>
+                }
+
+                <span class="rc-votes">{{ c.voteCount }} vote(s)</span>
+                <span class="rc-pct">{{ c.votePercentage | number:'1.0-0' }}%</span>
+
+                <div class="rc-bar-track">
+                  <div class="rc-bar-fill" [style.width.%]="c.votePercentage"
+                       [class.rc-bar-fill--winner]="c.winner"></div>
                 </div>
+
               </div>
             }
           </div>

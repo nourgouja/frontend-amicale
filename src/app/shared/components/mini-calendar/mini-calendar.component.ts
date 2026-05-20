@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, computed, signal, OnChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { getOffreTypeColor } from '../../utils/format.utils';
+import { CommonModule, DatePipe } from '@angular/common';
+import { getOffreTypeColor, getOffreTypeLabel } from '../../utils/format.utils';
 
 export interface CalendarOffre {
   id: number;
@@ -13,7 +13,7 @@ export interface CalendarOffre {
 @Component({
   selector: 'app-mini-calendar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DatePipe],
   templateUrl: './mini-calendar.component.html',
   styleUrl: './mini-calendar.component.scss',
 })
@@ -22,7 +22,8 @@ export class MiniCalendarComponent implements OnChanges {
   @Output() dayClick = new EventEmitter<{ date: Date; offres: CalendarOffre[] }>();
 
   readonly today = new Date();
-  viewDate = signal(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
+  viewDate    = signal(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
+  selectedDay = signal<Date | null>(null);
 
   readonly WEEKDAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
@@ -91,6 +92,35 @@ export class MiniCalendarComponent implements OnChanges {
     }));
   }
 
+  selectedDayOffres = computed(() => {
+    const d = this.selectedDay();
+    return d ? this.offresForDay(d) : [];
+  });
+
+  isSelectedDay(day: Date): boolean {
+    const s = this.selectedDay();
+    if (!s) return false;
+    return day.getDate() === s.getDate() &&
+           day.getMonth() === s.getMonth() &&
+           day.getFullYear() === s.getFullYear();
+  }
+
+  isTodayDate(d: Date): boolean {
+    return d.getDate() === this.today.getDate() &&
+           d.getMonth() === this.today.getMonth() &&
+           d.getFullYear() === this.today.getFullYear();
+  }
+
+  typeColor(t: string): string { return getOffreTypeColor(t); }
+  typeLabel(t: string): string { return getOffreTypeLabel(t); }
+
+  fmtSelectedDay(): string {
+    const d = this.selectedDay();
+    if (!d) return '';
+    if (this.isTodayDate(d)) return "Aujourd'hui";
+    return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
   prevMonth(): void {
     const d = this.viewDate();
     this.viewDate.set(new Date(d.getFullYear(), d.getMonth() - 1, 1));
@@ -102,6 +132,10 @@ export class MiniCalendarComponent implements OnChanges {
   }
 
   onDayClick(day: Date): void {
-    this.dayClick.emit({ date: day, offres: this.offresForDay(day) });
+    const events = this.offresForDay(day);
+    if (events.length === 0) { this.selectedDay.set(null); return; }
+    const already = this.isSelectedDay(day);
+    this.selectedDay.set(already ? null : day);
+    this.dayClick.emit({ date: day, offres: events });
   }
 }

@@ -88,7 +88,7 @@
     </div>
 
     <div class="pp-body">
-      <span class="pp-type-badge" [style.background]="colorFor(o.typeOffre)">{{ labelFor(o.typeOffre) }}</span>
+      <span class="pp-type-badge" [style.background]="colorFor(o.typeOffre) + '22'" [style.color]="colorFor(o.typeOffre)" [style.border]="'1.5px solid ' + colorFor(o.typeOffre) + '88'">{{ labelFor(o.typeOffre) }}</span>
       <h2 class="pp-title">{{ o.titre }}</h2>
 
       @if (o.description) {

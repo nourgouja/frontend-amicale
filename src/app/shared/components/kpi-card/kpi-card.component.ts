@@ -8,6 +8,7 @@ import { LucideAngularModule } from 'lucide-angular';
   imports: [DecimalPipe, LucideAngularModule],
   templateUrl: './kpi-card.component.html',
   styleUrl: './kpi-card.component.scss',
+  host: { style: 'display: flex; flex-direction: column;' },
 })
 export class KpiCardComponent {
   @Input() label = '';
@@ -18,6 +19,7 @@ export class KpiCardComponent {
   @Input() subtitle = '';
   @Input() badge = '';
   @Input() badgeVariant: 'green' | 'orange' | 'red' | 'muted' = 'green';
+  @Input() breakdown: { label: string; count: number }[] = [];
 
   get isNumeric(): boolean { return typeof this.value === 'number'; }
 }

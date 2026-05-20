@@ -38,6 +38,7 @@ export function getOffreTypeColor(type: string): string {
     SEJOUR:     '#0ea5e9',
     ACTIVITE:   '#16a34a',
     CONVENTION: '#f97316',
+    EVENEMENT:  '#8b5cf6',
     ANNONCE:    '#ec4899',
   };
   return map[type] ?? '#9ca3af';
@@ -49,6 +50,7 @@ export function getOffreTypeLabel(type: string): string {
     SEJOUR:     'Séjour',
     ACTIVITE:   'Activité',
     CONVENTION: 'Convention',
+    EVENEMENT:  'Événement',
     ANNONCE:    'Annonce',
   };
   return map[type] ?? type;

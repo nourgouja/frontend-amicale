@@ -17,7 +17,7 @@
   padding: 24px 0; gap: 8px;
 }
 
-.sidebar-brand { padding: 0 20px 24px; border-bottom: 1px solid #D1D5DB; }
+.sidebar-brand { padding: 0 20px 24px; }
 .sidebar-logo  { width: 160px; object-fit: contain; }
 
 .sidebar-nav { display: flex; flex-direction: column; gap: 4px; padding: 16px 12px 0; }
@@ -38,7 +38,7 @@
 
 .sidebar-spacer { flex: 1; }
 
-.sidebar-footer { padding: 24px 16px 16px; border-top: 1px solid #D1D5DB; }
+.sidebar-footer { padding: 24px 16px 16px; }
 
 .sidebar-footer-card {
   background: #F3F4F6; border-radius: 12px;

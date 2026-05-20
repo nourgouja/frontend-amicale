@@ -6,6 +6,7 @@ export interface OffreDashboardItem {
   id: number;
   titre: string;
   statut: string;
+  typeOffre?: string;
   placesRestantes: number | null;
   totalInscrits: number;
 }

@@ -19,7 +19,16 @@
     @if (unit) { <span class="kpi-unit">{{ unit }}</span> }
   </div>
 
-  @if (subtitle) {
+  @if (breakdown && breakdown.length > 0) {
+    <div class="kpi-breakdown">
+      @for (row of breakdown; track row.label) {
+        <div class="kpi-breakdown-row">
+          <span class="kpi-breakdown-label">{{ row.label }}</span>
+          <span class="kpi-breakdown-count">{{ row.count }}</span>
+        </div>
+      }
+    </div>
+  } @else if (subtitle) {
     <div class="kpi-subtitle">{{ subtitle }}</div>
   }
 </div>

@@ -1,21 +1,56 @@
 <div class="bureau-inscriptions">
 
+  <!-- Page header: title + KPI cards + export -->
   <div class="page-head">
-    <div>
+    <div class="page-head-titles">
       <h1 class="page-title">Inscriptions</h1>
       <p class="page-sub">Gérez les demandes d'inscription aux offres de votre pôle</p>
     </div>
+
+    <div class="page-head-kpis">
+      <div class="insc-kpi-card">
+        <div class="insc-kpi-icon insc-kpi-icon--orange">
+          <lucide-icon name="clipboard-list" [size]="20"></lucide-icon>
+        </div>
+        <div class="insc-kpi-body">
+          <span class="insc-kpi-label">En attente d'approbation</span>
+          <div class="insc-kpi-value-row">
+            <span class="insc-kpi-value" [class.insc-kpi-value--orange]="pendingCount() > 0">{{ pendingCount() }}</span>
+            @if (pendingCount() > 0) {
+              <span class="insc-kpi-badge insc-kpi-badge--orange">Action requise</span>
+            } @else {
+              <span class="insc-kpi-badge insc-kpi-badge--muted">À jour</span>
+            }
+          </div>
+          <span class="insc-kpi-sub">inscription(s) à traiter</span>
+        </div>
+      </div>
+
+      <div class="insc-kpi-card">
+        <div class="insc-kpi-icon insc-kpi-icon--primary">
+          <lucide-icon name="sparkles" [size]="20"></lucide-icon>
+        </div>
+        <div class="insc-kpi-body">
+          <span class="insc-kpi-label">Nouvelles inscriptions</span>
+          <div class="insc-kpi-value-row">
+            <span class="insc-kpi-value">{{ newSinceLastLogin() }}</span>
+            @if (newSinceLastLogin() > 0) {
+              <span class="insc-kpi-badge insc-kpi-badge--green">Nouveau</span>
+            }
+          </div>
+          <span class="insc-kpi-sub">depuis votre dernière connexion</span>
+        </div>
+      </div>
+    </div>
+
     <button class="btn-export" (click)="exportData()">
       <lucide-icon name="download" [size]="15"></lucide-icon>
       Exporter Données
     </button>
   </div>
 
-  <!-- Filter panel + KPI cards in one aligned row -->
-  <div class="top-row">
-
-    <!-- Horizontal filter panel -->
-    <div class="filter-panel">
+  <!-- Filter panel — full width -->
+  <div class="filter-panel">
 
     <div class="fp-group">
       <label class="fp-label">Membre</label>
@@ -42,7 +77,7 @@
       </select>
     </div>
 
-    <div class="fp-group">
+    <div class="fp-group fp-group--statut">
       <label class="fp-label">Statut</label>
       <div class="fp-chips">
         @for (s of statuts; track s.key) {
@@ -59,45 +94,7 @@
       </button>
     </div>
 
-    </div><!-- /filter-panel -->
-
-    <!-- KPI card 1 -->
-    <div class="insc-kpi-card">
-      <div class="insc-kpi-icon insc-kpi-icon--orange">
-        <lucide-icon name="clipboard-list" [size]="20"></lucide-icon>
-      </div>
-      <div class="insc-kpi-body">
-        <span class="insc-kpi-label">En attente d'approbation</span>
-        <div class="insc-kpi-value-row">
-          <span class="insc-kpi-value" [class.insc-kpi-value--orange]="pendingCount() > 0">{{ pendingCount() }}</span>
-          @if (pendingCount() > 0) {
-            <span class="insc-kpi-badge insc-kpi-badge--orange">Action requise</span>
-          } @else {
-            <span class="insc-kpi-badge insc-kpi-badge--muted">À jour</span>
-          }
-        </div>
-        <span class="insc-kpi-sub">inscription(s) à traiter</span>
-      </div>
-    </div>
-
-    <!-- KPI card 2 -->
-    <div class="insc-kpi-card">
-      <div class="insc-kpi-icon insc-kpi-icon--primary">
-        <lucide-icon name="sparkles" [size]="20"></lucide-icon>
-      </div>
-      <div class="insc-kpi-body">
-        <span class="insc-kpi-label">Nouvelles inscriptions</span>
-        <div class="insc-kpi-value-row">
-          <span class="insc-kpi-value">{{ newSinceLastLogin() }}</span>
-          @if (newSinceLastLogin() > 0) {
-            <span class="insc-kpi-badge insc-kpi-badge--green">Nouveau</span>
-          }
-        </div>
-        <span class="insc-kpi-sub">depuis votre dernière connexion</span>
-      </div>
-    </div>
-
-  </div><!-- /top-row -->
+  </div><!-- /filter-panel -->
 
   <!-- Table -->
   @if (loading()) {

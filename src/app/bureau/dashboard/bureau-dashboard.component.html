@@ -68,7 +68,7 @@
                       <span class="offre-titre">{{ offre.titre }}</span>
                     </div>
                   </td>
-                  <td><span class="type-pill" [style.background]="typeColor(offre.typeOffre)">{{ typeLabel(offre.typeOffre) }}</span></td>
+                  <td><span class="type-pill" [style.background]="typeColor(offre.typeOffre) + '22'" [style.color]="typeColor(offre.typeOffre)" [style.border]="'1.5px solid ' + typeColor(offre.typeOffre) + '88'">{{ typeLabel(offre.typeOffre) }}</span></td>
                   <td>
                     <span class="statut-pill"
                       [class.statut--open]="offre.statutOffre === 'OPEN'"
@@ -124,7 +124,7 @@
             <div class="dp-fields">
               <div class="dp-row"><span class="dp-label">Status:</span><app-status-badge [statut]="o.statutOffre" type="offre" /></div>
               @if (o.typeOffre) {
-                <div class="dp-row"><span class="dp-label">Type:</span><span class="dp-value"><span class="type-chip" [style.background]="typeColor(o.typeOffre) + '18'" [style.color]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span></span></div>
+                <div class="dp-row"><span class="dp-label">Type:</span><span class="dp-value"><span class="type-chip" [style.background]="typeColor(o.typeOffre) + '22'" [style.color]="typeColor(o.typeOffre)" [style.border]="'1.5px solid ' + typeColor(o.typeOffre) + '88'">{{ typeLabel(o.typeOffre) }}</span></span></div>
               }
               @if (o.lieu) { <div class="dp-row"><span class="dp-label">Lieu:</span><span class="dp-value">{{ o.lieu }}</span></div> }
               @if (o.prixParPersonne != null) { <div class="dp-row"><span class="dp-label">Prix:</span><span class="dp-value">{{ o.prixParPersonne }} DT / pers.</span></div> }
@@ -248,7 +248,7 @@
     </div>
 
     <!-- Right: Calendrier -->
-    <div class="panel">
+    <div class="panel calendar-panel">
       <div class="panel-head">
         <h3 class="panel-title">Calendrier</h3>
         <a class="panel-link" routerLink="/bureau/offres">Voir Plus</a>

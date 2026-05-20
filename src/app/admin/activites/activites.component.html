@@ -29,108 +29,195 @@
       </button>
     </div>
 
-    <!-- Filters -->
-    <div class="filter-row">
-      <div class="tab-group">
-        @for (s of offreStatuts; track s.key) {
-          <button class="tab-btn" [class.active]="offreStatut() === s.key"
-                  (click)="offreStatut.set(s.key)">{{ s.label }}</button>
+    <!-- Body: sidebar + table -->
+    <div class="act-body">
+
+      <!-- Left filter sidebar -->
+      <aside class="filter-sidebar">
+        <h3 class="fs-title">Filtres de recherche</h3>
+
+        <div class="fs-group">
+          <label class="fs-label">Rechercher une offre</label>
+          <div class="fs-input-wrap">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="fs-input" type="search" placeholder="Rechercher une offre…"
+                   [value]="offreSearch()" (input)="onOffreSearch($any($event.target).value)" />
+          </div>
+        </div>
+
+        <div class="fs-group">
+          <label class="fs-label">Statut</label>
+          <div class="fs-chips">
+            @for (s of offreStatuts; track s.key) {
+              <button class="fs-chip" [class.fs-chip--active]="offreStatut() === s.key"
+                      (click)="setOffreStatut(s.key)">{{ s.label }}</button>
+            }
+          </div>
+        </div>
+
+        <button class="fs-reset" (click)="resetOffreFilters()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Réinitialiser
+        </button>
+
+        <!-- Publications ce mois -->
+        <div class="pub-kpi">
+          <div class="pub-kpi-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+              <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+          </div>
+          <div class="pub-kpi-body">
+            <span class="pub-kpi-count">{{ thisMonthPublications() }}</span>
+            <span class="pub-kpi-label">publication(s)<br>ajoutée(s) ce mois</span>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Table -->
+      <div class="table-card">
+        @if (offresLoading()) {
+          <div class="state-row">
+            <div class="spinner"></div>
+            <span>Chargement des offres…</span>
+          </div>
+        } @else if (filteredOffres().length === 0) {
+          <div class="empty-state">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <p class="empty-title">Aucune offre trouvée</p>
+          </div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="th-icon"></th>
+                <th>Offre</th>
+                <th>Dates</th>
+                <th>Capacité</th>
+                <th>Statut</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (o of paginatedOffres(); track o.id) {
+                <tr class="data-row">
+                  <td class="td-icon">
+                    <div class="type-icon-badge" [style.background]="typeColor(o.typeOffre) + '18'" [style.color]="typeColor(o.typeOffre)" [title]="typeLabel(o.typeOffre)">
+                      @switch (o.typeOffre) {
+                        @case ('VOYAGE') {
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2C4.3 5.1 3.8 5.4 3.6 5.9l-.3.8c-.2.5 0 1.1.5 1.3L9 9.6l-4.3 4.3-2.4-.4-.3.3c-.5.5-.5 1.4 0 1.9l2.3 2.3c.3.3.6.4 1 .4l.4-.1L7 17l1.6 5.4c.2.6.8.9 1.3.7l.8-.3c.5-.2.7-.7.6-1.2L9.4 14l4.3-4.3 2.4 7.2c.2.5.8.8 1.3.5l.8-.3c.4-.2.7-.7.6-1.2z"/>
+                          </svg>
+                        }
+                        @case ('SEJOUR') {
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/>
+                          </svg>
+                        }
+                        @case ('ACTIVITE') {
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                          </svg>
+                        }
+                        @case ('CONVENTION') {
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m11 17 2 2a1 1 0 1 0 3-3"/>
+                            <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l1.71 1.71"/>
+                            <path d="m2 2 20 20"/>
+                            <path d="M8.71 8.71 6 11.41A5.79 5.79 0 0 0 8.29 19.5l1.71 1.71"/>
+                          </svg>
+                        }
+                        @case ('EVENEMENT') {
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                          </svg>
+                        }
+                        @default {
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>
+                          </svg>
+                        }
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    <div class="offre-cell">
+                      <span class="type-pill" [style.background]="typeColor(o.typeOffre) + '22'" [style.color]="typeColor(o.typeOffre)" [style.border]="'1px solid ' + typeColor(o.typeOffre) + '55'">{{ typeLabel(o.typeOffre) }}</span>
+                      <span class="offre-title">{{ o.titre }}</span>
+                    </div>
+                  </td>
+                  <td class="muted-cell">
+                    {{ fmtDate(o.dateDebut) }}
+                    @if (o.dateFin) { → {{ fmtDate(o.dateFin) }} }
+                  </td>
+                  <td>
+                    @if (o.capaciteMax) {
+                      <div class="cap-cell">
+                        <div class="cap-bar-track">
+                          <div class="cap-bar-fill" [style.width.%]="fillPercent(o)"></div>
+                        </div>
+                        <span class="cap-label">{{ inscritsCount(o) }}/{{ o.capaciteMax }}</span>
+                      </div>
+                    } @else {
+                      <span class="muted-cell">—</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="statut-badge"
+                          [class.statut--open]="o.statutOffre === 'OPEN'"
+                          [class.statut--draft]="o.statutOffre === 'DRAFT'"
+                          [class.statut--closed]="o.statutOffre === 'CLOSED'"
+                          [class.statut--archived]="o.statutOffre === 'ARCHIVED'">
+                      @switch (o.statutOffre) {
+                        @case ('OPEN')     { Ouverte }
+                        @case ('DRAFT')    { Brouillon }
+                        @case ('CLOSED')   { Fermée }
+                        @case ('ARCHIVED') { Archivée }
+                        @default           { {{ o.statutOffre }} }
+                      }
+                    </span>
+                  </td>
+                  <td>
+                    @if (o.typeOffre === 'CONVENTION') {
+                      <span class="convention-label">Publication</span>
+                    } @else {
+                      <button class="btn-participants" (click)="openParticipants(o)">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Participants
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          @if (totalPages() > 1) {
+            <div class="pagination">
+              <button class="pg-btn" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              @for (p of pageNumbers(); track $index) {
+                @if (p === '...') {
+                  <span class="pg-dots">…</span>
+                } @else {
+                  <button class="pg-num" [class.pg-num--active]="currentPage() === p" (click)="goToPage(+p)">{{ p }}</button>
+                }
+              }
+              <button class="pg-btn" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <span class="pg-info">{{ currentPage() }} / {{ totalPages() }}</span>
+            </div>
+          }
         }
       </div>
-      <div class="search-box">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="search-input" type="search" placeholder="Rechercher une offre…"
-               [value]="offreSearch()" (input)="onOffreSearch($any($event.target).value)" />
-      </div>
-    </div>
 
-    <!-- Table -->
-    <div class="table-card">
-      @if (offresLoading()) {
-        <div class="state-row">
-          <div class="spinner"></div>
-          <span>Chargement des offres…</span>
-        </div>
-      } @else if (filteredOffres().length === 0) {
-        <div class="empty-state">
-          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-          </svg>
-          <p class="empty-title">Aucune offre trouvée</p>
-        </div>
-      } @else {
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Offre</th>
-              <th>Dates</th>
-              <th>Lieu</th>
-              <th>Prix</th>
-              <th>Capacité</th>
-              <th>Statut</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (o of filteredOffres(); track o.id) {
-              <tr class="data-row">
-                <td>
-                  <div class="offre-cell">
-                    <span class="type-pill" [style.background]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span>
-                    <span class="offre-title">{{ o.titre }}</span>
-                  </div>
-                </td>
-                <td class="muted-cell">
-                  {{ fmtDate(o.dateDebut) }}
-                  @if (o.dateFin) { → {{ fmtDate(o.dateFin) }} }
-                </td>
-                <td class="muted-cell">{{ o.lieu ?? '—' }}</td>
-                <td class="muted-cell">
-                  @if (o.prixParPersonne != null) { {{ o.prixParPersonne | number:'1.0-0' }} TND }
-                  @else { Gratuit }
-                </td>
-                <td>
-                  @if (o.capaciteMax) {
-                    <div class="cap-cell">
-                      <div class="cap-bar-track">
-                        <div class="cap-bar-fill" [style.width.%]="fillPercent(o)"></div>
-                      </div>
-                      <span class="cap-label">{{ inscritsCount(o) }}/{{ o.capaciteMax }}</span>
-                    </div>
-                  } @else {
-                    <span class="muted-cell">—</span>
-                  }
-                </td>
-                <td>
-                  <span class="statut-badge"
-                        [class.statut--open]="o.statutOffre === 'OPEN'"
-                        [class.statut--draft]="o.statutOffre === 'DRAFT'"
-                        [class.statut--closed]="o.statutOffre === 'CLOSED'"
-                        [class.statut--archived]="o.statutOffre === 'ARCHIVED'">
-                    @switch (o.statutOffre) {
-                      @case ('OPEN')   { Ouverte }
-                      @case ('DRAFT') { Brouillon }
-                      @case ('CLOSED')    { Fermée }
-                      @case ('ARCHIVED')  { Archivée }
-                      @default            { {{ o.statutOffre }} }
-                    }
-                  </span>
-                </td>
-                <td>
-                  @if (o.typeOffre === 'CONVENTION') {
-                    <span class="convention-label">Publication</span>
-                  } @else {
-                  <button class="btn-participants" (click)="openParticipants(o)">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    Participants
-                  </button>
-                  } <!-- end @else -->
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
     </div>
 
   </div>
@@ -153,34 +240,44 @@
             Offres
           </button>
           @if (selectedOffre(); as o) {
-            <div class="hd-title-wrap">
-              <h1 class="page-title">
-                <span class="type-pill type-pill--sm" [style.background]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span>
-                {{ o.titre }}
-              </h1>
-              <div class="stat-chips">
-                <span class="stat-chip">{{ insCounts().total }} inscrits</span>
-                @if (insCounts().attente > 0) {
-                  <span class="stat-chip stat-chip--warn">{{ insCounts().attente }} en attente</span>
-                }
-                <span class="stat-chip stat-chip--ok">{{ insCounts().confirmee }} confirmés</span>
+            <h1 class="page-title">
+              <span class="type-pill type-pill--sm" [style.background]="typeColor(o.typeOffre) + '22'" [style.color]="typeColor(o.typeOffre)" [style.border]="'1.5px solid ' + typeColor(o.typeOffre) + '88'">{{ typeLabel(o.typeOffre) }}</span>
+              {{ o.titre }}
+            </h1>
+            <div class="attente-kpi attente-kpi--right">
+              <div class="attente-kpi-icon attente-kpi-icon--green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <div class="attente-kpi-body">
+                <span class="attente-kpi-title">Participants inscrits</span>
+                <span class="attente-kpi-count">{{ insCounts().total }}</span>
+                <span class="attente-kpi-sub">{{ insCounts().confirmee }} confirmé(s)</span>
               </div>
             </div>
           }
         </div>
 
         <!-- Filters -->
-        <div class="filter-row">
-          <div class="tab-group">
-            @for (s of insStatuts; track s.key) {
-              <button class="tab-btn" [class.active]="insStatut() === s.key"
-                      (click)="insStatut.set(s.key)">{{ s.label }}</button>
-            }
+        <div class="ins-filter-panel">
+          <div class="fp-group">
+            <label class="fp-label">Statut</label>
+            <div class="fp-chips">
+              @for (s of insStatuts; track s.key) {
+                <button class="fp-chip" [class.fp-chip--active]="insStatut() === s.key"
+                        (click)="insStatut.set(s.key)">{{ s.label }}</button>
+              }
+            </div>
           </div>
-          <div class="search-box">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-input" type="search" placeholder="Rechercher un participant…"
-                   [value]="insSearch()" (input)="onInsSearch($any($event.target).value)" />
+          <div class="fp-group fp-group--search">
+            <label class="fp-label">Rechercher</label>
+            <div class="fp-input-wrap">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="fp-input" type="search" placeholder="Rechercher un participant…"
+                     [value]="insSearch()" (input)="onInsSearch($any($event.target).value)" />
+            </div>
           </div>
         </div>
 
@@ -220,7 +317,6 @@
                   <th>Paiement</th>
                   <th># Invités</th>
                   <th>Total</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -266,22 +362,6 @@
                     </td>
                     <td class="muted-cell center-cell">{{ ins.guests?.length ?? ins.nombreAccompagnants }}</td>
                     <td class="muted-cell center-cell">{{ ins.totalPeople ?? (1 + ins.nombreAccompagnants) }}</td>
-                    <td (click)="$event.stopPropagation()">
-                      @if (ins.statut === 'PENDING') {
-                        <div class="action-btns">
-                          <button class="btn-approve" [disabled]="actionLoading() === ins.id"
-                                  (click)="confirmer(ins.id)">
-                            @if (actionLoading() === ins.id) { … } @else { Valider }
-                          </button>
-                          <button class="btn-reject" [disabled]="actionLoading() === ins.id"
-                                  (click)="refuser(ins.id)">
-                            @if (actionLoading() === ins.id) { … } @else { Rejeter }
-                          </button>
-                        </div>
-                      } @else {
-                        <span class="muted-cell">—</span>
-                      }
-                    </td>
                   </tr>
                 }
               </tbody>
@@ -306,7 +386,7 @@
             </div>
           }
           <div class="aside-body">
-            <span class="aside-type-badge" [style.background]="typeColor(o.typeOffre)">{{ typeLabel(o.typeOffre) }}</span>
+            <span class="aside-type-badge" [style.background]="typeColor(o.typeOffre) + '22'" [style.color]="typeColor(o.typeOffre)" [style.border]="'1.5px solid ' + typeColor(o.typeOffre) + '88'">{{ typeLabel(o.typeOffre) }}</span>
             <h2 class="aside-title">{{ o.titre }}</h2>
             @if (o.description) { <p class="aside-desc">{{ o.description }}</p> }
             <div class="aside-sep"></div>
@@ -384,75 +464,77 @@
 }
 
 <!-- ════════════════════════════════════════════
-     PART C – DETAIL MODAL
+     PART C – DETAIL SIDE PANEL
 ════════════════════════════════════════════ -->
-@if (view() === 'detail') {
-  <div class="modal-backdrop" (click)="backToParticipants()">
-    <div class="modal-panel" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+@if (view() === 'detail' && selectedIns(); as ins) {
+  <div class="panel-backdrop" (click)="backToParticipants()">
+    <div class="panel-side" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
 
-      <!-- Modal header -->
-      <div class="modal-hd">
-        <div class="modal-hd-left">
-          @if (selectedIns(); as ins) {
-            <div class="avatar avatar--lg">{{ initials(ins.adherentNom, ins.adherentPrenom) }}</div>
-            <div>
-              <h2 class="modal-title">{{ ins.adherentPrenom }} {{ ins.adherentNom }}</h2>
-              <p class="modal-sub">{{ ins.mailAdherent }}</p>
-            </div>
-          }
+      <!-- Header -->
+      <div class="panel-hd">
+        <div class="panel-hd-left">
+          <div class="panel-avatar">{{ initials(ins.adherentNom, ins.adherentPrenom) }}</div>
+          <div>
+            <h2 class="panel-title">{{ ins.adherentPrenom }} {{ ins.adherentNom }}</h2>
+            <p class="panel-sub">{{ ins.mailAdherent }}</p>
+          </div>
         </div>
-        <button class="modal-close" (click)="backToParticipants()" aria-label="Fermer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <button class="panel-close" (click)="backToParticipants()" aria-label="Fermer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
-      <!-- Modal body -->
       @if (detailLoading()) {
-        <div class="state-row state-row--modal">
-          <div class="spinner"></div>
-          <span>Chargement du dossier…</span>
-        </div>
-      } @else if (selectedIns(); as ins) {
-        <div class="modal-body">
+        <div class="state-row"><div class="spinner"></div><span>Chargement…</span></div>
+      } @else {
+        <div class="panel-body">
 
-          <!-- Status row -->
-          <div class="detail-status-row">
-            <div class="detail-kv">
-              <span class="kv-label">Statut inscription</span>
-              <span class="ins-badge"
-                    [class.ins--attente]="ins.statut === 'PENDING'"
-                    [class.ins--ok]="ins.statut === 'APPROVED'"
-                    [class.ins--rejet]="ins.statut === 'REJECTED'"
-                    [class.ins--annul]="ins.statut === 'CANCELLED'">
-                @switch (ins.statut) {
-                  @case ('PENDING') { En attente }
-                  @case ('APPROVED')  { Confirmée }
-                  @case ('REJECTED')    { Rejetée }
-                  @case ('CANCELLED')    { Annulée }
-                }
-              </span>
+          <!-- Inscription summary card -->
+          <div class="idc-card">
+            <div class="idc-offre-row">
+              <span class="idc-offre-title">{{ selectedOffre()?.titre }}</span>
+              <span class="idc-type-badge" [style.background]="typeColor(selectedOffre()?.typeOffre ?? '') + '22'" [style.color]="typeColor(selectedOffre()?.typeOffre ?? '')" [style.border]="'1.5px solid ' + typeColor(selectedOffre()?.typeOffre ?? '') + '88'">{{ typeLabel(selectedOffre()?.typeOffre ?? '') }}</span>
             </div>
-            <div class="detail-kv">
-              <span class="kv-label">Date d'inscription</span>
-              <span class="kv-val">{{ fmtDate(ins.dateInscription) }}</span>
-            </div>
-            @if (ins.montant != null) {
-              <div class="detail-kv">
-                <span class="kv-label">Montant total</span>
-                <span class="kv-val kv-val--price">{{ ins.montant | number:'1.0-2' }} TND</span>
+            <div class="idc-meta">
+              <div class="idc-meta-item">
+                <span class="idc-meta-label">Date d'inscription</span>
+                <span class="idc-meta-val">{{ fmtDate(ins.dateInscription) }}</span>
               </div>
-            }
+              <div class="idc-meta-item">
+                <span class="idc-meta-label">Statut</span>
+                <span class="ins-badge"
+                      [class.ins--attente]="ins.statut === 'PENDING'"
+                      [class.ins--ok]="ins.statut === 'APPROVED'"
+                      [class.ins--rejet]="ins.statut === 'REJECTED'"
+                      [class.ins--annul]="ins.statut === 'CANCELLED'">
+                  @switch (ins.statut) {
+                    @case ('PENDING')   { En attente }
+                    @case ('APPROVED')  { Confirmée }
+                    @case ('REJECTED')  { Rejetée }
+                    @case ('CANCELLED') { Annulée }
+                  }
+                </span>
+              </div>
+              @if (ins.montant != null) {
+                <div class="idc-meta-item">
+                  <span class="idc-meta-label">Montant total</span>
+                  <span class="idc-meta-val idc-meta-val--price">{{ ins.montant | number:'1.0-2' }} TND</span>
+                </div>
+              }
+            </div>
           </div>
 
-          <!-- Guests section (read-only) -->
-          <div class="modal-section">
+          <!-- Participants -->
+          <div class="panel-section">
             <h3 class="section-title">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              Participants : {{ ins.totalPeople ?? (1 + ins.nombreAccompagnants) }} personne(s)
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              Participants : {{ ins.totalPeople ?? (1 + (ins.nombreAccompagnants ?? 0)) }} personne(s)
             </h3>
-
             @if (ins.guests && ins.guests.length > 0) {
-              <table class="guests-admin-table">
+              <table class="guests-table">
                 <thead><tr><th>Nom</th><th>Prénom</th><th>Âge</th><th>Sexe</th></tr></thead>
                 <tbody>
                   @for (g of ins.guests; track $index) {
@@ -470,79 +552,52 @@
             }
           </div>
 
-          <!-- Payment schedule section -->
+          <!-- Paiements -->
           @if (ins.echeances && ins.echeances.length > 0) {
-            <div class="modal-section">
+            <div class="panel-section">
               <h3 class="section-title">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                Échéancier de paiement
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                Paiements
               </h3>
-              <table class="echeances-table">
-                <thead>
-                  <tr>
-                    <th>Date d'échéance</th>
-                    <th>Montant</th>
-                    <th>Statut</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (e of ins.echeances; track e.id) {
-                    <tr>
-                      <td>{{ fmtDate(e.dateEcheance) }}</td>
-                      <td class="echeance-montant">{{ e.montant | number:'1.0-2' }} TND</td>
-                      <td>
-                        <span class="pay-badge"
-                              [class.pay--ok]="e.statut === 'PAID'"
-                              [class.pay--late]="e.statut === 'OVERDUE'"
-                              [class.pay--attente]="e.statut === 'PENDING'">
-                          @switch (e.statut) {
-                            @case ('PAID')      { Payée }
-                            @case ('OVERDUE')  { En retard }
-                            @case ('PENDING') { En attente }
-                          }
-                        </span>
-                      </td>
-                      <td>
-                        @if (e.statut !== 'PAID' && ins.statut !== 'CANCELLED' && ins.statut !== 'REJECTED' && ins.statut !== 'PENDING') {
-                          <button class="btn-pay" [disabled]="payLoading() === e.id"
-                                  (click)="payer(e.id, ins.id)">
-                            @if (payLoading() === e.id) { … } @else { Marquer payée }
-                          </button>
-                        }
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
+              <div class="pay-list">
+                @for (e of ins.echeances; track e.id; let i = $index) {
+                  <div class="pay-item">
+                    <span class="pay-tranche">Tranche {{ i + 1 }}/{{ ins.echeances!.length }}</span>
+                    <span class="pay-amount">{{ e.montant | number:'1.0-2' }} TND</span>
+                    <span class="pay-badge"
+                          [class.pay--ok]="e.statut === 'PAID'"
+                          [class.pay--late]="e.statut === 'OVERDUE'"
+                          [class.pay--attente]="e.statut === 'PENDING'">
+                      @switch (e.statut) {
+                        @case ('PAID')    { Payée }
+                        @case ('OVERDUE') { En retard }
+                        @case ('PENDING') { En attente }
+                      }
+                    </span>
+                    @if (e.statut !== 'PAID' && ins.statut !== 'CANCELLED' && ins.statut !== 'REJECTED' && ins.statut !== 'PENDING') {
+                      <button class="btn-pay-row" [disabled]="payLoading() === e.id"
+                              (click)="payer(e.id, ins.id)">
+                        @if (payLoading() === e.id) { … } @else { Marquer payée }
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
             </div>
           }
 
-          <!-- Admin notes section -->
-          <div class="modal-section">
-            <h3 class="section-title">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              Notes administrateur
-            </h3>
-            <textarea class="notes-input" rows="3" placeholder="Ajouter une note interne…"
-                      [ngModel]="notesInput()" (ngModelChange)="notesInput.set($event)"></textarea>
-            <button class="btn-save-notes" [disabled]="notesSaving()" (click)="saveNotes()">
-              @if (notesSaving()) { Enregistrement… } @else { Enregistrer les notes }
-            </button>
-          </div>
 
         </div>
 
-        <!-- Modal footer – main actions -->
-        <div class="modal-footer">
+        <div class="panel-footer">
           @if (ins.statut === 'PENDING') {
-            <button class="btn-confirm-main" [disabled]="actionLoading() === ins.id"
-                    (click)="confirmer(ins.id)">
+            <button class="btn-confirm-main" [disabled]="actionLoading() === ins.id" (click)="confirmer(ins.id)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               @if (actionLoading() === ins.id) { Traitement… } @else { Confirmer l'inscription }
             </button>
-            <button class="btn-reject-main" [disabled]="actionLoading() === ins.id"
-                    (click)="refuser(ins.id)">
+            <button class="btn-reject-main" [disabled]="actionLoading() === ins.id" (click)="refuser(ins.id)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               @if (actionLoading() === ins.id) { Traitement… } @else { Rejeter }
             </button>

@@ -67,10 +67,6 @@ export const routes: Routes = [
         loadComponent: () => import('./admin/calendrier/calendrier.component').then(m => m.CalendrierComponent),
       },
       {
-        path: 'chiffres-cles',
-        loadComponent: () => import('./admin/chiffres-cles/chiffres-cles.component').then(m => m.ChiffresComponent),
-      },
-      {
         path: 'activites',
         loadComponent: () => import('./admin/activites/activites.component').then(m => m.ActivitesComponent),
       },

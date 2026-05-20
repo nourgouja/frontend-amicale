@@ -138,7 +138,7 @@
     </div>
 
     <div class="dp-body">
-      <span class="dp-type-badge" [style.background]="typeColor(o.typeOffre)">{{ o.typeOffre }}</span>
+      <span class="dp-type-badge" [style.background]="typeColor(o.typeOffre) + '22'" [style.color]="typeColor(o.typeOffre)" [style.border]="'1.5px solid ' + typeColor(o.typeOffre) + '88'">{{ o.typeOffre }}</span>
       <h2 class="dp-title">{{ o.titre }}</h2>
       @if (o.description) { <p class="dp-desc">{{ o.description }}</p> }
       <div class="dp-sep"></div>

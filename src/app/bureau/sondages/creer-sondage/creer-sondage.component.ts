@@ -34,11 +34,11 @@ export class CreerSondageComponent implements OnInit {
       titre: ['', [Validators.required, Validators.minLength(3)]],
       option1: this.fb.group({
         titre:       ['', Validators.required],
-        description: ['', Validators.required],
+        description: [''],
       }),
       option2: this.fb.group({
         titre:       ['', Validators.required],
-        description: ['', Validators.required],
+        description: [''],
       }),
     });
   }

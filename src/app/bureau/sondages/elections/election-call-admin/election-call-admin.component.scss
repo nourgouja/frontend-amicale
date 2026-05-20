@@ -14,8 +14,6 @@ $gray-900:  #111827;
 
 .admin-page {
   padding: 2rem;
-  max-width: 900px;
-  margin: 0 auto;
   position: relative;
 }
 
@@ -39,9 +37,8 @@ $gray-900:  #111827;
 // ── Header ─────────────────────────────────────────────────────────────────
 .page-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  align-items: center;
+  justify-content: flex-end;
   margin-bottom: 2rem;
 }
 .page-title   { font-size: 1.5rem; font-weight: 700; color: $gray-900; margin: 0 0 .25rem; }
@@ -132,7 +129,7 @@ $gray-900:  #111827;
   font-size: .875rem;
   color: $gray-900;
   outline: none;
-  &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary,.1); }
+  &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary,.1); outline: none; }
 }
 .form-textarea { resize: vertical; }
 .form-error { font-size: .75rem; color: $danger; }
@@ -183,12 +180,53 @@ $gray-900:  #111827;
 .call-title   { font-size: 1rem; font-weight: 700; color: $gray-900; margin: 0; }
 .call-desc    { font-size: .875rem; color: $gray-600; margin: .25rem 0 0; overflow-wrap: break-word; word-break: break-word; max-width: 100%; }
 .call-deadline {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .35rem;
+  margin-top: .5rem;
+}
+
+.cal-badge {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: .375rem;
-  font-size: .8125rem;
+  width: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid $warning;
+  flex-shrink: 0;
+}
+.cal-badge-month {
+  width: 100%;
+  background: $warning;
+  color: #fff;
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-align: center;
+  padding: 3px 0;
+}
+.cal-badge-day {
+  font-size: 1.25rem;
+  font-weight: 700;
   color: $warning;
-  margin-top: .375rem;
+  line-height: 1;
+  padding: 5px 0 2px;
+}
+.cal-badge-time {
+  font-size: .65rem;
+  font-weight: 600;
+  color: $warning;
+  padding-bottom: 4px;
+  opacity: .85;
+}
+
+.call-deadline-label {
+  font-size: .75rem;
+  color: $warning;
+  font-weight: 700;
+  letter-spacing: .01em;
 }
 
 // ── Status badges ──────────────────────────────────────────────────────────
@@ -204,23 +242,50 @@ $gray-900:  #111827;
 }
 
 // ── Stats ──────────────────────────────────────────────────────────────────
-.call-stats {
+.call-card__top {
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 1.5rem;
   margin-bottom: 1.25rem;
-  flex-wrap: wrap;
 }
-.stat {
+
+.cand-kpi {
+  flex-shrink: 0;
+  width: 160px;
+  background: linear-gradient(135deg, $primary 0%, darken($primary, 8%) 100%);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: #fff;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: .1rem;
-  &-value { font-size: 1.25rem; font-weight: 700; color: $gray-900; }
-  &-label { font-size: .75rem; color: $gray-400; }
-  &--pending  .stat-value { color: #2563eb; }
-  &--accepted .stat-value { color: $success; }
-  &--rejected .stat-value { color: $danger; }
+  gap: 4px;
 }
+.cand-kpi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cand-kpi-title {
+  font-size: .7rem;
+  font-weight: 600;
+  opacity: .85;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.cand-kpi-count {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-top: 2px;
+}
+.cand-kpi-sub {
+  font-size: .72rem;
+  opacity: .75;
+}
+
+// ── Suppress global focus ring on all buttons in this page ────────────────
+.admin-page button:focus-visible { outline: none; }
 
 // ── Actions ────────────────────────────────────────────────────────────────
 .call-actions {
@@ -228,7 +293,7 @@ $gray-900:  #111827;
   align-items: center;
   gap: .75rem;
   flex-wrap: wrap;
-  border-top: 1px solid $gray-100;
+  border-top: 2px solid $primary;
   padding-top: 1rem;
 }
 .btn-action {

@@ -88,15 +88,49 @@ export class ActivitesComponent implements OnInit, OnDestroy {
     { key: 'CLOSED',    label: 'Fermées' },
   ];
 
+  readonly pageSize = 10;
+  currentPage = signal(1);
+
   filteredOffres = computed(() => {
-    let data = this.offres();
-    const s  = this.offreStatut();
-    const q  = this.offreSearch().toLowerCase().trim();
+    let data = [...this.offres()].sort((a, b) =>
+      (b.dateDebut ?? '').localeCompare(a.dateDebut ?? '')
+    );
+    const s = this.offreStatut();
+    const q = this.offreSearch().toLowerCase().trim();
     if (s !== 'tout') data = data.filter(o => o.statutOffre === s);
     if (q) data = data.filter(o =>
       o.titre.toLowerCase().includes(q) || (o.lieu ?? '').toLowerCase().includes(q)
     );
     return data;
+  });
+
+  totalPages = computed(() => Math.max(1, Math.ceil(this.filteredOffres().length / this.pageSize)));
+
+  paginatedOffres = computed(() => {
+    const p = Math.min(this.currentPage(), this.totalPages());
+    const start = (p - 1) * this.pageSize;
+    return this.filteredOffres().slice(start, start + this.pageSize);
+  });
+
+  goToPage(n: number): void {
+    const clamped = Math.max(1, Math.min(n, this.totalPages()));
+    this.currentPage.set(clamped);
+  }
+
+  pageNumbers = computed(() => {
+    const total = this.totalPages();
+    const cur   = this.currentPage();
+    const pages: (number | '...')[] = [];
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (cur > 3) pages.push('...');
+      for (let i = Math.max(2, cur - 1); i <= Math.min(total - 1, cur + 1); i++) pages.push(i);
+      if (cur < total - 2) pages.push('...');
+      pages.push(total);
+    }
+    return pages;
   });
 
   // ── Part B – Participants ─────────────────────────────────
@@ -139,6 +173,12 @@ export class ActivitesComponent implements OnInit, OnDestroy {
   inscrits = computed(() => {
     const o = this.selectedOffre();
     return o ? Math.max(0, (o.capaciteMax ?? 0) - (o.placesRestantes ?? 0)) : 0;
+  });
+
+  thisMonthPublications = computed(() => {
+    const now = new Date();
+    const prefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return this.offres().filter(o => o.typeOffre === 'CONVENTION' && o.dateDebut?.startsWith(prefix)).length;
   });
 
   // ── Part C – Detail modal ────────────────────────────────
@@ -281,9 +321,9 @@ export class ActivitesComponent implements OnInit, OnDestroy {
     });
   }
 
-  onOffreSearch(value: string): void {
-    this.offreSearch.set(value);
-  }
+  onOffreSearch(value: string): void { this.offreSearch.set(value); this.currentPage.set(1); }
+  resetOffreFilters(): void { this.offreStatut.set('tout'); this.offreSearch.set(''); this.currentPage.set(1); }
+  setOffreStatut(s: OffreStatut): void { this.offreStatut.set(s); this.currentPage.set(1); }
 
   onInsSearch(value: string): void {
     this.insSearch.set(value);
@@ -296,6 +336,7 @@ export class ActivitesComponent implements OnInit, OnDestroy {
   // ── Helpers ──────────────────────────────────────────────
   typeColor(t: string): string { return getOffreTypeColor(t); }
   typeLabel(t: string): string { return getOffreTypeLabel(t); }
+
   fmtDate(s?: string | null): string { return s ? formatDate(s) : '—'; }
 
   initials(nom: string, prenom: string): string {
