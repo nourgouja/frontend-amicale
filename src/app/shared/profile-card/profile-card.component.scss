@@ -1,8 +1,10 @@
+@use '../../../styles/variables' as *;
+
 $primary: #026654;
 $border: #e9ecef;
 $text-dark: #0f172a;
 $text-muted: #64748b;
-$font: 'Poppins', sans-serif;
+$font: $font-base;
 
 .profile-card {
   position: absolute;

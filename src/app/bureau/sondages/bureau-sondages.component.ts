@@ -1,5 +1,6 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { SondageService } from '../../core/services/sondage.service';
 import { Sondage } from '../../core/models/sondage.model';
@@ -14,14 +15,50 @@ import { Sondage } from '../../core/models/sondage.model';
 export class BureauSondagesComponent implements OnInit {
   private router         = inject(Router);
   private sondageService = inject(SondageService);
+  private http           = inject(HttpClient);
 
   sondages        = signal<Sondage[]>([]);
   loading         = signal(true);
   toast           = signal<{ msg: string; type: 'success' | 'error' } | null>(null);
   showDetail      = signal(false);
   selectedSondage = signal<Sondage | null>(null);
+  totalMembres    = signal(0);
 
-  ngOnInit(): void { this.loadSondages(); }
+  participationStat = computed(() => {
+    const members      = this.totalMembres();
+    const all          = this.sondages();
+    const sondageCount = all.length;
+    const totalVotes   = all.reduce((sum, s) => sum + this.totalVotes(s), 0);
+    if (!members || !sondageCount) {
+      return { pct: 0, totalVotes, sondageCount, total: members };
+    }
+    // totalVotes / (sondageCount × members)
+    const pct = Math.min(100, Math.round((totalVotes / (sondageCount * members)) * 100));
+    return { pct, totalVotes, sondageCount, total: members };
+  });
+
+  participationDonut = computed(() => {
+    const { pct } = this.participationStat();
+    if (!pct) return '#e5e7eb';
+    return `conic-gradient(#026654 0% ${pct}%, #e5e7eb ${pct}% 100%)`;
+  });
+
+  sondageStatusStat = computed(() => {
+    const all = this.sondages();
+    return [
+      { label: 'En cours',  color: '#026654', count: all.filter(s => s.statut === 'OPEN').length },
+      { label: 'Clôturés',  color: '#9ca3af', count: all.filter(s => s.statut === 'CLOSED').length },
+      { label: 'Brouillons',color: '#f59e0b', count: all.filter(s => s.statut === 'DRAFT').length },
+    ];
+  });
+
+  ngOnInit(): void {
+    this.loadSondages();
+    this.http.get<any>('/api/statistiques/bureau').subscribe({
+      next: s => this.totalMembres.set(s.totalMembres ?? 0),
+      error: () => {},
+    });
+  }
 
   loadSondages(): void {
     this.loading.set(true);
@@ -61,7 +98,12 @@ export class BureauSondagesComponent implements OnInit {
   }
 
   statusLabel(statut: string): string {
-    return statut === 'DRAFT' ? 'Brouillon' : statut === 'OPEN' ? 'Actif' : 'Clôturé';
+    const map: Record<string, string> = { DRAFT: 'Brouillon', OPEN: 'En cours', CLOSED: 'Clôturé', ARCHIVED: 'Archivé' };
+    return map[statut] ?? statut;
+  }
+
+  optImageUrl(opt: import('../../core/models/sondage.model').SondageOption): string | null {
+    return opt.imageBase64 && opt.imageType ? `data:${opt.imageType};base64,${opt.imageBase64}` : null;
   }
 
   totalVotes(s: Sondage): number {
@@ -70,6 +112,12 @@ export class BureauSondagesComponent implements OnInit {
 
   optionPercent(voteCount: number, total: number): number {
     return total === 0 ? 0 : Math.round((voteCount / total) * 100);
+  }
+
+  isWinner(s: Sondage, voteCount: number): boolean {
+    if (s.statut !== 'CLOSED') return false;
+    const max = Math.max(...(s.options?.map(o => o.voteCount ?? 0) ?? [0]));
+    return max > 0 && voteCount === max;
   }
 
   private showToast(msg: string, type: 'success' | 'error'): void {

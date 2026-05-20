@@ -8,7 +8,9 @@
       "PowerShell(\\(Get-Content \"c:\\\\Users\\\\nourg\\\\amicale-star\\\\src\\\\app\\\\adherent\\\\dashboard\\\\adherent-dashboard.component.scss\"\\).Count)",
       "Bash(dir /s \"c:\\\\Users\\\\nourg\\\\amicale-star\\\\src\\\\app\\\\bureau\")",
       "Bash(powershell -Command \"Get-ChildItem 'c:/Users/nourg/amicale-star/node_modules/lucide-angular' -Name | Select-Object -First 5\")",
-      "Bash(powershell -Command \"Get-ChildItem 'c:/Users/nourg/amicale-star/node_modules/lucide-angular' -Recurse -Filter '*.d.ts' | Select-Object FullName\")"
+      "Bash(powershell -Command \"Get-ChildItem 'c:/Users/nourg/amicale-star/node_modules/lucide-angular' -Recurse -Filter '*.d.ts' | Select-Object FullName\")",
+      "Bash(git fetch *)",
+      "Bash(git pull *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\election\\candidate",
