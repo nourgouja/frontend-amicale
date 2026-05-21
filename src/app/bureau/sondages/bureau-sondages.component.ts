@@ -17,12 +17,10 @@ export class BureauSondagesComponent implements OnInit {
   private sondageService = inject(SondageService);
   private http           = inject(HttpClient);
 
-  sondages        = signal<Sondage[]>([]);
-  loading         = signal(true);
-  toast           = signal<{ msg: string; type: 'success' | 'error' } | null>(null);
-  showDetail      = signal(false);
-  selectedSondage = signal<Sondage | null>(null);
-  totalMembres    = signal(0);
+  sondages     = signal<Sondage[]>([]);
+  loading      = signal(true);
+  toast        = signal<{ msg: string; type: 'success' | 'error' } | null>(null);
+  totalMembres = signal(0);
 
   participationStat = computed(() => {
     const members      = this.totalMembres();
@@ -71,26 +69,23 @@ export class BureauSondagesComponent implements OnInit {
     this.router.navigate([`${base}/sondages/creer`]);
   }
 
-  openDetail(s: Sondage): void  { this.selectedSondage.set(s); this.showDetail.set(true); }
-  closeDetail(): void            { this.showDetail.set(false); this.selectedSondage.set(null); }
-
   publish(id: number): void {
     this.sondageService.publishSondage(id).subscribe({
-      next:  () => { this.showToast('Sondage publié avec succès.', 'success'); this.closeDetail(); this.loadSondages(); },
+      next:  () => { this.showToast('Sondage publié avec succès.', 'success'); this.loadSondages(); },
       error: err => this.showToast(err?.error?.message ?? 'Impossible de publier ce sondage.', 'error'),
     });
   }
 
   close(id: number): void {
     this.sondageService.closeSondage(id).subscribe({
-      next:  () => { this.showToast('Sondage clôturé.', 'success'); this.closeDetail(); this.loadSondages(); },
+      next:  () => { this.showToast('Sondage clôturé.', 'success'); this.loadSondages(); },
       error: err => this.showToast(err?.error?.message ?? 'Impossible de clôturer ce sondage.', 'error'),
     });
   }
 
   delete(id: number): void {
     this.sondageService.deleteSondage(id).subscribe({
-      next:  () => { this.showToast('Sondage supprimé.', 'success'); this.closeDetail(); this.loadSondages(); },
+      next:  () => { this.showToast('Sondage supprimé.', 'success'); this.loadSondages(); },
       error: err => this.showToast(err?.error?.message ?? 'Impossible de supprimer ce sondage.', 'error'),
     });
   }

@@ -1,3 +1,5 @@
+<div class="dashboard-root">
+
 <!-- ══════════════════════════════════════════════
      ELECTION CALL BANNER (conditional)
 ══════════════════════════════════════════════ -->
@@ -94,12 +96,81 @@
     <h1 class="page-title">Explorer les offres</h1>
     <p class="page-sub">Découvrez les meilleures activités et séjours pour nos membres.</p>
   </div>
-  <div class="filters">
-    @for (f of filters; track f.value) {
-      <button class="filter-btn" [class.active]="activeFilter() === f.value" (click)="setFilter(f.value)">
-        {{ f.label }}
-      </button>
+
+  <div class="offers-header-right">
+    @if (activeSondage(); as s) {
+      <div class="sondage-mini" [class.sondage-mini--open]="sondagePanelOpen()">
+
+        <!-- Header (always visible, click to expand) -->
+        <div class="sondage-mini-hd" (click)="toggleSondageDropdown()">
+          <div class="sondage-mini-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          </div>
+          <div class="sondage-mini-body">
+            <span class="sondage-mini-label">{{ s.statut === 'OPEN' ? 'Sondage en cours' : 'Résultats disponibles' }}</span>
+            <span class="sondage-mini-title">{{ s.titre }}</span>
+          </div>
+          <svg class="sondage-mini-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+               [style.transform]="sondagePanelOpen() ? 'rotate(180deg)' : 'rotate(0deg)'">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+          <button class="sondage-mini-close" type="button" (click)="dismissSondage(s.id, $event)" aria-label="Fermer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Dropdown body -->
+        @if (sondagePanelOpen()) {
+          <div class="sondage-mini-body-panel">
+
+            @if (sondageToast()) {
+              <div class="sondage-mini-toast">{{ sondageToast() }}</div>
+            }
+
+            @if (s.statut === 'OPEN' && !s.votedOptionId) {
+              <!-- Voting options -->
+              <div class="sondage-mini-options">
+                @for (opt of s.options; track opt.id) {
+                  <button class="sondage-mini-opt" type="button" (click)="vote(s.id, opt.id)">
+                    @if (optionImageUrl(opt); as src) {
+                      <img class="sondage-mini-opt-img" [src]="src" [alt]="opt.titre" />
+                    }
+                    <span class="sondage-mini-opt-label">{{ opt.titre }}</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="sondage-mini-opt-arrow">
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  </button>
+                }
+              </div>
+
+            } @else if (s.statut === 'OPEN' && s.votedOptionId) {
+              <!-- Already voted -->
+              <div class="sondage-mini-voted">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1B5E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Vote enregistré</span>
+              </div>
+              <a class="sondage-mini-link" routerLink="/adherent/annonces" (click)="$event.stopPropagation()">Voir les résultats →</a>
+
+            } @else {
+              <!-- Closed -->
+              <a class="sondage-mini-link" routerLink="/adherent/annonces" (click)="$event.stopPropagation()">Voir les résultats →</a>
+            }
+
+          </div>
+        }
+
+      </div>
     }
+
+    <div class="filters">
+      @for (f of filters; track f.value) {
+        <button class="filter-btn" [class.active]="activeFilter() === f.value" (click)="setFilter(f.value)">
+          {{ f.label }}
+        </button>
+      }
+    </div>
   </div>
 </div>
 
@@ -142,7 +213,7 @@
 
         <div class="prop-info">
           <div class="prop-location">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1B5E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
             </svg>
             <span>{{ o.lieu || 'Tunisie' }}</span>
@@ -302,3 +373,5 @@
     </div>
   }
 </section>
+
+</div><!-- /.dashboard-root -->

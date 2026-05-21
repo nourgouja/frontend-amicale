@@ -131,8 +131,11 @@ export class ElectionApplyComponent implements OnInit {
   }
 
   back(): void {
-    const base = this.router.url.startsWith('/adherent') ? '/adherent' : '/bureau';
-    this.router.navigate([`${base}/elections`]);
+    if (this.router.url.startsWith('/adherent')) {
+      this.router.navigate(['/adherent/dashboard']);
+    } else {
+      this.router.navigate(['/bureau/elections']);
+    }
   }
 
   statusLabel(s: string): string {

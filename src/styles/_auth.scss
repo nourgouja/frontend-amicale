@@ -3,17 +3,17 @@
 .auth-shell { display: flex; flex-direction: column; min-height: 100vh; }
 
 .auth-page {
-  flex: 1; display: grid; grid-template-columns: 55% 45%; min-height: 0;
+  flex: 1; display: grid; grid-template-columns: 44% 56%; min-height: 0;
 }
 
 .auth-left {
-  display: flex; flex-direction: column; padding: 36px 56px;
+  display: flex; flex-direction: column; padding: 32px 52px;
   background: $color-surface;
 }
 
-.auth-logo { width: 240px; height: auto; object-fit: contain; align-self: flex-start; margin-bottom: 100px; }
+.auth-logo { width: 110px; height: auto; object-fit: contain; align-self: flex-start; margin-bottom: 72px; }
 
-.auth-card { display: flex; flex-direction: column; justify-content: flex-start; max-width: 380px; }
+.auth-card { display: flex; flex-direction: column; justify-content: flex-start; max-width: 340px; }
 
 .auth-right {
   position: relative; overflow: hidden;

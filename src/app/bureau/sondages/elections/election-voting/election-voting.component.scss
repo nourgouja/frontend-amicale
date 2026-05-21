@@ -141,6 +141,11 @@
 .candidate-info { display: flex; flex-direction: column; gap: 4px; text-align: center; }
 .candidate-name { font-size: $font-size-base; font-weight: 700; color: $color-text; }
 .candidate-desc { font-size: $font-size-xs; color: $color-text-muted; line-height: 1.5; }
+.candidate-motivation {
+  font-size: $font-size-xs; color: $color-text-muted; line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden; margin-top: 2px;
+}
 
 .vote-stats { display: flex; flex-direction: column; gap: $space-2; margin-top: $space-2; }
 .vote-bar-row { display: flex; justify-content: space-between; align-items: center; }

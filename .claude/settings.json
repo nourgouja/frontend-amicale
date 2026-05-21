@@ -10,7 +10,20 @@
       "Bash(powershell -Command \"Get-ChildItem 'c:/Users/nourg/amicale-star/node_modules/lucide-angular' -Name | Select-Object -First 5\")",
       "Bash(powershell -Command \"Get-ChildItem 'c:/Users/nourg/amicale-star/node_modules/lucide-angular' -Recurse -Filter '*.d.ts' | Select-Object FullName\")",
       "Bash(git fetch *)",
-      "Bash(git pull *)"
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git cherry-pick *)",
+      "Bash(git checkout *)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); t=d['projects']['amicale-star']['architect'].get\\('test',{}\\); print\\(json.dumps\\(t,indent=2\\)\\)\")",
+      "Bash(node -e \"const v = require\\('./node_modules/vitest/package.json'\\); console.log\\(v.version\\)\")",
+      "PowerShell(node -e \"const v = require\\('./node_modules/vitest/package.json'\\); console.log\\(v.version\\)\")",
+      "PowerShell(npm install --legacy-peer-deps 2>&1)",
+      "PowerShell(npm test -- --run 2>&1)",
+      "PowerShell(npm test -- --run --coverage 2>&1)",
+      "PowerShell(npm install --save-dev @vitest/coverage-v8@4.0.8 --legacy-peer-deps 2>&1)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\nourg\\\\IdeaProjects\\\\BACKEND_STAR\\\\Pfe\" -Recurse -Filter \"pom.xml\")",
+      "Bash(Select-Object -First 1)",
+      "Bash(mvn clean *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\dto\\election\\candidate",
@@ -26,7 +39,8 @@
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\dashboard",
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\adhesion",
       "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\entity\\user",
-      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\user"
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe\\src\\main\\java\\tn\\star\\Pfe\\service\\user",
+      "C:\\Users\\nourg\\IdeaProjects\\BACKEND_STAR\\Pfe"
     ]
   }
 }

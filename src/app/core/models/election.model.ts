@@ -15,6 +15,7 @@ export interface Candidate {
   position: Position;
   pictureUrl?: string;
   description?: string;
+  motivation?: string;
   voteCount: number;
   votePercentage: number;
   winner: boolean;

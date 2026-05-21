@@ -2,7 +2,7 @@
 
 /* ── Page wrapper ── */
 .catalogue-page {
-  display: flex; flex-direction: column; gap: $space-6;
+  display: flex; flex-direction: column; gap: $space-4;
 }
 
 /* ── Header ── */
@@ -11,7 +11,7 @@
 }
 .page-title {
   font-family: 'Manrope', sans-serif;
-  font-size: 32px; font-weight: 700; color: #1B5E3B;
+  font-size: 32px; font-weight: 700; color: #1A1A1A;
   letter-spacing: -0.32px; line-height: 40px; margin: 0;
 }
 .page-sub { font-size: 14px; font-weight: 400; color: #374151; margin: 0; line-height: 17px; }
@@ -22,56 +22,87 @@
   padding: 4px 12px; border-radius: $radius-full;
 }
 
-/* ── Filters bar ── */
-.filters-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: $space-4; flex-wrap: wrap;
+/* ── Top row ── */
+.top-row {
+  display: grid; grid-template-columns: 1fr auto; gap: $space-4; align-items: stretch;
 }
 
-.type-tabs { display: flex; flex-wrap: wrap; gap: $space-2; }
+.filter-panel {
+  @include card;
+  display: flex; align-items: center; gap: $space-4; flex-wrap: wrap; padding: $space-4 $space-5;
+}
 
-.type-tab {
-  padding: 8px 20px; border-radius: 9999px; border: none;
-  background: #E5E7EB; font-family: $font-base;
-  font-size: 16px; font-weight: 400; color: #374151;
-  cursor: pointer; transition: background $transition-fast, color $transition-fast;
-  &:hover { background: darken(#E5E7EB, 5%); }
-  &.active { background: #1B5E3B; color: #fff; font-weight: 400; }
-  &:focus-visible { @include focus-ring; }
+.fp-group {
+  display: flex; flex-direction: column; gap: 5px;
+  &--search { flex: 1; min-width: 140px; }
+}
+
+.fp-label {
+  font-size: $font-size-xs; font-weight: 700; color: $color-text-muted;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+
+.fp-chips { display: flex; gap: $space-2; flex-wrap: wrap; }
+
+.fp-chip {
+  padding: 5px 12px; border-radius: $radius-full;
+  border: 1px solid $color-border; background: $color-bg;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 500; color: $color-text-muted;
+  cursor: pointer; transition: background $transition-fast, color $transition-fast, border-color $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; }
+  &--active { background: $color-primary; color: #fff; border-color: $color-primary; font-weight: 600; }
   @include reduced-motion { transition: none; }
 }
 
-.bar-right {
-  display: flex; align-items: center; gap: $space-3; flex-wrap: wrap;
-}
-
-.statut-tabs {
-  display: flex; background: $color-bg; border-radius: $radius-md; padding: 3px; gap: 2px;
-}
-
-.statut-tab {
-  padding: 5px 14px; border-radius: calc(#{$radius-md} - 2px); border: none; background: none;
-  font-family: $font-base; font-size: 16px; font-weight: 400; color: $color-text-muted;
-  cursor: pointer; transition: background $transition-fast, color $transition-fast;
-  &.active { background: $color-surface; color: $color-primary; font-weight: 400; box-shadow: $shadow-card; }
-  &:hover:not(.active) { color: $color-text; }
-  &:focus-visible { @include focus-ring; }
-  @include reduced-motion { transition: none; }
-}
-
-.search-wrap {
+.fp-input-wrap {
   display: flex; align-items: center; gap: $space-2;
-  background: $color-surface; border: 1px solid $color-border; border-radius: $radius-md;
-  padding: 0 $space-3; height: 38px;
-  svg { color: $color-text-muted; flex-shrink: 0; }
+  height: 36px; padding: 0 $space-3;
+  border: 1px solid $color-border; border-radius: $radius-md; background: $color-bg;
   &:focus-within { border-color: $color-primary; }
+  svg { color: $color-text-muted; flex-shrink: 0; }
 }
 
-.search-input {
-  border: none; background: none; outline: none;
-  font-family: $font-base; font-size: 16px; font-weight: 400; color: $color-text; width: 190px;
+.fp-input {
+  flex: 1; border: none; background: none; outline: none;
+  font-family: $font-base; font-size: $font-size-xs; color: $color-text;
   &::placeholder { color: $color-text-muted; }
 }
+
+.fp-select {
+  height: 36px; padding: 0 $space-3; border-radius: $radius-md;
+  border: 1px solid $color-border; background: $color-bg;
+  font-family: $font-base; font-size: $font-size-xs; color: $color-text;
+  cursor: pointer; outline: none;
+  &:focus { border-color: $color-primary; }
+}
+
+.fp-reset {
+  display: inline-flex; align-items: center; gap: $space-2;
+  padding: 6px 14px; border-radius: $radius-md;
+  border: 1px solid $color-border; background: $color-surface;
+  font-family: $font-base; font-size: $font-size-xs; font-weight: 500; color: $color-text-muted;
+  cursor: pointer; white-space: nowrap;
+  transition: border-color $transition-fast, color $transition-fast;
+  &:hover { border-color: $color-primary; color: $color-primary; }
+  &--icon { padding: 7px; border-radius: $radius-full; }
+  @include reduced-motion { transition: none; }
+}
+
+/* ── Green KPI card ── */
+.cat-kpi-green {
+  background: $color-primary-dark; border-radius: $radius-md;
+  padding: $space-4 $space-5; display: flex; flex-direction: column;
+  gap: $space-2; position: relative; overflow: hidden; min-width: 160px;
+}
+.cat-kpi-green-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  svg { position: absolute; right: $space-3; top: $space-3; }
+}
+.cat-kpi-green-title { font-size: $font-size-sm; font-weight: 700; color: #fff; }
+.cat-kpi-green-body  { display: flex; align-items: baseline; gap: $space-2; }
+.cat-kpi-green-count { font-size: $font-size-2xl; font-weight: 800; color: #fff; line-height: 1; }
+.cat-kpi-green-label { font-size: $font-size-xs; color: rgba(255,255,255,0.75); }
+.cat-kpi-green-sub   { font-size: $font-size-xs; color: rgba(255,255,255,0.65); }
 
 /* ── Offers grid ── */
 .offers-grid {
@@ -126,23 +157,22 @@
 .type-badge {
   position: absolute; top: 16px; left: 16px; z-index: 3;
   padding: 4px 12px; border-radius: 9999px;
-  font-size: 12px; font-weight: 500; color: #fff; letter-spacing: 0.6px;
-  backdrop-filter: blur(6px);
-  &--voyage     { background: #1B5E3B; }
-  &--sejour     { background: #0A3D26; }
-  &--activite   { background: #F59E0B; }
-  &--evenement  { background: #3B82F6; }
-  &--convention { background: #7C3AED; }
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+
+  &--voyage     { background: #fff; color: #3b82f6;  border: 1.5px solid rgba(59,130,246,.55); }
+  &--sejour     { background: #fff; color: #0ea5e9;  border: 1.5px solid rgba(14,165,233,.55); }
+  &--activite   { background: #fff; color: #16a34a;  border: 1.5px solid rgba(22,163,74,.55);  }
+  &--evenement  { background: #fff; color: #8b5cf6;  border: 1.5px solid rgba(139,92,246,.55); }
+  &--convention { background: #fff; color: #f97316;  border: 1.5px solid rgba(249,115,22,.55); }
 }
 .prop-arrow {
   position: absolute; top: 16px; right: 16px;
   width: 40px; height: 40px; border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(6px);
-  border: none; cursor: pointer;
+  background: #fff; border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  color: #fff; text-decoration: none;
-  transition: background $transition-fast;
-  &:hover { background: rgba(255,255,255,0.35); }
+  color: #1A1A1A; text-decoration: none;
+  transition: background $transition-fast, transform $transition-fast;
+  &:hover { background: #f3f4f6; transform: scale(1.06); }
   @include reduced-motion { transition: none; }
 }
 .prop-info { padding: 16px; gap: 8px; flex: 1; display: flex; flex-direction: column; }
@@ -162,13 +192,36 @@
 }
 .prop-host { display: flex; align-items: center; gap: $space-2; }
 .host-avatar {
-  width: 24px; height: 24px; border-radius: 9999px;
-  background: #B3E2C7; color: #0D3522;
-  font-size: 10px; font-weight: 700;
+  width: 26px; height: 26px; border-radius: 9999px;
+  background: #D1FAE5; color: #065f46;
+  font-size: 11px; font-weight: 700;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  border: 1.5px solid #6EE7B7;
 }
 .host-name { font-size: 11px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.55px; }
-.prop-price { font-size: 20px; font-weight: 800; color: #1B5E3B; white-space: nowrap; }
+.prop-price {
+  font-size: 20px; font-weight: 800; color: #1A1A1A; white-space: nowrap;
+  &--libre { font-size: 13px; font-weight: 600; color: #1B5E3B; }
+}
+
+.prop-card {
+  text-decoration: none;
+  &--expanded {
+    grid-column: span 1;
+    .prop-img-wrap { height: 160px; }
+  }
+}
+
+.prop-desc {
+  font-size: 13px; color: #374151; line-height: 1.6;
+  margin-top: 6px; flex: unset;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
 /* ── Skeleton ── */
 .offer-skeleton {

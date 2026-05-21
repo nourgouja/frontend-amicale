@@ -90,7 +90,9 @@
 
             <div class="candidate-info">
               <p class="candidate-name">{{ c.prenom }} {{ c.nom }}</p>
-              @if (c.description) {
+              @if (c.motivation) {
+                <p class="candidate-motivation">{{ c.motivation }}</p>
+              } @else if (c.description) {
                 <p class="candidate-desc">{{ c.description }}</p>
               }
 

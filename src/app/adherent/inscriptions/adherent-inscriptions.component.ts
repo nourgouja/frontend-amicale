@@ -110,17 +110,34 @@ export class AdherentInscriptionsComponent implements OnInit {
       .reduce((sum, e) => sum + (e.montant ?? 0), 0)
   );
 
-  montantConfirme = computed(() =>
-    this.inscriptions()
+  montantConfirme = computed(() => {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return this.inscriptions()
       .filter(i => i.statut === 'APPROVED')
-      .reduce((sum, i) => sum + (i.montant ?? 0), 0)
-  );
+      .filter(i => {
+        if (!i.dateDebutOffre) return true;
+        if (new Date(i.dateDebutOffre) >= today) return true;
+        // past offer: exclude only if fully paid
+        const echs = i.echeances ?? [];
+        const fullyPaid = echs.length > 0 ? echs.every(e => e.statut === 'PAID') : true;
+        return !fullyPaid;
+      })
+      .reduce((sum, i) => sum + (i.montant ?? 0), 0);
+  });
 
-  montantEnAttente = computed(() =>
-    this.inscriptions()
+  montantEnAttente = computed(() => {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return this.inscriptions()
       .filter(i => i.statut === 'PENDING')
-      .reduce((sum, i) => sum + (i.montant ?? 0), 0)
-  );
+      .filter(i => {
+        if (!i.dateDebutOffre) return true;
+        if (new Date(i.dateDebutOffre) >= today) return true;
+        const echs = i.echeances ?? [];
+        const fullyPaid = echs.length > 0 ? echs.every(e => e.statut === 'PAID') : true;
+        return !fullyPaid;
+      })
+      .reduce((sum, i) => sum + (i.montant ?? 0), 0);
+  });
 
   montantTotal = computed(() => this.montantConfirme() + this.montantEnAttente());
 

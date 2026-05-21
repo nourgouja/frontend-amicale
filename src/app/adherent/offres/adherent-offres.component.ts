@@ -35,12 +35,11 @@ export class AdherentOffresComponent implements OnInit {
   activeStatut  = signal('');
 
   readonly typeFilters = [
-    { value: '',           label: 'Tout'       },
-    { value: 'VOYAGE',     label: 'Voyage'     },
-    { value: 'SEJOUR',     label: 'Séjour'     },
-    { value: 'ACTIVITE',   label: 'Activité'   },
-    { value: 'CONVENTION', label: 'Convention' },
-    { value: 'EVENEMENT',  label: 'Événement'  },
+    { value: '',          label: 'Tout'      },
+    { value: 'VOYAGE',    label: 'Voyage'    },
+    { value: 'SEJOUR',    label: 'Séjour'    },
+    { value: 'ACTIVITE',  label: 'Activité'  },
+    { value: 'EVENEMENT', label: 'Événement' },
   ];
 
   readonly statutFilters = [
@@ -49,17 +48,39 @@ export class AdherentOffresComponent implements OnInit {
     { value: 'CLOSED', label: 'Fermées' },
   ];
 
+  expandedId = signal<number | null>(null);
+
+  toggleConvention(id: number, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.expandedId.update(cur => cur === id ? null : id);
+  }
+
+  openCount = computed(() => this.offres().filter(o => o.statutOffre === 'OPEN').length);
+
+  newThisMonth = computed(() => {
+    const now = new Date();
+    return this.offres().filter(o => {
+      if (!o.dateDebut) return false;
+      const d = new Date(o.dateDebut);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }).length;
+  });
+
   filtered = computed(() => {
     const type   = this.activeFilter();
     const statut = this.activeStatut();
     const q      = this.searchQuery().toLowerCase().trim();
-    return this.offres().filter(o => {
-      const matchType   = !type || o.typeOffre === type;
-      const matchStatut = !statut || o.statutOffre === statut;
-      const matchQuery  = !q || o.titre.toLowerCase().includes(q)
-                             || (o.lieu ?? '').toLowerCase().includes(q);
-      return matchType && matchStatut && matchQuery;
-    });
+    return this.offres()
+      .filter(o => {
+        if (o.typeOffre === 'CONVENTION' && type !== 'CONVENTION') return false;
+        const matchType   = !type || o.typeOffre === type;
+        const matchStatut = !statut || o.statutOffre === statut;
+        const matchQuery  = !q || o.titre.toLowerCase().includes(q)
+                               || (o.lieu ?? '').toLowerCase().includes(q);
+        return matchType && matchStatut && matchQuery;
+      })
+      .sort((a, b) => b.id - a.id);
   });
 
   ngOnInit(): void {

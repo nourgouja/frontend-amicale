@@ -211,6 +211,10 @@ export class AdherentDashboardComponent implements OnInit {
 
   setFilter(value: string): void { this.activeFilter.set(value); }
 
+  optionImageUrl(opt: { imageBase64?: string; imageType?: string }): string | null {
+    return opt.imageBase64 && opt.imageType ? `data:${opt.imageType};base64,${opt.imageBase64}` : null;
+  }
+
   coverUrl(o: Offre): string | null {
     return o.imageBase64 && o.imageType ? `data:${o.imageType};base64,${o.imageBase64}` : null;
   }

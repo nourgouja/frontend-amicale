@@ -96,4 +96,8 @@ export class AdherentAnnoncesComponent implements OnInit {
     const total = this.totalElectionVotes(e);
     return total === 0 ? 0 : Math.round((c.voteCount / total) * 100);
   }
+
+  electedMembers(e: Election): Candidate[] {
+    return (e.candidates ?? []).filter(c => c.winner);
+  }
 }

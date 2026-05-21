@@ -41,8 +41,7 @@
   } @else {
     <div class="sondages-grid">
       @for (s of sondages(); track s.id) {
-        <div class="sondage-card" (click)="openDetail(s)" role="button" tabindex="0"
-             (keydown.enter)="openDetail(s)" (keydown.space)="openDetail(s)">
+        <div class="sondage-card">
 
           <div class="card-top">
             <span class="status-badge status-badge--{{ s.statut.toLowerCase() }}">
@@ -169,68 +168,3 @@
 
 </div>
 
-<!-- Detail side panel -->
-@if (showDetail() && selectedSondage(); as s) {
-  <div class="dp-overlay" (click)="closeDetail()"></div>
-  <div class="dp-panel" role="dialog" aria-modal="true">
-
-    <div class="dp-head">
-      <span class="status-badge status-badge--{{ s.statut.toLowerCase() }}">{{ statusLabel(s.statut) }}</span>
-      <button class="dp-close" (click)="closeDetail()" aria-label="Fermer">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="dp-body">
-      <h2 class="dp-title">{{ s.titre }}</h2>
-      @if (s.description) { <p class="dp-desc">{{ s.description }}</p> }
-
-      <div class="dp-sep"></div>
-
-      <p class="dp-votes-label">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-        {{ totalVotes(s) }} vote(s) au total
-      </p>
-
-      <div class="dp-options">
-        @for (opt of s.options; track opt.id) {
-          <div class="dp-option">
-            <div class="dp-option-header">
-              <span class="dp-option-name">{{ opt.titre }}</span>
-              <span class="dp-option-pct">{{ opt.voteCount }} ({{ optionPercent(opt.voteCount, totalVotes(s)) }}%)</span>
-            </div>
-            <div class="progress-track">
-              <div class="progress-fill" [style.width.%]="optionPercent(opt.voteCount, totalVotes(s))"></div>
-            </div>
-            @if (opt.description) {
-              <p class="dp-option-desc">{{ opt.description }}</p>
-            }
-          </div>
-        }
-      </div>
-    </div>
-
-    <div class="dp-footer">
-      <button class="dp-btn dp-ghost" (click)="closeDetail()">Fermer</button>
-      @if (s.statut === 'DRAFT') {
-        <button class="dp-btn dp-primary" (click)="publish(s.id)">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Publier
-        </button>
-      }
-      @if (s.statut === 'OPEN') {
-        <button class="dp-btn dp-outline" (click)="close(s.id)">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-          Résultats
-        </button>
-      }
-      <button class="dp-btn dp-danger" (click)="delete(s.id)">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-        Supprimer
-      </button>
-    </div>
-
-  </div>
-}

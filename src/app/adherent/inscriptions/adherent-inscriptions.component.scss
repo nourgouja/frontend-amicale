@@ -9,7 +9,7 @@
 .page-head-left { display: flex; flex-direction: column; gap: 4px; }
 .page-title {
   font-family: 'Manrope', sans-serif;
-  font-size: 32px; font-weight: 700; color: #1B5E3B;
+  font-size: 32px; font-weight: 700; color: #1A1A1A;
   letter-spacing: -0.32px; line-height: 40px; margin: 0;
 }
 .page-sub { font-size: 14px; font-weight: 400; color: #374151; margin: 0; line-height: 17px; }
@@ -47,9 +47,9 @@
 .status-tabs { display: flex; align-items: stretch; height: 100%; }
 
 .status-tab {
-  display: flex; align-items: center; padding: 0 20px;
+  display: flex; align-items: center; padding: 0 16px;
   border: none; border-bottom: 3px solid transparent; background: none;
-  font-family: $font-base; font-size: 16px; font-weight: 400; color: #374151;
+  font-family: $font-base; font-size: 13px; font-weight: 400; color: #374151;
   cursor: pointer; white-space: nowrap;
   transition: color $transition-fast, border-color $transition-fast;
   &--active { color: #1B5E3B; font-weight: 600; border-bottom-color: #F4C430; }
@@ -67,14 +67,14 @@
 
 .search-wrap {
   display: flex; align-items: center; gap: $space-2;
-  background: $color-surface; border: 1px solid $color-border; border-radius: $radius-md;
-  padding: 0 $space-3; height: 38px; flex: 1; max-width: 300px;
+  background: $color-bg; border: 1px solid $color-border; border-radius: $radius-md;
+  padding: 0 $space-3; height: 32px; width: 220px; flex-shrink: 0;
   svg { color: $color-text-muted; flex-shrink: 0; }
 }
 
 .search-input {
   flex: 1; border: none; background: none; outline: none;
-  font-family: $font-base; font-size: $font-size-sm; color: $color-text;
+  font-family: $font-base; font-size: 12px; color: $color-text;
   &::placeholder { color: $color-text-muted; }
 }
 
@@ -96,33 +96,42 @@
 
 .list-col { display: flex; flex-direction: column; gap: $space-3; }
 
-// ── Inscription card ──────────────────────────────────────────────────────────
-.ins-card {
-  display: flex; align-items: center; gap: 16px;
-  background: #ffffff; border: 1px solid #D1D5DB; border-radius: 12px;
-  padding: 20px; cursor: pointer;
+// ── Card wrapper (merges card + accordion into one visual unit) ───────────────
+.ins-wrap {
+  display: flex; flex-direction: column;
+  border: 1px solid #D1D5DB; border-radius: 12px; overflow: hidden;
+  background: #fff;
   transition: box-shadow $transition-fast, transform $transition-fast;
   &:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); transform: translateY(-1px); }
-  &--active {
+  &--open {
     border-color: $color-primary;
     box-shadow: 0 0 0 1px $color-primary, 0 4px 16px rgba(27,94,59,0.10);
     transform: none;
+    &:hover { box-shadow: 0 0 0 1px $color-primary, 0 4px 16px rgba(27,94,59,0.10); transform: none; }
   }
-  &--cancelled { opacity: 0.65; }
   @include reduced-motion { transition: none; &:hover { transform: none; } }
 }
 
+// ── Inscription card ──────────────────────────────────────────────────────────
+.ins-card {
+  display: flex; align-items: center; gap: 16px;
+  background: transparent; border: none; border-radius: 0;
+  padding: 10px 16px; cursor: pointer; user-select: none;
+  &--cancelled { opacity: 0.65; }
+}
+
 .ins-icon-sq {
-  width: 64px; height: 64px; border-radius: 12px; flex-shrink: 0;
+  width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
 }
 
-.ins-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.ins-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 
 .ins-top-row {
   display: flex; align-items: flex-start; justify-content: space-between; gap: $space-2;
 }
 .ins-title-group { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.ins-top-right { display: flex; align-items: center; gap: $space-2; flex-shrink: 0; }
 .ins-title { font-size: $font-size-sm; font-weight: 700; color: #1A1A1A; @include truncate; margin: 0; }
 .ins-type-chip {
   display: inline-block; padding: 2px 10px; border-radius: 9999px;
@@ -170,8 +179,8 @@
 
 // ── Inline accordion detail ───────────────────────────────────────────────────
 .ins-detail-inline {
-  background: #fff; border: 1px solid #D1D5DB; border-radius: 12px;
-  overflow: hidden; display: flex; flex-direction: column;
+  background: #fff; border-top: 1px solid #D1D5DB;
+  display: flex; flex-direction: column;
 }
 
 .ins-detail-inline-hd {
@@ -287,7 +296,7 @@
   padding: $space-3 $space-5; border-bottom: 1px solid $color-border;
   transition: background $transition-fast;
   &:last-child { border-bottom: none; }
-  &--paid { background: rgba(2,102,84,0.03); }
+  &--paid { background: #fff; }
   @include reduced-motion { transition: none; }
 }
 
@@ -319,14 +328,44 @@
 
 // ── Participants footer ────────────────────────────────────────────────────────
 .detail-participants {
-  padding: $space-3 $space-5;
+  padding: $space-3 $space-5 $space-4;
   border-top: 1px solid $color-border;
   background: $color-bg;
+  display: flex; flex-direction: column; gap: $space-3;
 }
 .detail-section-label {
   display: inline-flex; align-items: center; gap: $space-2;
   font-size: $font-size-xs; font-weight: 600; color: $color-text-muted;
   svg { flex-shrink: 0; }
+}
+
+.guest-list {
+  display: flex; flex-direction: column; gap: $space-2;
+}
+
+.guest-row {
+  display: flex; align-items: center; gap: $space-3;
+  padding: 8px 12px; border-radius: 8px;
+  background: #fff; border: 1px solid $color-border;
+}
+
+.guest-avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  background: #EEF8F1; color: #1B5E3B;
+  font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.guest-info {
+  display: flex; flex-direction: column; gap: 1px; min-width: 0;
+}
+
+.guest-name {
+  font-size: $font-size-sm; font-weight: 600; color: $color-text;
+}
+
+.guest-meta {
+  font-size: $font-size-xs; color: $color-text-muted;
 }
 
 // ── States ────────────────────────────────────────────────────────────────────
