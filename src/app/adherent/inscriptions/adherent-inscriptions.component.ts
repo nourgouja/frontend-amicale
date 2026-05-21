@@ -2,11 +2,10 @@ import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 import { InscriptionModalComponent, InscriptionResult } from '../inscription-modal/inscription-modal.component';
 import { formatDate } from '../../shared/utils/format.utils';
-import { LucideAngularModule, LUCIDE_ICONS, LucideIconProvider, Search, CircleX } from 'lucide-angular';
+import { RouterLink } from '@angular/router';
 
 interface Guest {
   nom: string;
@@ -47,10 +46,7 @@ interface Inscription {
 @Component({
   selector: 'app-adherent-inscriptions',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent, ConfirmModalComponent, InscriptionModalComponent, LucideAngularModule],
-  providers: [
-    { provide: LUCIDE_ICONS, multi: true, useValue: new LucideIconProvider({ Search, CircleX }) },
-  ],
+  imports: [CommonModule, FormsModule, ConfirmModalComponent, InscriptionModalComponent, RouterLink],
   templateUrl: './adherent-inscriptions.component.html',
   styleUrl: './adherent-inscriptions.component.scss',
 })
@@ -61,21 +57,38 @@ export class AdherentInscriptionsComponent implements OnInit {
   loading      = signal(true);
   searchQuery  = signal('');
   statutFilter = signal('all');
-  cancelTarget = signal<Inscription | null>(null);
-  cancelling   = signal(false);
-  selectedIns  = signal<Inscription | null>(null);
-  editTarget   = signal<Inscription | null>(null);
+  cancelTarget  = signal<Inscription | null>(null);
+  cancelling    = signal(false);
+  selectedIns   = signal<Inscription | null>(null);
+  expandedInsId = signal<number | null>(null);
+  editTarget    = signal<Inscription | null>(null);
+  filterVisible = signal(false);
 
   readonly statuts = [
-    { key: 'all',       label: 'Tous les statuts' },
-    { key: 'PENDING',   label: 'En attente'        },
-    { key: 'APPROVED',  label: 'Confirmée'         },
-    { key: 'CANCELLED', label: 'Annulée'           },
-    { key: 'REJECTED',  label: 'Rejetée'           },
+    { key: 'all',      label: 'Toutes'     },
+    { key: 'APPROVED', label: 'Confirmées' },
+    { key: 'PENDING',  label: 'En attente' },
   ];
 
-  readonly typeColors: Record<string, string> = {
-    VOYAGE: '#3b82f6', SEJOUR: '#10b981', ACTIVITE: '#f59e0b', CONVENTION: '#8b5cf6',
+  readonly typeIconBgs: Record<string, string> = {
+    ACTIVITE: '#B3E2C7', SEJOUR: '#E5E7EB', HEBERGEMENT: '#E5E7EB',
+    VOYAGE: 'rgba(254,226,226,0.9)', CONVENTION: '#EDE9FE', EVENEMENT: '#DBEAFE',
+  };
+  readonly typeIconColors: Record<string, string> = {
+    ACTIVITE: '#1B5E3B', SEJOUR: '#6B7280', HEBERGEMENT: '#6B7280',
+    VOYAGE: '#DC2626', CONVENTION: '#7C3AED', EVENEMENT: '#3B82F6',
+  };
+  readonly typeBadgeMap: Record<string, { bg: string; color: string }> = {
+    ACTIVITE:    { bg: 'rgba(244,196,48,0.20)',  color: '#246B45' },
+    SEJOUR:      { bg: 'rgba(59,130,246,0.12)',  color: '#1E40AF' },
+    HEBERGEMENT: { bg: 'rgba(59,130,246,0.12)',  color: '#1E40AF' },
+    VOYAGE:      { bg: 'rgba(107,114,128,0.15)', color: '#374151' },
+    CONVENTION:  { bg: 'rgba(124,58,237,0.12)',  color: '#7C3AED' },
+    EVENEMENT:   { bg: 'rgba(59,130,246,0.12)',  color: '#1E40AF' },
+  };
+  readonly typeLabels: Record<string, string> = {
+    VOYAGE: 'Voyage', SEJOUR: 'Séjour', HEBERGEMENT: 'Hébergement',
+    ACTIVITE: 'Activité', CONVENTION: 'Convention', EVENEMENT: 'Événement',
   };
 
   filtered = computed(() => {
@@ -97,6 +110,20 @@ export class AdherentInscriptionsComponent implements OnInit {
       .reduce((sum, e) => sum + (e.montant ?? 0), 0)
   );
 
+  montantConfirme = computed(() =>
+    this.inscriptions()
+      .filter(i => i.statut === 'APPROVED')
+      .reduce((sum, i) => sum + (i.montant ?? 0), 0)
+  );
+
+  montantEnAttente = computed(() =>
+    this.inscriptions()
+      .filter(i => i.statut === 'PENDING')
+      .reduce((sum, i) => sum + (i.montant ?? 0), 0)
+  );
+
+  montantTotal = computed(() => this.montantConfirme() + this.montantEnAttente());
+
   prochainesEcheancesCount = computed(() =>
     this.inscriptions()
       .filter(i => i.statut !== 'CANCELLED' && i.statut !== 'REJECTED')
@@ -116,6 +143,9 @@ export class AdherentInscriptionsComponent implements OnInit {
   }
 
   selectIns(ins: Inscription | null): void { this.selectedIns.set(ins); }
+  toggleExpand(ins: Inscription): void {
+    this.expandedInsId.update(id => id === ins.id ? null : ins.id);
+  }
 
   openCancel(ins: Inscription): void { this.cancelTarget.set(ins); }
   closeCancel(): void { this.cancelTarget.set(null); }
@@ -154,7 +184,21 @@ export class AdherentInscriptionsComponent implements OnInit {
   }
 
   formatDate(s: string): string { return s ? formatDate(s) : '—'; }
-  typeColor(type: string): string { return this.typeColors[type] ?? '#9ca3af'; }
+  typeIconBg(type: string): string { return this.typeIconBgs[type] ?? '#F3F4F6'; }
+  typeIconColor(type: string): string { return this.typeIconColors[type] ?? '#9CA3AF'; }
+  typeBadgeStyle(type: string): { background: string; color: string } {
+    const c = this.typeBadgeMap[type];
+    return c ? { background: c.bg, color: c.color } : { background: 'rgba(107,114,128,0.15)', color: '#374151' };
+  }
+  typeLabel(type: string): string { return this.typeLabels[type] ?? type; }
+  statutLabel(s: string): string {
+    const m: Record<string, string> = { APPROVED: 'Confirmée', PENDING: 'En attente', CANCELLED: 'Annulée', REJECTED: 'Rejetée' };
+    return m[s] ?? s;
+  }
+  statutDotColor(s: string): string {
+    const m: Record<string, string> = { APPROVED: '#1B5E3B', PENDING: '#F59E0B', CANCELLED: '#9CA3AF', REJECTED: '#DC2626' };
+    return m[s] ?? '#9CA3AF';
+  }
   sexeLabel(s?: string | null): string {
     return s === 'M' ? 'Homme' : s === 'F' ? 'Femme' : s === 'AUTRE' ? 'Autre' : '';
   }

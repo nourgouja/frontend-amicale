@@ -3,188 +3,284 @@
   <!-- Page header -->
   <div class="page-head">
     <div class="page-head-left">
-      <h1 class="page-title">My activities</h1>
-      <p class="page-sub">Historique de vos inscriptions aux offres</p>
+      <h1 class="page-title">Mes Inscriptions</h1>
+      <p class="page-sub">Historique de vos inscriptions aux offres et activités de l'amicale.</p>
     </div>
-    @if (!loading() && inscriptions().length > 0) {
-      <div class="stats-row">
-        <div class="stat-chip">
-          <span class="stat-value">{{ totalRestant() | number:'1.0-2' }} DT</span>
-          <span class="stat-label">Total restant</span>
-        </div>
-        <div class="stat-chip">
-          <span class="stat-value">{{ prochainesEcheancesCount() }}</span>
-          <span class="stat-label">Prochaines échéances</span>
-        </div>
-      </div>
-    }
+    <div class="page-head-right">
+      <button class="btn-filtrer" (click)="filterVisible.update(v => !v)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+        </svg>
+        Filtrer
+      </button>
+      <a class="btn-nouvelle" routerLink="/adherent/offres">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Nouvelle Inscription
+      </a>
+    </div>
   </div>
 
-  <!-- Filters -->
-  <div class="filters-bar">
-    <div class="search-wrap">
-      <lucide-icon name="search" [size]="15" class="search-icon"></lucide-icon>
-      <input type="search" class="search-input" placeholder="Rechercher une offre…"
-             [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
-    </div>
-    <select class="statut-select" [ngModel]="statutFilter()" (ngModelChange)="statutFilter.set($event)">
+  <!-- Status tabs bar -->
+  <div class="status-tabs-bar">
+    <div class="status-tabs">
       @for (s of statuts; track s.key) {
-        <option [value]="s.key">{{ s.label }}</option>
+        <button class="status-tab"
+                [class.status-tab--active]="statutFilter() === s.key"
+                (click)="statutFilter.set(s.key)">
+          {{ s.label }}
+        </button>
       }
-    </select>
+    </div>
+    <span class="ins-count-badge">{{ filtered().length }} Inscription{{ filtered().length !== 1 ? 's' : '' }}</span>
   </div>
+
+  <!-- Search (toggleable) -->
+  @if (filterVisible()) {
+    <div class="filters-bar">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="search" class="search-input" placeholder="Rechercher une offre…"
+               [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
+      </div>
+    </div>
+  }
 
   @if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
       <p>Chargement…</p>
     </div>
-  } @else if (filtered().length === 0) {
-    <div class="empty-state">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-      </svg>
-      <p>Aucune inscription trouvée</p>
-    </div>
   } @else {
 
-    <div class="two-col" [class.two-col--split]="selectedIns()">
+    <div class="two-col two-col--split">
 
       <!-- ── Left: inscription list ── -->
       <div class="list-col">
-        @for (ins of filtered(); track ins.id) {
-          <div class="ins-card"
-               [class.ins-card--active]="selectedIns()?.id === ins.id"
-               [class.ins-card--cancelled]="ins.statut === 'CANCELLED' || ins.statut === 'REJECTED'"
-               (click)="selectIns(ins)">
-            <div class="ins-type-bar" [style.background]="typeColor(ins.typeOffre)"></div>
-            <div class="ins-body">
-              <div class="ins-main">
-                <div class="ins-info">
-                  <h3 class="ins-title">{{ ins.offreTitre }}</h3>
-                  <p class="ins-meta">
-                    Inscrit le {{ formatDate(ins.dateInscription) }}
-                    @if (ins.totalPeople && ins.totalPeople > 1) { · {{ ins.totalPeople }} personnes }
-                  </p>
-                </div>
-                <div class="ins-right">
-                  @if (ins.montant != null) {
-                    <span class="ins-amount">{{ ins.montant | number:'1.0-2' }} DT</span>
+        @if (filtered().length === 0) {
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <p>Aucune inscription trouvée</p>
+          </div>
+        } @else {
+          @for (ins of filtered(); track ins.id) {
+            <div class="ins-card"
+                 [class.ins-card--active]="expandedInsId() === ins.id"
+                 [class.ins-card--cancelled]="ins.statut === 'CANCELLED' || ins.statut === 'REJECTED'">
+
+              <!-- Icon square -->
+              <div class="ins-icon-sq"
+                   [style.background]="typeIconBg(ins.typeOffre)"
+                   [style.color]="typeIconColor(ins.typeOffre)">
+                @switch (ins.typeOffre) {
+                  @case ('ACTIVITE') {
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="5" r="1.5"/><path d="M12 7v5l3 3"/><path d="M9 12H6"/><path d="M18 12h-3"/>
+                    </svg>
                   }
-                  <app-status-badge [statut]="ins.statut" type="inscription" />
-                  @if (ins.statut === 'PENDING') {
-                    <button class="btn-edit" (click)="openEdit(ins); $event.stopPropagation()" aria-label="Modifier">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                      Modifier
-                    </button>
-                    <button class="btn-cancel" (click)="openCancel(ins); $event.stopPropagation()" aria-label="Annuler">
-                      <lucide-icon name="circle-x" [size]="14"></lucide-icon>
-                      Annuler
-                    </button>
+                  @case ('VOYAGE') {
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 20V17.5L8 15.4V11.8L0 15V12L8 6.4V2C8 1.45 8.19583 0.979167 8.5875 0.5875C8.97917 0.195833 9.45 0 10 0C10.55 0 11.0208 0.195833 11.4125 0.5875C11.8042 0.979167 12 1.45 12 2V6.4L20 12V15L12 11.8V15.4L15 17.5V20L10 18.5L5 20Z" fill="#DC2626"/>
+                    </svg>
                   }
-                </div>
+                  @case ('SEJOUR') {
+                    <svg width="22" height="15" viewBox="0 0 22 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0 15V0H2V10H10V2H18C19.1 2 20.0417 2.39167 20.825 3.175C21.6083 3.95833 22 4.9 22 6V15H20V12H2V15H0ZM6 9C5.16667 9 4.45833 8.70833 3.875 8.125C3.29167 7.54167 3 6.83333 3 6C3 5.16667 3.29167 4.45833 3.875 3.875C4.45833 3.29167 5.16667 3 6 3C6.83333 3 7.54167 3.29167 8.125 3.875C8.70833 4.45833 9 5.16667 9 6C9 6.83333 8.70833 7.54167 8.125 8.125C7.54167 8.70833 6.83333 9 6 9ZM12 10H20V6C20 5.45 19.8042 4.97917 19.4125 4.5875C19.0208 4.19583 18.55 4 18 4H12V10ZM6 7C6.28333 7 6.52083 6.90417 6.7125 6.7125C6.90417 6.52083 7 6.28333 7 6C7 5.71667 6.90417 5.47917 6.7125 5.2875C6.52083 5.09583 6.28333 5 6 5C5.71667 5 5.47917 5.09583 5.2875 5.2875C5.09583 5.47917 5 5.71667 5 6C5 6.28333 5.09583 6.52083 5.2875 6.7125C5.47917 6.90417 5.71667 7 6 7ZM12 4V10V4Z" fill="#1B5E3B"/>
+                    </svg>
+                  }
+                  @case ('CONVENTION') {
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  }
+                  @default {
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                  }
+                }
               </div>
 
-              <!-- Echeances mini-bar -->
-              @if (ins.echeances && ins.echeances.length > 0 && ins.statut !== 'CANCELLED' && ins.statut !== 'REJECTED') {
-                <div class="ins-pay-bar">
-                  <div class="pay-dots">
-                    @for (e of ins.echeances; track e.id) {
-                      <span class="pay-dot"
-                            [class.pay-dot--paid]="e.statut === 'PAID'"
-                            [class.pay-dot--late]="e.statut === 'OVERDUE'"
-                            [title]="e.statut"></span>
-                    }
+              <!-- Card body -->
+              <div class="ins-body">
+
+                <!-- Top row: title + type chip | status pill -->
+                <div class="ins-top-row">
+                  <div class="ins-title-group">
+                    <h3 class="ins-title">{{ ins.offreTitre }}</h3>
+                    <span class="ins-type-chip" [style]="typeBadgeStyle(ins.typeOffre)">{{ typeLabel(ins.typeOffre) }}</span>
                   </div>
-                  <span class="pay-summary">
-                    {{ paidCount(ins) }}/{{ ins.echeances.length }} versement(s)
+                  <span class="ins-statut-pill"
+                        [class.ins-statut-pill--approved]="ins.statut === 'APPROVED'"
+                        [class.ins-statut-pill--pending]="ins.statut === 'PENDING'"
+                        [class.ins-statut-pill--cancelled]="ins.statut === 'CANCELLED' || ins.statut === 'REJECTED'">
+                    <span class="ins-statut-dot" [style.background]="statutDotColor(ins.statut)"></span>
+                    {{ statutLabel(ins.statut) }}
                   </span>
                 </div>
-              }
+
+                <!-- Versement dots -->
+                @if (ins.echeances && ins.echeances.length > 0 && ins.statut !== 'CANCELLED' && ins.statut !== 'REJECTED') {
+                  <div class="ins-pay-bar">
+                    <div class="pay-dots">
+                      @for (e of ins.echeances; track e.id) {
+                        <span class="pay-dot"
+                              [class.pay-dot--paid]="e.statut === 'PAID'"
+                              [class.pay-dot--late]="e.statut === 'OVERDUE'"></span>
+                      }
+                    </div>
+                    <span class="pay-summary">{{ paidCount(ins) }}/{{ ins.echeances.length }} versement(s)</span>
+                  </div>
+                }
+
+                <!-- Bottom row: date + people | amount + arrow -->
+                <div class="ins-bottom-row">
+                  <span class="ins-meta">
+                    {{ formatDate(ins.dateInscription) }}
+                    @if (ins.totalPeople && ins.totalPeople > 1) { · {{ ins.totalPeople }} participants }
+                  </span>
+                  <div class="ins-amount-row">
+                    @if (ins.montant != null) {
+                      <span class="ins-amount">{{ ins.montant | number:'1.0-2' }} TND</span>
+                    }
+                    <button class="ins-arrow-btn" [class.ins-arrow-btn--open]="expandedInsId() === ins.id"
+                            (click)="toggleExpand(ins); $event.stopPropagation()" aria-label="Voir détails">
+                      <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 1L6 6L11 1" stroke="#1B5E3B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
             </div>
-          </div>
+
+            <!-- Inline detail (accordion) -->
+            @if (expandedInsId() === ins.id) {
+              <div class="ins-detail-inline">
+
+                <!-- Header -->
+                <div class="ins-detail-inline-hd">
+                  <div class="ins-detail-inline-info">
+                    <span class="ins-detail-inline-title">{{ ins.offreTitre }}</span>
+                    <span class="ins-detail-inline-sep">·</span>
+                    <span class="ins-detail-inline-sub">
+                      @if (ins.montant != null) { {{ ins.montant | number:'1.0-2' }} DT · }{{ ins.echeances && ins.echeances.length > 0 ? ins.echeances.length + ' versement(s)' : 'Comptant' }}
+                    </span>
+                  </div>
+                  <div class="ins-detail-inline-actions">
+                    @if (ins.statut === 'PENDING') {
+                      <button class="btn-edit" (click)="openEdit(ins)" aria-label="Modifier">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Modifier
+                      </button>
+                      <button class="btn-cancel" (click)="openCancel(ins)" aria-label="Annuler">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        Annuler
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Versements -->
+                @if (ins.echeances && ins.echeances.length > 0) {
+                  <div class="versements-list">
+                    @for (e of ins.echeances; track e.id) {
+                      <div class="versement-row" [class.versement-row--paid]="e.statut === 'PAID'">
+                        <div class="versement-icon">
+                          @if (e.statut === 'PAID') {
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="#026654" stroke="none"><circle cx="12" cy="12" r="12"/><polyline points="7 12 10 15 17 9" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          } @else {
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                          }
+                        </div>
+                        <div class="versement-info">
+                          <span class="versement-label">Versement n°{{ e.numero }}</span>
+                          <span class="versement-date">Échéance : {{ formatDate(e.dateEcheance) }}</span>
+                        </div>
+                        <span class="versement-amount">{{ e.montant | number:'1.0-2' }} DT</span>
+                        <div class="versement-statut">
+                          <span class="vstatut"
+                                [class.vstatut--paid]="e.statut === 'PAID'"
+                                [class.vstatut--late]="e.statut === 'OVERDUE'"
+                                [class.vstatut--pending]="e.statut === 'PENDING'">
+                            @switch (e.statut) {
+                              @case ('PAID')    { Payée }
+                              @case ('OVERDUE') { En retard }
+                              @default          { En attente }
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="no-echeances">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    @if (ins.montant != null) {
+                      <p>Paiement comptant — {{ ins.montant | number:'1.0-2' }} DT</p>
+                    } @else {
+                      <p>Aucune échéance de paiement</p>
+                    }
+                  </div>
+                }
+
+                <!-- Participants -->
+                <div class="detail-participants">
+                  <span class="detail-section-label">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    {{ ins.totalPeople ?? 1 }} participant(s)
+                  </span>
+                </div>
+
+              </div>
+            }
+          }
         }
       </div>
 
-      <!-- ── Right: payment detail ── -->
-      @if (selectedIns(); as ins) {
-        <div class="detail-col">
-          <div class="detail-panel">
+      <!-- ── Right: always summary + help ── -->
+      <div class="detail-col">
 
-            <div class="detail-hd">
-              <div class="detail-hd-info">
-                <div class="detail-type-dot" [style.background]="typeColor(ins.typeOffre)"></div>
-                <div>
-                  <h2 class="detail-title">{{ ins.offreTitre }}</h2>
-                  <p class="detail-sub">
-                    @if (ins.montant != null) { {{ ins.montant | number:'1.0-2' }} DT · }
-                    @if (ins.echeances && ins.echeances.length > 0) {
-                      {{ ins.echeances.length }} versement(s)
-                    } @else {
-                      Comptant
-                    }
-                  </p>
-                </div>
-              </div>
-              <button class="detail-close" (click)="selectIns(null)" aria-label="Fermer">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </div>
-
-            <!-- Versements -->
-            @if (ins.echeances && ins.echeances.length > 0) {
-              <div class="versements-list">
-                @for (e of ins.echeances; track e.id) {
-                  <div class="versement-row" [class.versement-row--paid]="e.statut === 'PAID'">
-                    <div class="versement-icon">
-                      @if (e.statut === 'PAID') {
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#026654" stroke="none"><circle cx="12" cy="12" r="12"/><polyline points="7 12 10 15 17 9" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      } @else {
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
-                      }
-                    </div>
-                    <div class="versement-info">
-                      <span class="versement-label">Versement n°{{ e.numero }}</span>
-                      <span class="versement-date">Échéance : {{ formatDate(e.dateEcheance) }}</span>
-                    </div>
-                    <span class="versement-amount">{{ e.montant | number:'1.0-2' }} DT</span>
-                    <div class="versement-statut">
-                      <span class="vstatut"
-                            [class.vstatut--paid]="e.statut === 'PAID'"
-                            [class.vstatut--late]="e.statut === 'OVERDUE'"
-                            [class.vstatut--pending]="e.statut === 'PENDING'">
-                        @switch (e.statut) {
-                          @case ('PAID')    { Payée }
-                          @case ('OVERDUE') { En retard }
-                          @default          { En attente }
-                        }
-                      </span>
-                    </div>
-                  </div>
-                }
-              </div>
-            } @else {
-              <div class="no-echeances">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                @if (ins.montant != null) {
-                  <p>Paiement comptant — {{ ins.montant | number:'1.0-2' }} DT</p>
-                } @else {
-                  <p>Aucune échéance de paiement</p>
-                }
-              </div>
-            }
-
-            <!-- Participants -->
-            <div class="detail-participants">
-              <span class="detail-section-label">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                {{ ins.totalPeople ?? 1 }} participant(s)
-              </span>
-            </div>
-
+        <!-- Résumé des dépenses -->
+        <div class="summary-card">
+          <h3 class="summary-title">Résumé des dépenses</h3>
+          <div class="summary-row">
+            <span class="summary-label">Confirmées</span>
+            <span class="summary-amount">{{ montantConfirme() | number:'1.0-2' }} TND</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row">
+            <span class="summary-label">En attente</span>
+            <span class="summary-amount">{{ montantEnAttente() | number:'1.0-2' }} TND</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row summary-row--total">
+            <span class="summary-total-label">Total</span>
+            <span class="summary-total-amount">{{ montantTotal() | number:'1.0-2' }} TND</span>
           </div>
         </div>
-      }
+
+        <!-- Besoin d'aide ? -->
+        <div class="help-card">
+          <h3 class="help-title">Besoin d'aide ?</h3>
+          <p class="help-text">Pour toute demande d'annulation ou modification hors délai, contactez le bureau de l'amicale.</p>
+          <button class="btn-support">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Contacter le support
+          </button>
+        </div>
+
+      </div>
 
     </div>
   }

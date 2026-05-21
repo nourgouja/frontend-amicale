@@ -9,8 +9,12 @@
 .page-head {
   display: flex; align-items: flex-end; justify-content: space-between; gap: $space-4; flex-wrap: wrap;
 }
-.page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; margin: 0 0 2px; }
-.page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin: 0; }
+.page-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 32px; font-weight: 700; color: #1B5E3B;
+  letter-spacing: -0.32px; line-height: 40px; margin: 0;
+}
+.page-sub { font-size: 14px; font-weight: 400; color: #374151; margin: 0; line-height: 17px; }
 
 .result-count {
   font-size: $font-size-sm; font-weight: 600; color: $color-text-muted;
@@ -27,11 +31,12 @@
 .type-tabs { display: flex; flex-wrap: wrap; gap: $space-2; }
 
 .type-tab {
-  padding: 7px 18px; border-radius: $radius-full; border: 1.5px solid $color-border;
-  background: $color-surface; font-family: $font-base; font-size: $font-size-sm;
-  font-weight: 500; color: $color-text-muted; cursor: pointer; transition: all $transition-fast;
-  &:hover { border-color: $color-primary; color: $color-primary; }
-  &.active { background: $color-primary; color: #fff; border-color: $color-primary; font-weight: 600; }
+  padding: 8px 20px; border-radius: 9999px; border: none;
+  background: #E5E7EB; font-family: $font-base;
+  font-size: 16px; font-weight: 400; color: #374151;
+  cursor: pointer; transition: background $transition-fast, color $transition-fast;
+  &:hover { background: darken(#E5E7EB, 5%); }
+  &.active { background: #1B5E3B; color: #fff; font-weight: 400; }
   &:focus-visible { @include focus-ring; }
   @include reduced-motion { transition: none; }
 }
@@ -46,9 +51,9 @@
 
 .statut-tab {
   padding: 5px 14px; border-radius: calc(#{$radius-md} - 2px); border: none; background: none;
-  font-family: $font-base; font-size: $font-size-sm; font-weight: 500; color: $color-text-muted;
+  font-family: $font-base; font-size: 16px; font-weight: 400; color: $color-text-muted;
   cursor: pointer; transition: background $transition-fast, color $transition-fast;
-  &.active { background: $color-surface; color: $color-primary; font-weight: 600; box-shadow: $shadow-card; }
+  &.active { background: $color-surface; color: $color-primary; font-weight: 400; box-shadow: $shadow-card; }
   &:hover:not(.active) { color: $color-text; }
   &:focus-visible { @include focus-ring; }
   @include reduced-motion { transition: none; }
@@ -64,7 +69,7 @@
 
 .search-input {
   border: none; background: none; outline: none;
-  font-family: $font-base; font-size: $font-size-sm; color: $color-text; width: 190px;
+  font-family: $font-base; font-size: 16px; font-weight: 400; color: $color-text; width: 190px;
   &::placeholder { color: $color-text-muted; }
 }
 
@@ -73,33 +78,34 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: $space-5;
+  margin-top: $space-4;
 }
 
 /* ── Prop card ── */
 .prop-card {
-  background: $color-surface; border-radius: 18px;
-  box-shadow: $shadow-card; border: 1px solid $color-border;
-  overflow: hidden; cursor: pointer;
+  min-width: 0; background: #ffffff; border-radius: 12px;
+  overflow: hidden; cursor: pointer; display: flex; flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
   transition: transform $transition-base, box-shadow $transition-base;
-  &:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.13); }
+  &:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.10); }
   @include reduced-motion { transition: none; &:hover { transform: none; } }
 }
 
-.prop-card--fermee { opacity: 0.72; }
+.prop-card--fermee { background: rgba(229, 231, 235, 0.5); }
 
 .prop-img-wrap {
-  position: relative; height: 195px; background: #e5e7eb; overflow: hidden;
+  position: relative; height: 195px; flex-shrink: 0; background: #e5e7eb; overflow: hidden;
 }
 
 .fermee-overlay {
   position: absolute; inset: 0;
-  background: rgba(0,0,0,0.32);
+  background: rgba(26, 26, 26, 0.1);
   display: flex; align-items: center; justify-content: center; z-index: 2;
 }
 .fermee-badge {
-  background: rgba(0,0,0,0.65); color: #fff;
-  padding: 6px 18px; border-radius: $radius-full;
-  font-size: $font-size-sm; font-weight: 700; text-transform: uppercase;
+  background: rgba(26, 26, 26, 0.8); backdrop-filter: blur(2px); color: #fff;
+  padding: 8px 24px; border-radius: 9999px;
+  font-size: $font-size-sm; font-weight: 700;
 }
 .prop-img {
   width: 100%; height: 100%; object-fit: cover; display: block;
@@ -117,43 +123,52 @@
   padding: 6px 16px; border-radius: $radius-full;
   font-size: $font-size-sm; font-weight: 600;
 }
-.type-label-badge {
-  position: absolute; bottom: $space-2; left: $space-2; z-index: 2;
-  background: rgba(0,0,0,0.55); color: #fff; backdrop-filter: blur(4px);
-  padding: 3px 10px; border-radius: $radius-full;
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+.type-badge {
+  position: absolute; top: 16px; left: 16px; z-index: 3;
+  padding: 4px 12px; border-radius: 9999px;
+  font-size: 12px; font-weight: 500; color: #fff; letter-spacing: 0.6px;
+  backdrop-filter: blur(6px);
+  &--voyage     { background: #1B5E3B; }
+  &--sejour     { background: #0A3D26; }
+  &--activite   { background: #F59E0B; }
+  &--evenement  { background: #3B82F6; }
+  &--convention { background: #7C3AED; }
 }
 .prop-arrow {
-  position: absolute; top: $space-3; right: $space-3;
-  width: 34px; height: 34px; border-radius: 50%;
-  background: rgba(255,255,255,.9); border: none; cursor: pointer;
+  position: absolute; top: 16px; right: 16px;
+  width: 40px; height: 40px; border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(6px);
+  border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  color: $color-text; text-decoration: none;
-  transition: background $transition-fast, transform $transition-fast;
-  &:hover { background: #fff; transform: scale(1.08); }
+  color: #fff; text-decoration: none;
+  transition: background $transition-fast;
+  &:hover { background: rgba(255,255,255,0.35); }
   @include reduced-motion { transition: none; }
 }
-.prop-info { padding: $space-4; }
+.prop-info { padding: 16px; gap: 8px; flex: 1; display: flex; flex-direction: column; }
 .prop-location {
-  display: flex; align-items: center; gap: 5px; margin-bottom: 5px;
-  span { font-size: 11px; color: $color-text-muted; }
+  display: flex; align-items: center; gap: 4px;
+  span { font-size: 12px; font-weight: 500; color: #374151; letter-spacing: 0.6px; }
 }
 .prop-title {
-  font-size: $font-size-base; font-weight: 700; color: $color-text;
-  margin-bottom: $space-3; line-height: 1.35;
+  font-size: 16px; font-weight: 600; color: #1A1A1A;
+  flex: 1; line-height: 24px;
   display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
   -webkit-box-orient: vertical; overflow: hidden;
 }
-.prop-footer { display: flex; align-items: center; justify-content: space-between; gap: $space-2; }
-.prop-host   { display: flex; align-items: center; gap: $space-2; }
+.prop-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: $space-2;
+  border-top: 1px solid #D1D5DB; padding-top: 16px; margin-top: auto;
+}
+.prop-host { display: flex; align-items: center; gap: $space-2; }
 .host-avatar {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: $color-primary-light; color: $color-primary;
-  font-size: 11px; font-weight: 700;
+  width: 24px; height: 24px; border-radius: 9999px;
+  background: #B3E2C7; color: #0D3522;
+  font-size: 10px; font-weight: 700;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.host-name  { font-size: 11px; font-weight: 600; color: $color-text; }
-.prop-price { font-size: $font-size-md; font-weight: 700; color: $color-text; white-space: nowrap; }
+.host-name { font-size: 11px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.55px; }
+.prop-price { font-size: 20px; font-weight: 800; color: #1B5E3B; white-space: nowrap; }
 
 /* ── Skeleton ── */
 .offer-skeleton {
@@ -171,7 +186,7 @@
 /* ── Empty state ── */
 .empty-state {
   display: flex; flex-direction: column; align-items: center; gap: $space-3;
-  padding: $space-8 $space-4; color: $color-text-muted;
+  padding: $space-8 $space-4; color: $color-text-muted; margin-top: $space-4;
   p { font-size: $font-size-sm; }
 }
 

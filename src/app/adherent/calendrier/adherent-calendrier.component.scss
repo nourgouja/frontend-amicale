@@ -1,234 +1,175 @@
 @use '../../../styles/variables' as *;
 
 .cal-page {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  height: 100%;
+  display: flex; flex-direction: column; gap: $space-5; height: 100%;
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
 .cal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: $space-4; flex-wrap: wrap;
 }
+
+.cal-header-left { display: flex; flex-direction: column; gap: 4px; }
 
 .cal-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: $color-text;
+  font-family: 'Manrope', sans-serif;
+  font-size: 32px; font-weight: 700; color: #1B5E3B;
+  letter-spacing: -0.32px; line-height: 40px; margin: 0;
 }
 
-.cal-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.cal-sub { font-size: 14px; font-weight: 400; color: #374151; margin: 0; line-height: 17px; }
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+.cal-nav { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+.nav-month-group {
+  display: flex; align-items: center; gap: 4px;
+  background: #ffffff; border: 1px solid #D1D5DB; border-radius: 9999px;
+  padding: 4px 6px;
 }
 
-.nav-btn {
-  height: 36px;
-  padding: 0 14px;
-  border: 1.5px solid $color-border;
-  background: $color-surface;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: $color-text;
-  cursor: pointer;
-  font-family: $font-base;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.15s, color 0.15s;
-  &:hover { border-color: $color-primary; color: $color-primary; }
-}
-
-.today-btn {
-  background: $color-primary;
-  border-color: $color-primary;
-  color: #fff;
-  &:hover { opacity: 0.88; color: #fff; }
+.nav-arrow {
+  width: 32px; height: 32px; border-radius: 9999px; border: none;
+  background: transparent; color: #374151;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-family: $font-base;
+  transition: background $transition-fast, color $transition-fast;
+  &:hover { background: #F3F4F6; color: #1B5E3B; }
+  @include reduced-motion { transition: none; }
 }
 
 .month-label {
-  font-size: 15px;
-  font-weight: 600;
-  color: $color-text;
-  min-width: 160px;
-  text-align: center;
-  text-transform: capitalize;
+  font-size: 15px; font-weight: 600; color: #1A1A1A;
+  min-width: 150px; text-align: center; text-transform: capitalize;
 }
 
-// ── Grid ──────────────────────────────────────────────────────────────────────
+.nav-btn {
+  height: 40px; padding: 0 20px;
+  border: none; border-radius: 9999px;
+  font-size: 14px; font-weight: 500; color: #374151;
+  cursor: pointer; font-family: $font-base;
+  background: #F3F4F6;
+  display: flex; align-items: center; justify-content: center;
+  transition: background $transition-fast;
+  &:hover { background: #E5E7EB; }
+  @include reduced-motion { transition: none; }
+}
+
+.today-btn {
+  background: #1B5E3B; color: #fff;
+  &:hover { background: #0A3D26; }
+}
+
+// ── Calendar grid ─────────────────────────────────────────────────────────────
 .cal-grid-wrap {
-  background: $color-surface;
-  border-radius: 16px;
-  border: 1px solid $color-border;
-  overflow: hidden;
-  box-shadow: $shadow-card;
+  background: #ffffff; border-radius: 12px;
+  border: 1px solid #D1D5DB; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  flex: 1;
 }
 
 .cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  display: grid; grid-template-columns: repeat(7, 1fr);
 }
 
 .cal-weekday {
-  padding: 10px 0;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: $color-text-muted;
-  background: $color-bg;
-  border-bottom: 1px solid $color-border;
-  letter-spacing: 0.04em;
+  padding: 12px 0; text-align: center;
+  font-size: 12px; font-weight: 700; color: #9CA3AF;
+  background: #ffffff; border-bottom: 1px solid #E5E7EB;
+  letter-spacing: 0.06em; text-transform: uppercase;
 }
 
 .cal-cell {
-  min-height: 100px;
-  padding: 8px;
-  border-right: 1px solid $color-border;
-  border-bottom: 1px solid $color-border;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  transition: background 0.1s;
-
-  &:hover { background: $color-bg; }
+  min-height: 100px; padding: 8px;
+  border-right: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB;
+  display: flex; flex-direction: column; gap: 3px;
+  transition: background $transition-fast;
+  &:hover { background: #ffffff; }
   &:nth-child(7n) { border-right: none; }
 
   &.today {
-    background: rgba(2, 102, 84, 0.04);
+    background: #ffffff;
     .day-number {
-      background: $color-primary;
-      color: #fff;
-      border-radius: 50%;
-      width: 26px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #1B5E3B; color: #fff;
+      border-radius: 50%; width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
     }
   }
 
   &.other-month {
-    background: #fafafa;
-    .day-number { color: #c9cdd4; }
+    background: #ffffff;
+    .day-number { color: #D1D5DB; }
   }
+  @include reduced-motion { transition: none; }
 }
 
 .day-number {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: $color-text;
-  flex-shrink: 0;
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 13px; font-weight: 600; color: #1A1A1A;
+  flex-shrink: 0; width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
   margin-bottom: 2px;
 }
 
-.day-events {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow: hidden;
-}
+.day-events { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
 
 .event-pill {
-  width: 100%;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: none;
-  font-size: 11px;
-  font-weight: 500;
-  color: #fff;
-  text-align: left;
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-family: $font-base;
-  transition: opacity 0.15s;
-  &:hover { opacity: 0.80; }
+  width: 100%; padding: 3px 7px; border-radius: 4px; border: none;
+  font-size: 11px; font-weight: 600; color: #fff; text-align: left;
+  cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: $font-base; transition: opacity $transition-fast;
+  &:hover { opacity: 0.82; }
+  @include reduced-motion { transition: none; }
 }
 
 // ── Legend ────────────────────────────────────────────────────────────────────
 .legend {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  align-items: center;
+  display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+  padding: 4px 0;
 }
 
 .legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: $color-text-muted;
-  font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: #374151; font-weight: 500;
 }
 
 .legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
-  flex-shrink: 0;
+  width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
 }
 
 // ── Loading ───────────────────────────────────────────────────────────────────
 .cal-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 60px;
-  color: $color-text-muted;
-  font-size: 13px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px; padding: 60px; color: #9CA3AF; font-size: 14px;
 }
 
 .spinner {
-  width: 30px;
-  height: 30px;
-  border: 3px solid $color-border;
-  border-top-color: $color-primary;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  width: 32px; height: 32px;
+  border: 3px solid #E5E7EB; border-top-color: #1B5E3B;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+  @include reduced-motion { animation: none; opacity: 0.5; }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
 // ── Preview panel ─────────────────────────────────────────────────────────────
 .overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  z-index: 800;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.3); z-index: 800;
   animation: fadeIn 0.15s ease;
+  @include reduced-motion { animation: none; }
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .preview-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 360px;
-  max-width: 100vw;
-  height: 100vh;
-  background: $color-surface;
-  box-shadow: -6px 0 32px rgba(0,0,0,0.14);
-  z-index: 801;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  position: fixed; top: 0; right: 0;
+  width: 380px; max-width: 100vw; height: 100vh;
+  background: #ffffff; z-index: 801;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+  display: flex; flex-direction: column; overflow: hidden;
   animation: slideIn 0.22s ease;
+  @include reduced-motion { animation: none; }
 }
 
 @keyframes slideIn {
@@ -237,137 +178,77 @@
 }
 
 .pp-cover {
-  position: relative;
-  height: 180px;
-  flex-shrink: 0;
-  overflow: hidden;
+  position: relative; height: 190px; flex-shrink: 0; overflow: hidden;
 }
 
-.pp-cover-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+.pp-cover-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .pp-cover-fallback {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
 }
 
 .pp-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0,0,0,0.35);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.15s;
+  position: absolute; top: 12px; right: 12px;
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: rgba(0,0,0,0.35); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background $transition-fast;
   &:hover { background: rgba(0,0,0,0.55); }
+  @include reduced-motion { transition: none; }
 }
 
 .pp-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  flex: 1; overflow-y: auto; padding: 24px;
+  display: flex; flex-direction: column; gap: 0;
   scrollbar-width: thin;
 }
 
 .pp-type-badge {
-  display: inline-flex;
-  align-items: center;
-  height: 22px;
-  padding: 0 10px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  width: fit-content;
+  display: inline-flex; align-items: center; height: 24px; padding: 0 12px;
+  border-radius: 9999px; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 12px; width: fit-content;
 }
 
 .pp-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: $color-text;
-  line-height: 1.35;
-  margin-bottom: 6px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 20px; font-weight: 700; color: #1A1A1A;
+  line-height: 1.3; margin-bottom: 8px;
 }
 
 .pp-desc {
-  font-size: 12.5px;
-  color: $color-text-muted;
-  line-height: 1.6;
-  margin-bottom: 12px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 13px; color: #6B7280; line-height: 1.6; margin-bottom: 16px;
+  display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3;
+  -webkit-box-orient: vertical; overflow: hidden;
 }
 
-.pp-sep {
-  height: 1px;
-  background: $color-border;
-  margin: 14px 0;
-}
+.pp-sep { height: 1px; background: #E5E7EB; margin: 16px 0; }
 
 .pp-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
+  display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;
 }
 
 .pp-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: $color-text-muted;
+  display: flex; align-items: center; gap: 10px; color: #9CA3AF;
 }
 
 .pp-value {
-  font-size: 13px;
-  color: $color-text;
-  &--bold { font-weight: 600; }
+  font-size: 14px; color: #374151;
+  &--bold { font-weight: 600; color: #1A1A1A; }
 }
 
 .pp-price {
-  font-size: 16px;
-  font-weight: 700;
-  color: $color-primary;
+  font-size: 18px; font-weight: 700; color: #1B5E3B;
 }
 
 .pp-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 12px 20px;
-  border-radius: $radius-full;
-  border: none;
-  background: $color-primary;
-  color: #fff;
-  font-size: $font-size-sm;
-  font-weight: 600;
-  font-family: $font-base;
-  cursor: pointer;
-  margin-top: auto;
-  transition: background 0.15s;
-  &:hover { background: $color-primary-dark; }
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 12px 20px; border-radius: 9999px; border: none;
+  background: #1B5E3B; color: #fff;
+  font-size: 15px; font-weight: 600; font-family: $font-base;
+  cursor: pointer; margin-top: auto;
+  transition: background $transition-fast;
+  &:hover { background: #0A3D26; }
+  @include reduced-motion { transition: none; }
 }

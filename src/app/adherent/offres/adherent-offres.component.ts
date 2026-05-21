@@ -32,7 +32,7 @@ export class AdherentOffresComponent implements OnInit {
   loading       = signal(true);
   searchQuery   = signal('');
   activeFilter  = signal('');
-  activeStatut  = signal('OPEN');
+  activeStatut  = signal('');
 
   readonly typeFilters = [
     { value: '',           label: 'Tout'       },
@@ -44,9 +44,9 @@ export class AdherentOffresComponent implements OnInit {
   ];
 
   readonly statutFilters = [
-    { value: 'OPEN', label: 'Ouvertes' },
-    { value: '',        label: 'Toutes'   },
-    { value: 'CLOSED',  label: 'Fermées'  },
+    { value: '',       label: 'Toutes'  },
+    { value: 'OPEN',   label: 'Ouvertes'},
+    { value: 'CLOSED', label: 'Fermées' },
   ];
 
   filtered = computed(() => {
@@ -54,9 +54,8 @@ export class AdherentOffresComponent implements OnInit {
     const statut = this.activeStatut();
     const q      = this.searchQuery().toLowerCase().trim();
     return this.offres().filter(o => {
-      // "Tout" (type='') shows everything except conventions; conventions need explicit filter
-      const matchType   = type ? o.typeOffre === type : o.typeOffre !== 'CONVENTION';
-      const matchStatut = o.typeOffre === 'CONVENTION' || !statut || o.statutOffre === statut;
+      const matchType   = !type || o.typeOffre === type;
+      const matchStatut = !statut || o.statutOffre === statut;
       const matchQuery  = !q || o.titre.toLowerCase().includes(q)
                              || (o.lieu ?? '').toLowerCase().includes(q);
       return matchType && matchStatut && matchQuery;
@@ -79,7 +78,7 @@ export class AdherentOffresComponent implements OnInit {
 
   resetFilters(): void {
     this.activeFilter.set('');
-    this.activeStatut.set('OPEN');
+    this.activeStatut.set('');
     this.searchQuery.set('');
   }
 

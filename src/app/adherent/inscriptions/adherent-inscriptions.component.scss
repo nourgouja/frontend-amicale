@@ -4,22 +4,63 @@
 
 // ── Page header ───────────────────────────────────────────────────────────────
 .page-head {
-  display: flex; align-items: flex-start; justify-content: space-between; gap: $space-4; flex-wrap: wrap;
+  display: flex; align-items: center; justify-content: space-between; gap: $space-4; flex-wrap: wrap;
 }
-.page-head-left { }
-.page-title { font-size: $font-size-2xl; font-weight: 700; color: $color-text; }
-.page-sub   { font-size: $font-size-sm; color: $color-text-muted; margin-top: 2px; }
-
-// ── Stats ─────────────────────────────────────────────────────────────────────
-.stats-row { display: flex; gap: $space-3; flex-shrink: 0; }
-
-.stat-chip {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: $space-3 $space-5; border-radius: $radius-lg; border: 1.5px solid $color-border;
-  background: $color-surface; min-width: 120px; gap: 2px;
+.page-head-left { display: flex; flex-direction: column; gap: 4px; }
+.page-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 32px; font-weight: 700; color: #1B5E3B;
+  letter-spacing: -0.32px; line-height: 40px; margin: 0;
 }
-.stat-value { font-size: $font-size-lg; font-weight: 800; color: $color-primary; }
-.stat-label { font-size: 10px; font-weight: 700; color: $color-text-muted; text-transform: uppercase; letter-spacing: 0.5px; }
+.page-sub { font-size: 14px; font-weight: 400; color: #374151; margin: 0; line-height: 17px; }
+
+.page-head-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+.btn-filtrer {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 9999px; border: none;
+  background: #E5E7EB; color: #374151;
+  font-family: $font-base; font-size: 16px; font-weight: 400;
+  cursor: pointer; transition: background $transition-fast;
+  &:hover { background: #D1D5DB; }
+  @include reduced-motion { transition: none; }
+}
+
+.btn-nouvelle {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 9999px; border: none;
+  background: #1B5E3B; color: #fff;
+  font-family: $font-base; font-size: 16px; font-weight: 400;
+  cursor: pointer; text-decoration: none;
+  transition: background $transition-fast;
+  &:hover { background: #0A3D26; }
+  @include reduced-motion { transition: none; }
+}
+
+// ── Status tabs bar ───────────────────────────────────────────────────────────
+.status-tabs-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #ffffff; border: 1px solid #D1D5DB; border-radius: 12px;
+  padding: 0 $space-3; height: 52px; overflow: hidden;
+}
+
+.status-tabs { display: flex; align-items: stretch; height: 100%; }
+
+.status-tab {
+  display: flex; align-items: center; padding: 0 20px;
+  border: none; border-bottom: 3px solid transparent; background: none;
+  font-family: $font-base; font-size: 16px; font-weight: 400; color: #374151;
+  cursor: pointer; white-space: nowrap;
+  transition: color $transition-fast, border-color $transition-fast;
+  &--active { color: #1B5E3B; font-weight: 600; border-bottom-color: #F4C430; }
+  &:hover:not(.status-tab--active) { color: #1A1A1A; }
+  @include reduced-motion { transition: none; }
+}
+
+.ins-count-badge {
+  font-size: 13px; font-weight: 600; color: #374151;
+  background: #F3F4F6; border-radius: 12px; padding: 4px 12px; white-space: nowrap;
+}
 
 // ── Filters ───────────────────────────────────────────────────────────────────
 .filters-bar { display: flex; align-items: center; gap: $space-3; flex-wrap: wrap; }
@@ -28,19 +69,13 @@
   display: flex; align-items: center; gap: $space-2;
   background: $color-surface; border: 1px solid $color-border; border-radius: $radius-md;
   padding: 0 $space-3; height: 38px; flex: 1; max-width: 300px;
-  .search-icon { color: $color-text-muted; flex-shrink: 0; }
+  svg { color: $color-text-muted; flex-shrink: 0; }
 }
 
 .search-input {
   flex: 1; border: none; background: none; outline: none;
   font-family: $font-base; font-size: $font-size-sm; color: $color-text;
   &::placeholder { color: $color-text-muted; }
-}
-
-.statut-select {
-  height: 38px; padding: 0 $space-3; border: 1px solid $color-border; border-radius: $radius-md;
-  background: $color-surface; font-family: $font-base; font-size: $font-size-sm; color: $color-text;
-  cursor: pointer; outline: none; &:focus { border-color: $color-primary; }
 }
 
 // ── Two-column layout ─────────────────────────────────────────────────────────
@@ -51,7 +86,7 @@
   align-items: start;
 
   &--split {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 3fr 1fr;
 
     @media (max-width: 900px) {
       grid-template-columns: 1fr;
@@ -63,44 +98,93 @@
 
 // ── Inscription card ──────────────────────────────────────────────────────────
 .ins-card {
-  display: flex; @include card; overflow: hidden; cursor: pointer;
+  display: flex; align-items: center; gap: 16px;
+  background: #ffffff; border: 1px solid #D1D5DB; border-radius: 12px;
+  padding: 20px; cursor: pointer;
   transition: box-shadow $transition-fast, transform $transition-fast;
   &:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.10); transform: translateY(-1px); }
   &--active {
-    box-shadow: 0 0 0 2px $color-primary, 0 4px 16px rgba(2,102,84,0.12);
+    border-color: $color-primary;
+    box-shadow: 0 0 0 1px $color-primary, 0 4px 16px rgba(27,94,59,0.10);
     transform: none;
   }
-  &--cancelled { opacity: 0.7; }
+  &--cancelled { opacity: 0.65; }
   @include reduced-motion { transition: none; &:hover { transform: none; } }
 }
 
-.ins-type-bar { width: 4px; flex-shrink: 0; }
-.ins-body { flex: 1; padding: $space-3 $space-4; display: flex; flex-direction: column; gap: $space-2; }
-.ins-main { display: flex; align-items: center; gap: $space-3; }
-.ins-info { flex: 1; min-width: 0; }
-.ins-title { font-size: $font-size-sm; font-weight: 600; color: $color-text; @include truncate; }
-.ins-meta  { font-size: $font-size-xs; color: $color-text-muted; margin-top: 2px; }
-.ins-right { display: flex; align-items: center; gap: $space-2; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
-
-.ins-amount {
-  font-size: $font-size-sm; font-weight: 700; color: $color-primary;
+.ins-icon-sq {
+  width: 64px; height: 64px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
 }
 
-// ── Payment progress mini-bar ─────────────────────────────────────────────────
-.ins-pay-bar {
-  display: flex; align-items: center; gap: $space-2;
+.ins-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+
+.ins-top-row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: $space-2;
+}
+.ins-title-group { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.ins-title { font-size: $font-size-sm; font-weight: 700; color: #1A1A1A; @include truncate; margin: 0; }
+.ins-type-chip {
+  display: inline-block; padding: 2px 10px; border-radius: 9999px;
+  font-size: 11px; font-weight: 600; align-self: flex-start;
 }
 
+.ins-statut-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 9999px; flex-shrink: 0;
+  font-size: 11px; font-weight: 600; white-space: nowrap;
+  &--approved { background: rgba(27,94,59,0.10); color: #1B5E3B; }
+  &--pending  { background: rgba(245,158,11,0.12); color: #B45309; }
+  &--cancelled { background: #F3F4F6; color: #6B7280; }
+}
+.ins-statut-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+// ── Versement dots row (on card) ─────────────────────────────────────────────
+.ins-pay-bar { display: flex; align-items: center; gap: 6px; }
 .pay-dots { display: flex; gap: 4px; }
-
 .pay-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: $color-border;
-  &--paid  { background: $color-primary; }
-  &--late  { background: $color-error; }
+  width: 8px; height: 8px; border-radius: 50%; background: #D1D5DB;
+  &--paid { background: $color-primary; }
+  &--late { background: $color-error; }
+}
+.pay-summary { font-size: $font-size-xs; color: $color-text-muted; }
+
+.ins-bottom-row {
+  display: flex; align-items: center; justify-content: space-between; gap: $space-2;
+}
+.ins-meta { font-size: $font-size-xs; color: $color-text-muted; }
+.ins-amount-row { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.ins-amount { font-size: 18px; font-weight: 700; color: #1B5E3B; }
+
+.ins-arrow-btn {
+  width: 40px; height: 40px; border-radius: 9999px; border: 1.5px solid #D1D5DB;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  transition: border-color $transition-fast;
+  &:hover { border-color: $color-primary; }
+  svg { transition: transform 0.2s ease; }
+  &--open svg { transform: rotate(180deg); }
+  @include reduced-motion { transition: none; svg { transition: none; } }
 }
 
-.pay-summary { font-size: $font-size-xs; color: $color-text-muted; }
+// ── Inline accordion detail ───────────────────────────────────────────────────
+.ins-detail-inline {
+  background: #fff; border: 1px solid #D1D5DB; border-radius: 12px;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+
+.ins-detail-inline-hd {
+  display: flex; align-items: center; justify-content: space-between; gap: $space-3;
+  padding: 12px $space-4; border-bottom: 1px solid $color-border; flex-wrap: nowrap;
+}
+.ins-detail-inline-info {
+  display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; overflow: hidden;
+}
+.ins-detail-inline-title { font-size: $font-size-sm; font-weight: 700; color: $color-text; white-space: nowrap; }
+.ins-detail-inline-sep { color: $color-text-muted; flex-shrink: 0; }
+.ins-detail-inline-sub { font-size: $font-size-xs; color: $color-text-muted; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ins-detail-inline-actions { display: flex; align-items: center; gap: $space-2; flex-shrink: 0; }
 
 // ── Action buttons ────────────────────────────────────────────────────────────
 .btn-edit {
@@ -123,8 +207,55 @@
   @include reduced-motion { transition: none; }
 }
 
+// ── Summary card ─────────────────────────────────────────────────────────────
+.summary-card {
+  background: #1B5E3B; border-radius: 12px; padding: 24px;
+  display: flex; flex-direction: column; gap: 16px; overflow: hidden; position: relative;
+}
+
+.summary-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px; font-weight: 700; color: #fff; margin: 0;
+}
+
+.summary-row {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.summary-label { font-size: 14px; color: rgba(255,255,255,0.7); }
+.summary-amount { font-size: 16px; font-weight: 700; color: #fff; }
+.summary-divider { height: 1px; background: rgba(255,255,255,0.12); }
+
+.summary-row--total { padding-top: 4px; }
+.summary-total-label { font-size: 20px; font-weight: 700; color: #fff; }
+.summary-total-amount { font-size: 24px; font-weight: 800; color: #F4C430; }
+
+// ── Help card ─────────────────────────────────────────────────────────────────
+.help-card {
+  background: #ffffff; border: 1px solid #D1D5DB; border-radius: 12px;
+  padding: 24px; display: flex; flex-direction: column; gap: 12px;
+}
+
+.help-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px; font-weight: 700; color: #1B5E3B; margin: 0;
+}
+
+.help-text { font-size: 14px; color: #374151; line-height: 1.6; margin: 0; }
+
+.btn-support {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 20px; border-radius: 9999px;
+  border: 2px solid #1B5E3B; background: transparent; color: #1B5E3B;
+  font-family: $font-base; font-size: 15px; font-weight: 600;
+  cursor: pointer; margin-top: 4px; align-self: stretch; justify-content: center;
+  transition: background $transition-fast;
+  &:hover { background: rgba(27,94,59,0.06); }
+  @include reduced-motion { transition: none; }
+}
+
 // ── Detail panel ──────────────────────────────────────────────────────────────
-.detail-col { position: sticky; top: $space-4; }
+.detail-col { position: sticky; top: $space-4; display: flex; flex-direction: column; gap: $space-4; }
 
 .detail-panel {
   @include card; overflow: hidden; display: flex; flex-direction: column; gap: 0;

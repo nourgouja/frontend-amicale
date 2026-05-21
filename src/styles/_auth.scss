@@ -11,9 +11,9 @@
   background: $color-surface;
 }
 
-.auth-logo { height: 52px; object-fit: contain; align-self: flex-start; margin-bottom: $space-8; }
+.auth-logo { width: 240px; height: auto; object-fit: contain; align-self: flex-start; margin-bottom: 100px; }
 
-.auth-card { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 380px; }
+.auth-card { display: flex; flex-direction: column; justify-content: flex-start; max-width: 380px; }
 
 .auth-right {
   position: relative; overflow: hidden;

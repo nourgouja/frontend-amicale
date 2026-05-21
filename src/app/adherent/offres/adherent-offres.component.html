@@ -80,7 +80,7 @@
               <div class="fermee-overlay"><span class="fermee-badge">Fermée</span></div>
             }
 
-            <span class="type-label-badge">{{ typeLabel(o.typeOffre) }}</span>
+            <span class="type-badge type-badge--{{ o.typeOffre | lowercase }}">{{ typeLabel(o.typeOffre) }}</span>
 
             <a class="prop-arrow" [routerLink]="['/adherent/offres', o.id]"
                (click)="$event.stopPropagation()" aria-label="Voir l'offre">
@@ -92,7 +92,7 @@
 
           <div class="prop-info">
             <div class="prop-location">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#26d07c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
               </svg>
               <span>{{ o.lieu || 'Tunisie' }}</span>

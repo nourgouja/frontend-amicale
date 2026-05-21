@@ -28,7 +28,6 @@ export class AdherentLayoutComponent implements OnInit {
     { label: 'Tableau de bord',  route: '/adherent/dashboard',    icon: 'LayoutDashboard' },
     { label: 'Mes Inscriptions', route: '/adherent/inscriptions', icon: 'ClipboardList'   },
     { label: 'Annonces',         route: '/adherent/annonces',     icon: 'Megaphone'       },
-    { label: 'Cotisations',      route: '/adherent/cotisation',   icon: 'CreditCard'      },
     { label: 'Calendrier',       route: '/adherent/calendrier',   icon: 'CalendarDays'    },
   ];
 
