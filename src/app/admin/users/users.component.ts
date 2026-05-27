@@ -82,7 +82,7 @@ export class AdminUsersComponent implements OnInit {
   readonly postes = [
     { value: 'PRESIDENT',        label: 'Président' },
     { value: 'SECRETARY',        label: 'Secrétaire' },
-    { value: 'TRESORIER',        label: 'Trésorier' },
+    { value: 'TREASURER',        label: 'Trésorier' },
     { value: 'RESPONSABLE_POLE', label: 'Membre de Pôle' },
   ];
 
@@ -451,7 +451,7 @@ export class AdminUsersComponent implements OnInit {
   roleLabel(role: string): string { return { ADMIN: 'Admin', MEMBRE_BUREAU: 'Membre Bureau', ADHERENT: 'Adhérent' }[role] ?? role; }
 
   posteLabel(poste: string | undefined): string {
-    const map: Record<string, string> = { PRESIDENT: 'Président', SECRETARY: 'Secrétaire', TRESORIER: 'Trésorier', RESPONSABLE_POLE: 'Membre de Pôle' };
+    const map: Record<string, string> = { PRESIDENT: 'Président', SECRETARY: 'Secrétaire', TREASURER: 'Trésorier', RESPONSABLE_POLE: 'Membre de Pôle' };
     return poste ? (map[poste] ?? poste) : '—';
   }
 

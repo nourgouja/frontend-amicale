@@ -39,8 +39,8 @@ export class ForgotPasswordComponent {
         this.loading.set(false);
         this.errorMessage.set(
           err.status === 404
-            ? 'No account found with that email.'
-            : 'An error occurred. Please try again.'
+            ? 'Aucun compte trouvé avec cet email.'
+            : 'Une erreur est survenue. Veuillez réessayer.'
         );
       },
     });

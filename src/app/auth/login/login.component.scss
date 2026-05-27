@@ -4,34 +4,35 @@
 $primary: #026654;
 
 
-.card-title    { font-size: 28px; font-weight: 700; color: #111; margin: 0 0 6px; }
-.card-subtitle { font-size: 13px; color: #666; margin: 0 0 28px; line-height: 1.5; }
+.card-title    { font-size: 26px; font-weight: 700; color: #111; margin: 0 0 5px; }
+.card-subtitle { font-size: 12.5px; color: #666; margin: 0 0 24px; line-height: 1.5; }
 
-.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 13px; }
 
 .field-label { font-size: 10.5px; font-weight: 700; color: #333; letter-spacing: 0.8px; text-transform: uppercase; }
 
 .input-wrap { position: relative; display: flex; align-items: center; }
 
-.input-icon { position: absolute; left: 11px; color: #666; pointer-events: none; }
+.input-icon { position: absolute; left: 12px; color: #666; pointer-events: none; width: 15px; height: 15px; }
 
 .input {
   width: 100%; height: 42px; padding: 0 12px 0 36px;
-  border: 1px solid rgba(0,0,0,.12); border-radius: 8px;
-  background: #f9fafb; font-family: inherit; font-size: 13px; color: #111;
+  border: 1px solid rgba(0,0,0,.12); border-radius: 9px;
+  background: #f9fafb; font-family: inherit; font-size: 13.5px; color: #111;
   outline: none; transition: border-color 0.2s, box-shadow 0.2s;
   &::placeholder { color: #aaa; }
   &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba(2,102,84,.10); background: #fff; }
-  &--pad-right { padding-right: 42px; }
+  &--pad-right { padding-right: 44px; }
 }
 
 .eye-btn {
-  position: absolute; right: 10px; background: none; border: none;
+  position: absolute; right: 11px; background: none; border: none;
   color: #666; cursor: pointer; display: flex; align-items: center; padding: 4px;
+  svg { width: 16px; height: 16px; }
   &:hover { color: $primary; }
 }
 
-.forgot-row { margin-bottom: 20px; }
+.forgot-row { margin-bottom: 22px; }
 .forgot-link {
   font-size: 10.5px; font-weight: 700; color: $primary; text-decoration: none;
   letter-spacing: 0.6px; text-transform: uppercase;
@@ -41,12 +42,12 @@ $primary: #026654;
 .error-msg { color: #dc2626; font-size: 12px; margin-bottom: 10px; }
 
 .submit-btn {
-  width: 100%; height: 44px; background: $primary; color: #fff; border: none;
-  border-radius: 8px; font-family: inherit; font-size: 13.5px; font-weight: 600;
+  width: 100%; height: 42px; background: $primary; color: #fff; border: none;
+  border-radius: 9px; font-family: inherit; font-size: 13.5px; font-weight: 600;
   cursor: pointer; transition: background 0.2s; margin-top: 4px;
   &:hover:not(:disabled) { background: color.adjust($primary, $lightness: -6%); }
   &:disabled { opacity: 0.62; cursor: not-allowed; }
 }
 
-.signup-row { font-size: 12px; color: #555; text-align: center; margin: 18px 0 0; }
+.signup-row { font-size: 12.5px; color: #555; text-align: center; margin: 20px 0 0; }
 .signup-link { color: $primary; font-weight: 600; text-decoration: none; &:hover { text-decoration: underline; } }

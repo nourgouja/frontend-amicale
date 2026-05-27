@@ -5,23 +5,23 @@
       <div class="auth-card">
         @if (success()) {
           <div class="success-state">
-            <h2 class="success-title">Request Sent!</h2>
-            <p class="success-sub">Your request has been received. The administrator will send an activation link shortly.</p>
-            <a routerLink="/login" class="back-login-link">Back to login</a>
+            <h2 class="success-title">Demande envoyée !</h2>
+            <p class="success-sub">Votre demande a été reçue. L'administrateur vous enverra un lien d'activation sous peu.</p>
+            <a routerLink="/login" class="back-login-link">Retour à la connexion</a>
           </div>
         } @else {
-          <h1 class="card-title">Create account</h1>
-          <p class="card-subtitle">Submit your details to request access.</p>
+          <h1 class="card-title">Créer un compte</h1>
+          <p class="card-subtitle">Soumettez vos informations pour demander l'accès.</p>
 
           <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
             <div class="field">
-              <label class="field-label" for="fullName">FULL NAME</label>
+              <label class="field-label" for="fullName">NOM COMPLET</label>
               <div class="input-wrap">
                 <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                 </svg>
                 <input id="fullName" type="text" formControlName="fullName" class="input"
-                       placeholder="Enter your full name" autocomplete="name"
+                       placeholder="Entrez votre nom complet" autocomplete="name"
                        [class.input--error]="form.get('fullName')?.invalid && form.get('fullName')?.touched" />
               </div>
             </div>
@@ -33,13 +33,13 @@
                   <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                 </svg>
                 <input id="email" type="email" formControlName="email" class="input"
-                       placeholder="name@star.tn" autocomplete="email"
+                       placeholder="nom@star.tn" autocomplete="email"
                        [class.input--error]="form.get('email')?.invalid && form.get('email')?.touched" />
               </div>
             </div>
 
             <div class="field">
-              <label class="field-label" for="telephone">PHONE NUMBER</label>
+              <label class="field-label" for="telephone">NUMÉRO DE TÉLÉPHONE</label>
               <div class="input-wrap">
                 <input id="telephone" type="tel" formControlName="telephone" class="input input--no-icon"
                        placeholder="+216" autocomplete="tel" />
@@ -65,12 +65,12 @@
             }
 
             <button type="submit" class="submit-btn" [disabled]="loading()">
-              {{ loading() ? 'Sending…' : 'SEND REQUEST' }}
+              {{ loading() ? 'Envoi en cours…' : 'ENVOYER LA DEMANDE' }}
             </button>
           </form>
 
           <p class="login-row">
-            Already have an account?&nbsp;<a routerLink="/login" class="login-link">Log in</a>
+            Vous avez déjà un compte ?&nbsp;<a routerLink="/login" class="login-link">Se connecter</a>
           </p>
         }
       </div>
@@ -84,9 +84,9 @@
   <footer class="auth-footer">
     <span>© 2026 AMICALE STAR</span>
     <div class="footer-links">
-      <a href="#">PRIVACY POLICY</a>
-      <a href="#">TERMS OF SERVICE</a>
-      <a href="#">SECURITY</a>
+      <a href="#">POLITIQUE DE CONFIDENTIALITÉ</a>
+      <a href="#">CONDITIONS D'UTILISATION</a>
+      <a href="#">SÉCURITÉ</a>
     </div>
   </footer>
 </div>

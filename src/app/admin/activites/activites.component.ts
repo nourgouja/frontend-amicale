@@ -92,9 +92,7 @@ export class ActivitesComponent implements OnInit, OnDestroy {
   currentPage = signal(1);
 
   filteredOffres = computed(() => {
-    let data = [...this.offres()].sort((a, b) =>
-      (b.dateDebut ?? '').localeCompare(a.dateDebut ?? '')
-    );
+    let data = [...this.offres()].sort((a, b) => b.id - a.id);
     const s = this.offreStatut();
     const q = this.offreSearch().toLowerCase().trim();
     if (s !== 'tout') data = data.filter(o => o.statutOffre === s);

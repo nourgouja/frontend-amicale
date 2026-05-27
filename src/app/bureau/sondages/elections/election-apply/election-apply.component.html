@@ -15,6 +15,14 @@
 
   @if (loading()) {
     <div class="loading-state"><div class="spinner"></div></div>
+  } @else if (loadError()) {
+    <div class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <p>{{ loadError() }}</p>
+      <button class="btn-secondary" style="margin-top:12px" (click)="back()">Retour</button>
+    </div>
   } @else if (call()) {
 
     <div class="call-banner">
@@ -34,6 +42,16 @@
         }
       </div>
     </div>
+
+    <!-- Deadline passed -->
+    @if (!call()!.canApply && !myApplication()) {
+      <div class="empty-state" style="margin-top:24px">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <p>La période de candidature est terminée.</p>
+      </div>
+    }
 
     <!-- Already applied: show status -->
     @if (myApplication()) {
@@ -76,8 +94,8 @@
       </div>
     }
 
-    <!-- Application form (only if not yet applied) -->
-    @if (!myApplication()) {
+    <!-- Application form (only if not yet applied and deadline not passed) -->
+    @if (!myApplication() && call()!.canApply) {
       <div class="form-card">
         <h2 class="form-title">Soumettre ma candidature</h2>
         <p class="form-subtitle">Vous ne pouvez postuler qu'une seule fois et pour un seul poste.</p>
@@ -104,19 +122,6 @@
               <span class="form-error">Veuillez sélectionner un poste</span>
             }
           </div>
-
-          <!-- Pole selector (only for RESPONSABLE_POLE) -->
-          @if (isResponsablePole()) {
-            <div class="form-group">
-              <label class="form-label">Pôle concerné <span class="req">*</span></label>
-              <select class="form-input form-select" formControlName="poleNom">
-                <option value="" disabled>Choisissez un pôle…</option>
-                @for (p of poles(); track p.id) {
-                  <option [value]="p.nom">{{ p.nom }}</option>
-                }
-              </select>
-            </div>
-          }
 
           <!-- Motivation -->
           <div class="form-group" [class.form-group--error]="isInvalid('motivation')">

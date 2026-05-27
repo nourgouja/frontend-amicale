@@ -44,8 +44,8 @@ export class LoginComponent {
         this.loading.set(false);
         this.errorMessage.set(
           err.status === 401
-            ? 'Invalid email or password.'
-            : 'An error occurred. Please try again.'
+            ? 'Email ou mot de passe incorrect.'
+            : 'Une erreur est survenue. Veuillez réessayer.'
         );
       },
     });

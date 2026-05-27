@@ -63,7 +63,7 @@ export class ResetPasswordModalComponent {
     this.http.post('/api/auth/change-password', payload).subscribe({
       next: () => {
         this.loading.set(false);
-        this.successMessage.set('Password updated successfully!');
+        this.successMessage.set('Mot de passe mis à jour avec succès !');
         this.authService.clearFirstLogin();
         
        
@@ -75,7 +75,7 @@ export class ResetPasswordModalComponent {
       error: (err) => {
         this.loading.set(false);
         this.errorMessage.set(
-          err.error?.message || 'An error occurred. Please try again.'
+          err.error?.message || 'Une erreur est survenue. Veuillez réessayer.'
         );
       },
     });

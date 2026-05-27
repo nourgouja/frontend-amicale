@@ -149,7 +149,9 @@ export class AdherentInscriptionsComponent implements OnInit {
       .length
   );
 
-  ngOnInit(): void { this.load(); }
+  secretaireEmail = signal<string | null>(null);
+
+  ngOnInit(): void { this.load(); this.loadSecretaire(); }
 
   private load(): void {
     this.loading.set(true);
@@ -157,6 +159,23 @@ export class AdherentInscriptionsComponent implements OnInit {
       next: list => { this.inscriptions.set(list); this.loading.set(false); },
       error: ()  => this.loading.set(false),
     });
+  }
+
+  private loadSecretaire(): void {
+    this.http.get<{ id: number; nom: string; prenom: string; poste: string | null; poleNom: string | null; email: string }[]>('/api/utilisateurs/membres-bureau').subscribe({
+      next: membres => {
+        const sec = membres.find(m => m.poste === 'SECRETARY');
+        this.secretaireEmail.set(sec?.email ?? null);
+      },
+    });
+  }
+
+  get mailtoSecretaire(): string {
+    const email = this.secretaireEmail();
+    if (!email) return 'mailto:';
+    const subject = encodeURIComponent('Demande concernant mon inscription – Amicale STAR');
+    const body = encodeURIComponent('Bonjour,\n\nJe me permets de vous contacter concernant mon inscription.\n\nCordialement,');
+    return `mailto:${email}?subject=${subject}&body=${body}`;
   }
 
   selectIns(ins: Inscription | null): void { this.selectedIns.set(ins); }

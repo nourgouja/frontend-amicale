@@ -55,6 +55,12 @@ export class ElectionCallService {
     );
   }
 
+  getCallById(id: number): Observable<ElectionCall | null> {
+    return this.http.get<ElectionCall>(`${this.base}/${id}`).pipe(
+      catchError(() => of(null))
+    );
+  }
+
   apply(callId: number, req: ApplyRequest, photo?: File): Observable<CandidateApplication> {
     const fd = new FormData();
     fd.append('position', req.position);

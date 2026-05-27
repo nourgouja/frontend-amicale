@@ -77,7 +77,7 @@ export class OffresComponent implements OnInit {
   loadOffres(): void {
     this.loading.set(true);
     this.http.get<Offre[]>('/api/offres/all').subscribe({
-      next:  res => { this.offres.set(res); this.loading.set(false); },
+      next:  res => { this.offres.set(res.sort((a, b) => b.id - a.id)); this.loading.set(false); },
       error: ()  => this.loading.set(false),
     });
   }

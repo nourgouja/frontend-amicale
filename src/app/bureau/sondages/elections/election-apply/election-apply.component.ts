@@ -2,7 +2,6 @@ import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { ElectionCallService } from '../../../../core/services/election-call.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CandidateApplication, ElectionCall } from '../../../../core/models/election-call.model';
@@ -21,15 +20,13 @@ export class ElectionApplyComponent implements OnInit {
   private route        = inject(ActivatedRoute);
   private router       = inject(Router);
   private fb           = inject(FormBuilder);
-  private http         = inject(HttpClient);
 
   call          = signal<ElectionCall | null>(null);
   myApplication = signal<CandidateApplication | null>(null);
   loading       = signal(true);
+  loadError     = signal('');
   submitting    = signal(false);
   toast         = signal<{ msg: string; type: 'success' | 'error' } | null>(null);
-  poles         = signal<{ id: number; nom: string }[]>([]);
-
   photoFile    = signal<File | null>(null);
   photoPreview = signal<string | null>(null);
   photoError   = signal('');
@@ -51,24 +48,23 @@ export class ElectionApplyComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.http.get<{ id: number; nom: string }[]>('/api/poles').subscribe({
-      next: list => this.poles.set(list),
-      error: ()   => {},
-    });
-
     this.callService.getActiveCall().subscribe({
       next: activeCall => {
-        if (!activeCall || activeCall.id !== this.callId) {
-          this.back();
+        if (!activeCall) {
+          this.loadError.set("Aucun appel à candidature actif.");
+          this.loading.set(false);
           return;
         }
         this.call.set(activeCall);
-        this.callService.getMyApplication(this.callId).subscribe({
+        this.callService.getMyApplication(activeCall.id).subscribe({
           next: app => { this.myApplication.set(app); this.loading.set(false); },
           error: () => this.loading.set(false),
         });
       },
-      error: () => { this.loading.set(false); this.back(); },
+      error: () => {
+        this.loadError.set("Impossible de charger l'appel à candidature.");
+        this.loading.set(false);
+      },
     });
   }
 
@@ -112,7 +108,7 @@ export class ElectionApplyComponent implements OnInit {
       motivation: this.form.value.motivation!.trim(),
     };
 
-    this.callService.apply(this.callId, req, this.photoFile()!).subscribe({
+    this.callService.apply(this.call()!.id, req, this.photoFile()!).subscribe({
       next: app => {
         this.myApplication.set(app);
         this.submitting.set(false);
@@ -132,7 +128,7 @@ export class ElectionApplyComponent implements OnInit {
 
   back(): void {
     if (this.router.url.startsWith('/adherent')) {
-      this.router.navigate(['/adherent/dashboard']);
+      this.router.navigate(['/adherent/elections']);
     } else {
       this.router.navigate(['/bureau/elections']);
     }

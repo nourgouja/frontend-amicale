@@ -21,7 +21,7 @@
       <app-kpi-card label="Utilisateurs" [value]="d.totalUtilisateurs" icon="users" color="primary"
         [breakdown]="[
           { label: 'Administrateurs', count: d.parRole['ADMIN'] ?? 0 },
-          { label: 'Membres Bureau',  count: d.parRole['BUREAU'] ?? 0 },
+          { label: 'Membres Bureau',  count: d.parRole['MEMBRE_BUREAU'] ?? 0 },
           { label: 'Adhérents',       count: d.parRole['ADHERENT'] ?? 0 }
         ]" />
       <app-kpi-card label="Inscriptions" [value]="d.totalInscriptions" icon="clipboard-clock" color="primary"

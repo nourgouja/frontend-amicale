@@ -47,7 +47,7 @@ export class RegisterComponent {
       cin:           val.cin || undefined,
     }).subscribe({
       next:  () => { this.loading.set(false); this.success.set(true); },
-      error: () => { this.loading.set(false); this.error.set('An error occurred. Please try again.'); },
+      error: () => { this.loading.set(false); this.error.set('Une erreur est survenue. Veuillez réessayer.'); },
     });
   }
 }

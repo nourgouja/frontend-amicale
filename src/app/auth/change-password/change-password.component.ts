@@ -63,13 +63,13 @@ export class ChangePasswordComponent {
     this.http.post('/api/auth/change-password', payload).subscribe({
       next: () => {
         this.loading.set(false);
-        this.successMessage.set('Password changed successfully.');
+        this.successMessage.set('Mot de passe modifié avec succès.');
         this.authService.clearFirstLogin();
         this.router.navigate(['/home']);
       },
       error: () => {
         this.loading.set(false);
-        this.errorMessage.set('An error occurred. Please try again.');
+        this.errorMessage.set('Une erreur est survenue. Veuillez réessayer.');
       },
     });
   }
