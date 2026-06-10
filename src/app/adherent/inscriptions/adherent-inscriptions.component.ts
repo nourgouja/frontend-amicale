@@ -116,8 +116,7 @@ export class AdherentInscriptionsComponent implements OnInit {
       .filter(i => i.statut === 'APPROVED')
       .filter(i => {
         if (!i.dateDebutOffre) return true;
-        if (new Date(i.dateDebutOffre) >= today) return true;
-        // past offer: exclude only if fully paid
+        if (this.parseLocalDate(i.dateDebutOffre) >= today) return true;
         const echs = i.echeances ?? [];
         const fullyPaid = echs.length > 0 ? echs.every(e => e.statut === 'PAID') : true;
         return !fullyPaid;
@@ -131,7 +130,7 @@ export class AdherentInscriptionsComponent implements OnInit {
       .filter(i => i.statut === 'PENDING')
       .filter(i => {
         if (!i.dateDebutOffre) return true;
-        if (new Date(i.dateDebutOffre) >= today) return true;
+        if (this.parseLocalDate(i.dateDebutOffre) >= today) return true;
         const echs = i.echeances ?? [];
         const fullyPaid = echs.length > 0 ? echs.every(e => e.statut === 'PAID') : true;
         return !fullyPaid;
@@ -217,6 +216,11 @@ export class AdherentInscriptionsComponent implements OnInit {
 
   paidCount(ins: Inscription): number {
     return ins.echeances?.filter(e => e.statut === 'PAID').length ?? 0;
+  }
+
+  private parseLocalDate(s: string): Date {
+    const [y, m, d] = s.split('-').map(Number);
+    return new Date(y, m - 1, d);
   }
 
   formatDate(s: string): string { return s ? formatDate(s) : '—'; }

@@ -256,6 +256,23 @@
 
 .panel-body { padding: $space-4 $space-5; display: flex; flex-direction: column; gap: $space-3; }
 
+.panel-actions {
+  display: flex; gap: $space-2; padding: $space-4 $space-5;
+  border-top: 1px solid $color-border;
+}
+.pa-btn {
+  flex: 1; height: 38px; border-radius: $radius-md;
+  font-family: $font-base; font-size: $font-size-sm; font-weight: 600;
+  cursor: pointer; border: none; transition: background $transition-fast, color $transition-fast;
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &--ghost   { background: transparent; border: 1.5px solid $color-border; color: $color-text;
+               &:hover:not(:disabled) { background: $color-bg; } }
+  &--primary { background: $color-primary; color: #fff;
+               &:hover:not(:disabled) { background: $color-primary-dark; } }
+  &--danger  { background: transparent; border: 1.5px solid rgba(220,38,38,0.35); color: $color-error;
+               &:hover:not(:disabled) { background: rgba(220,38,38,0.06); } }
+}
+
 .type-badge {
   display: inline-flex; align-items: center;
   padding: 4px 10px; border-radius: $radius-full;

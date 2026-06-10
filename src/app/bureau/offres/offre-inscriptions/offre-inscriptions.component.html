@@ -448,6 +448,23 @@
         </div>
 
       </div>
+
+      <div class="panel-actions">
+        @if (o.statutOffre === 'OPEN') {
+          <button class="pa-btn pa-btn--ghost" [disabled]="offreActionLoading() !== null"
+                  (click)="onFermer()">
+            {{ offreActionLoading() === 'fermer' ? '…' : 'Fermer' }}
+          </button>
+        }
+        <button class="pa-btn pa-btn--primary" (click)="onModifier()">Modifier</button>
+        @if (o.statutOffre !== 'CANCELLED') {
+          <button class="pa-btn pa-btn--danger" [disabled]="offreActionLoading() !== null"
+                  (click)="onArchiver()">
+            {{ offreActionLoading() === 'archiver' ? '…' : 'Archiver' }}
+          </button>
+        }
+      </div>
+
     </aside>
   }
 

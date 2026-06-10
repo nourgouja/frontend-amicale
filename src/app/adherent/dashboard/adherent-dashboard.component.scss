@@ -560,7 +560,7 @@
 }
 
 .convention-card {
-  flex: 0 0 260px; width: 260px; height: 72px;
+  flex: 0 0 320px; width: 320px; height: 80px;
   display: flex; flex-direction: row;
   border-radius: $radius-xl; overflow: hidden;
   border: 1px solid #D1D5DB; background: $color-surface;
@@ -571,7 +571,7 @@
 }
 
 .convention-img {
-  flex: 0 0 110px; width: 110px; height: 100%;
+  flex: 0 0 180px; width: 180px; height: 100%;
   overflow: hidden; background: #1B5E3B;
 }
 

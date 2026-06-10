@@ -97,7 +97,11 @@ export class BureauOffresComponent implements OnInit {
     if (q) data = data.filter(o =>
       o.titre.toLowerCase().includes(q) || (o.lieu ?? '').toLowerCase().includes(q)
     );
-    return data;
+    return [...data].sort((a, b) => {
+      const ta = a.createdAt ? new Date(a.createdAt).getTime() : a.id;
+      const tb = b.createdAt ? new Date(b.createdAt).getTime() : b.id;
+      return tb - ta;
+    });
   });
 
   ngOnInit(): void {

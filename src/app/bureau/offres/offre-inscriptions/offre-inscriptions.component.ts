@@ -240,6 +240,47 @@ export class OffreInscriptionsComponent implements OnInit {
     }
   }
 
+  offreActionLoading = signal<string | null>(null);
+
+  onModifier(): void {
+    const o = this.offre();
+    if (o) this.router.navigate(['/bureau/offres', o.id, 'edit']);
+  }
+
+  onFermer(): void {
+    const o = this.offre();
+    if (!o) return;
+    this.offreActionLoading.set('fermer');
+    this.http.patch(`/api/offres/fermer/${o.id}`, {}).subscribe({
+      next: () => {
+        this.offre.update(v => v ? { ...v, statutOffre: 'CLOSED' } : v);
+        this.offreActionLoading.set(null);
+        this.showToast('Offre fermée.', 'success');
+      },
+      error: (err) => {
+        this.offreActionLoading.set(null);
+        this.showToast(err?.error?.message ?? 'Impossible de fermer cette offre.', 'error');
+      },
+    });
+  }
+
+  onArchiver(): void {
+    const o = this.offre();
+    if (!o) return;
+    this.offreActionLoading.set('archiver');
+    this.http.patch(`/api/offres/archiver/${o.id}`, {}).subscribe({
+      next: () => {
+        this.offre.update(v => v ? { ...v, statutOffre: 'ARCHIVEE' } : v);
+        this.offreActionLoading.set(null);
+        this.showToast('Offre archivée.', 'success');
+      },
+      error: (err) => {
+        this.offreActionLoading.set(null);
+        this.showToast(err?.error?.message ?? 'Impossible d\'archiver cette offre.', 'error');
+      },
+    });
+  }
+
   goBack(): void { this.router.navigate(['/bureau/offres']); }
   onSearch(e: Event): void { this.searchTerm.set((e.target as HTMLInputElement).value); }
   setStatut(s: string): void { this.statutFilter.set(s); }

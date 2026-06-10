@@ -38,7 +38,6 @@ export class AdherentCotisationComponent implements OnInit {
   inscriptions = signal<InscriptionSummary[]>([]);
   loading      = signal(true);
 
-  // Only CONFIRMEE inscriptions with echeances
   confirmed = computed(() =>
     this.inscriptions().filter(i => i.statut === 'APPROVED' && i.echeances?.length > 0)
   );
